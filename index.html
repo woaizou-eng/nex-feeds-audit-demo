@@ -11939,7 +11939,7 @@ function renderHumanStage() {
       t.enabled
         ? v5AgentTable(a)
         : '<div class="muted">未开启时直接进入人工标注，免人审判断仍在 Agent 辅助标注之前执行。</div>'
-    }</div></section><section class="panel"><div class="panel-head"><span class="stage-step">3</span>人工标注</div><div class="panel-body">${nodeTemplateSummary()}<div id="human-distribution"></div><div class="task-row"><label>审核模式</label><div class="rv3-biz-mode"><strong>${esc(rev3BizAuditScheme(taskDraft))}</strong><small>BIZ 流程属性</small></div></div><div class="task-row"><label>标注模式</label><select class="small-select" id="annotation-mode">${options(revAnnotationChoices(taskDraft), e.annotationMode)}</select></div><div id="human-work-options"></div></div></section>`),
+    }</div></section><section class="panel"><div class="panel-head"><span class="stage-step">3</span>人工标注</div><div class="panel-body">${nodeTemplateSummary()}<div id="human-distribution"></div><div class="task-row"><label>标注模式</label><select class="small-select" id="annotation-mode">${options(revAnnotationChoices(taskDraft), e.annotationMode)}</select></div><div id="human-work-options"></div></div></section>`),
     renderExemptionTasks(),
     ($("#agent-enabled").onclick = () => {
       ((t.enabled = !t.enabled), renderHumanStage());
