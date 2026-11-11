@@ -3707,6 +3707,11 @@ span.v6-new,
 <style id="rev12-compute-style">.r12-compute-heading{display:flex;align-items:center;gap:10px}.r12-compute-heading h1{margin-right:0}.r12-compute-notice{padding:12px 16px;margin:0 0 20px;background:#f6f5ff;color:#65627b;border:1px solid #e6e2fa;border-radius:6px;font-size:12px;line-height:1.6}.r12-compute-muted{display:block;font-size:11px;color:#8992a4;margin-top:4px}.r12-compute-basics{display:grid;grid-template-columns:2fr 1fr;gap:24px}.r12-compute-editor>.task-row{grid-template-columns:230px 1fr}.r12-compute-control .small-select{min-width:250px;max-width:500px}.r12-compute-drawer{width:min(1100px,96vw)!important}.r12-compute-tabs{margin-top:20px}.r12-compute-global,.r12-compute-rule-tools{display:flex;gap:12px;align-items:center;margin-bottom:14px}.r12-compute-global select,.r12-compute-rule-tools select{border:1px solid #dce1ed;border-radius:5px;padding:8px 12px;color:#56627b;background:#fff;margin-left:8px}.r12-compute-rule{display:grid;grid-template-columns:minmax(250px,2fr) auto minmax(110px,.7fr) minmax(120px,1fr) auto;gap:10px;align-items:center;margin-bottom:12px}.r12-compute-rule:has(select[data-cp-output]){grid-template-columns:minmax(200px,1.7fr) minmax(100px,1fr) minmax(100px,.7fr) minmax(120px,1fr) auto}.r12-compute-rule:not(:has(select[data-cp-output])){grid-template-columns:minmax(250px,2fr) minmax(110px,.7fr) minmax(120px,1fr) auto}.r12-compute-rule input,.r12-compute-rule select{min-width:0;width:100%;padding:9px;border:1px solid #dce1ed;border-radius:5px;color:#56627b;background:#fff}.r12-compute-rule .np7-trigger{min-width:0}.r12-compute-rule .np7-trigger strong{font-size:12px}.r12-compute-rule .np7-trigger small{font-size:10px}.r12-compute-pending{color:#a16b19}.r12-compute-matched{color:#398365}.r12-compute-fallback{color:#6976a5}.r12-sort-value{display:flex;flex-direction:column;gap:4px;min-width:110px}.r12-sort-value small{font-size:10px;color:#9a7728}
 </style>
 <style id="rev12-final-layout">.r9-dataset-table th:nth-child(3),.r9-dataset-table td:nth-child(3){min-width:110px}.r9-dataset-table th:nth-child(5),.r9-dataset-table td:nth-child(5){min-width:70px;white-space:nowrap}[data-nav="机审算力配置"]{gap:7px;padding-left:11px;padding-right:8px}[data-nav="机审算力配置"] .navtext{font-size:12px;white-space:nowrap}[data-nav="机审算力配置"] .r8-new{margin-left:0;font-size:8px;padding:0 3px}</style>
+<style id="rev13-api-style">.nex-datasets .ds-bizsettings .dsf-label{white-space:nowrap;justify-self:end}@media(max-width:625px){.nex-datasets .ds-bizsettings .dsf-label{justify-self:start}}</style>
+<style id="rev13-flow-style">.r13-flow-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}.r13-members-head{display:flex;justify-content:space-between;align-items:center;margin:18px 0 10px}.r13-pending-members{max-height:180px;overflow:auto;border:1px solid #e2e7f1;border-radius:6px;padding:10px}.r13-pending-members>label{display:flex;gap:10px;align-items:center;padding:8px}.r13-pending-members small{display:block;color:#8a94a9;margin-top:4px}.r13-members{max-height:220px;overflow:auto}.r13-members th{position:sticky;top:0;background:#f6f8fc;z-index:1}
+.r12-flow-field[hidden]{display:none!important}
+.r13-flow-name small{display:block;margin-top:4px;color:#8a94a9;font-size:11px;white-space:nowrap}
+</style>
 </head>
 <body>
   <header><div class="logo">NEX</div><button class="space" id="space"><em>✦</em> 官方测试空间 <span class="chevron">▼</span></button><nav class="topnav"><button class="active">管理中心</button><button>作业中心</button><button>HCM</button><button>AI Workshop</button><button>平台工坊</button></nav><div class="account"><button class="round" id="help" aria-label="Demo 使用说明">♧</button><button class="round" id="export" title="导出算子配置" aria-label="导出算子配置">▣</button><span class="avatar">管</span><button class="accountname" id="account">业务空间管理员 <span class="chevron">▼</span></button></div></header>
@@ -3996,37 +4001,48 @@ function assetIds(){
 }
 function assetPriority(id){const n=s.cfg.dsPriority?.[id];return n!==''&&Number.isFinite(Number(n))?Number(n):1;}
 function assetMethod(source){return source.mode==='Excel'?'本地上传':source.mode;}
+function dsApiMetadata(source){
+  const value={...source},record={...(source.record||{})},tags=[...(source.tags||[])];
+  const saved=record.bizData||source.bizData||record.legacyApiSettings||{};
+  const legacyTypes=tags.filter(t=>['业务数据','订正数据'].includes(t));
+  const type=['业务数据','订正数据'].includes(saved.type)?saved.type:legacyTypes.includes('订正数据')?'订正数据':'业务数据';
+  if(source.method==='API')record.bizData={...saved,advanced:false,type,resubmit:['是','否'].includes(saved.resubmit)?saved.resubmit:''};
+  else {if(record.bizData||source.bizData||legacyTypes.length)record.legacyApiSettings={...saved,type};delete record.bizData;}
+  delete value.bizData;value.record=record;value.tags=[...new Set(tags.filter(t=>!['业务数据','订正数据'].includes(t)))];return value;
+}
 function dsStatTags(record){
-  const tags=[...(record.tags||[])];
+  const tags=[...(record.tags||[])].filter(t=>!['业务数据','订正数据'].includes(t));
   if(record.statsTagsEdited)return tags;
   const flow=dsFlows().find(f=>String(f.id)===String(record.flowId)),group=dsGroups().find(g=>String(g.id)===String(record.groupId||flow?.groupId));
   if(group)tags.push('分组：'+group.name);
   if(flow)tags.push('流程：'+flow.name+(flow.bizId?'（BIZ '+flow.bizId+'）':''));
-  if(record.record?.bizData?.type)tags.push(record.record.bizData.type);
   return [...new Set(tags)];
 }
 function assetMeta(id){
   id=String(id);
   const local=s.dsCatalog?.[id];
-  if(local)return {...local.record,...local,id,tags:dsStatTags(local),indexed:(local.fields||[]).filter(f=>f.indexed).map(f=>f.name)};
+  if(local){const value=dsApiMetadata(local);return {...value.record,...value,id,tags:dsStatTags(value),indexed:(value.fields||[]).filter(f=>f.indexed).map(f=>f.name)};}
   const preset=dsPreset(id);if(!preset)return undefined;
   const old=s.cfg.datasetMeta?.[id]||{};
   const indexed=old.indexed||['source_dataset_id','content_type','black_shop'];
-  return {id,name:old.name||preset.name,tags:dsStatTags({...old,flowId:old.flowId||DSG_FLOW.id,tags:old.tags||[ASSET_SOURCE_TAGS[id]].filter(Boolean)}),
+  return dsApiMetadata({id,name:old.name||preset.name,tags:[...(old.tags||[ASSET_SOURCE_TAGS[id]].filter(Boolean)),...dsStatTags({...old,flowId:old.flowId||DSG_FLOW.id,tags:[]})],
     auditObject:old.auditObject||'内容',type:old.type||'通用数据集',scenario:old.scenario||'',method:old.method||assetMethod(preset),
     admins:[ASSET_INITIAL.includes(id)?'当前用户':'推荐运营'],project:'',flowId:DSG_FLOW.id,sourceKind:preset.detail?preset.source:'',sourceId:id,sourceCode:preset.code||'',
-    fields:ASSET_PRESET_FIELDS.map(f=>({...f,indexed:indexed.includes(f.name)})),indexed,record:{},preset:true};
+    fields:ASSET_PRESET_FIELDS.map(f=>({...f,indexed:indexed.includes(f.name)})),indexed,record:{...(old.record||{}),...(!old.record?.bizData&&old.bizData?{bizData:old.bizData}:{})},preset:true});
 }
 function assetBoundForSource(sourceId){return assetIds().filter(id=>assetMeta(id)?.sourceId===String(sourceId));}
 const sourceTagPalette={"magenta": "#c41d7f", "red": "#cf1322", "volcano": "#d4380d", "orange": "#d46b08", "gold": "#ad8b00", "lime": "#658a05", "green": "#389e0d", "cyan": "#08979c", "blue": "#1677ff", "geekblue": "#2f54eb", "purple": "#722ed1"}; const tagKey=c=>({"绿":"green","红":"red"}[c]||c);
 function dsTagOptions(){
-  if(Array.isArray(s.dsTags)){const names=new Set(s.dsTags.map(t=>t.name));return [...s.dsTags,...['业务数据','订正数据',...dsGroups().map(g=>'分组：'+g.name),...dsFlows().map(f=>'流程：'+f.name+(f.bizId?'（BIZ '+f.bizId+'）':''))].filter(n=>!names.has(n)).map(name=>({name,color:'purple'}))];}
-  const names=new Set(['信息流一审数据集','业务数据','订正数据',...dsGroups().map(g=>'分组：'+g.name),...dsFlows().map(f=>'流程：'+f.name+(f.bizId?'（BIZ '+f.bizId+'）':'')),...Object.values(ASSET_SOURCE_TAGS)]);
-  assetAllIds().forEach(id=>(assetMeta(id)?.tags||[]).forEach(n=>names.add(n)));
-  return [...names].map((name,i)=>({name,color:i%2===0?'绿':'红'}));
+  const reserved=name=>['业务数据','订正数据'].includes(name);
+  const base=Array.isArray(s.dsTags)?s.dsTags.filter(t=>!reserved(t.name)):[];
+  const names=new Set(['信息流一审数据集',...dsGroups().map(g=>'分组：'+g.name),...dsFlows().map(f=>'流程：'+f.name+(f.bizId?'（BIZ '+f.bizId+'）':'')),...Object.values(ASSET_SOURCE_TAGS)]);
+  assetAllIds().forEach(id=>(assetMeta(id)?.tags||[]).filter(t=>!reserved(t)).forEach(n=>names.add(n)));
+  const existing=new Set(base.map(t=>t.name));return [...base,...[...names].filter(n=>!existing.has(n)&&!reserved(n)).map((name,i)=>({name,color:i%2===0?'绿':'红'}))];
 }
+
 function dsAddTag(name,color){
   const label=String(name||'').trim();
+  if(['业务数据','订正数据'].includes(label))return '这是 API 数据类型，请在数据导入配置中选择。';
   if(!label||!Object.hasOwn(sourceTagPalette,tagKey(color)))return '请填写标签名称并选择颜色。';
   if(dsTagOptions().some(t=>t.name===label))return '这个标签名称已存在。';
   s.dsTags=[...dsTagOptions(),{name:label,color}];return '';
@@ -4043,7 +4059,7 @@ function assetSafeDetails(form){
     record.upload={filename:upload.filename||upload.name,sheet:upload.sheet||upload.sheetName,count:upload.count,format:upload.format};
   }
   for(const k of ['bizData','advanced','extension','extensions','circleData','circle','selection','apiReference','sourceRef','sourceName','filterRule','projectName']){
-    if(r[k]!==undefined)record[k]=r[k];
+    if(r[k]!==undefined&&(k!=='bizData'||form.method==='API'))record[k]=r[k];
   }
   return record;
 }
@@ -4060,7 +4076,7 @@ function dsCommit(form){
   const sourceId=String(form.sourceId||'');
   if(sourceId&&!dsPreset(sourceId))return '关联的 BIZ 来源不在已核对的清单内。';
   const tagFlows=dsFlows().filter(f=>(form.tags||[]).includes('流程：'+f.name+(f.bizId?'（BIZ '+f.bizId+'）':'')));
-  const model={name,statsTagsEdited:true,sourceOnly:!!form.sourceOnly,priority:r10Finite(form.priority)?Number(form.priority):old?.priority??1,admins:[...(form.admins||form.admin||[])],tags:[...new Set(form.tags||[])],project:form.project||'',
+  const model={name,statsTagsEdited:true,sourceOnly:!!form.sourceOnly,priority:r10Finite(form.priority)?Number(form.priority):old?.priority??1,admins:[...(form.admins||form.admin||[])],tags:[...new Set(form.tags||[])].filter(t=>!['业务数据','订正数据'].includes(t)),project:form.project||'',
     auditObject:form.auditObject||old?.auditObject||'内容',type:form.type,method:form.method,scenario:form.scenario||'',flowId:form.flowId||'',sourceKind:form.sourceKind||form.apiSource||'',
     sourceId,fields:(form.fields||[]).map(f=>({name:f.name,description:f.description||'',type:f.type,indexed:!!f.indexed,primary:!!f.primary})),
     record:assetSafeDetails(form)};
@@ -4129,7 +4145,7 @@ function dsBizCriteriaData(id){
   const sourceDataType=preset&&verifiedBusinessIds.includes(String(id))?'业务数据':'';
   return {code:a.record?.sourceRef||a.sourceCode||a.code||preset?.code||linkedSource?.code||'',
     object:a.auditObject||a.object||a.record?.auditObject||flow?.auditObject||(id==='DEMO-ADS'?'广告素材':'内容'),
-    dataType:(a.tags||[]).find(t=>['业务数据','订正数据'].includes(t))||(a.statsTagsEdited?'':a.record?.bizData?.type||a.bizData?.type||sourceDataType),
+    dataType:a.method==='API'?(a.record?.bizData?.type||sourceDataType):'',
     importType:a.method==='本地上传'?'Excel':a.method,
     source:dsfSourceKind(a.sourceKind||'')};
 }
@@ -4191,7 +4207,7 @@ function assetDetailView(id){
       ...(o?[['ODPS 表名',assetShowValue(o.table)],['调度周期',assetShowValue(o.cycle)],...(o.partition?[['分区',esc(o.partition)]]:[]),['授权方式',assetShowValue(o.auth)]]:[]),
       ['105317 任务',esc(status)]
     ])+
-    (a.type==='业务数据集'&&a.scenario==='信息流推荐'?correctionEntry(id):'')+'<h4>字段配置</h4>'+(fields.length?'<div class="dc-scroll">'+table(['主键','字段名称','描述','支持检索','数据类型'],fields.map(f=>[
+    (a.method==='API'?correctionEntry(id):'')+'<h4>字段配置</h4>'+(fields.length?'<div class="dc-scroll">'+table(['主键','字段名称','描述','支持检索','数据类型'],fields.map(f=>[
       f.primary?'是':'—',esc(f.name),esc(f.description||'—'),f.indexed?'是':'否',esc(f.type||'—')
     ]))+'</div>':'<p>暂无字段。</p>')+'</div><footer class="f-foot">'+
     (s.dsCatalog?.[id]?btn('编辑数据集','asset-edit',id):'')+btn('关闭','asset-close')+'</footer>';
@@ -4217,6 +4233,7 @@ function assetWriteTags(id,tags){
 }
 function assetSaveTag(a){
   const name=String(a.name||'').trim();
+  if(['业务数据','订正数据'].includes(name)){a.error='这是 API 数据类型，请在数据导入配置中选择。';return;}
   if(!a.oldName){a.error=dsAddTag(name,a.color);}
   else{
     if(!name){a.error='请输入标签名称。';return;}
@@ -4459,9 +4476,9 @@ function dsGroupChange(key,value) {
 
 // Read only the resource's saved configuration. Linking to a BIZ source does not copy its flags.
 function correctionFields(id) {
-  const asset=assetMeta(id);if(!asset)return '';
+  const asset=assetMeta(id);if(!asset||asset.method!=='API')return '';
   const setup=asset.record?.bizData;
-  return '<dl class="dsc-values"><div><dt>数据分类</dt><dd>'+esc((asset.tags||[]).filter(t=>['业务数据','订正数据'].includes(t)).join('、')||setup?.type||'未标记')+'</dd></div><div><dt>已审可重新送审</dt><dd>'+esc(setup?.resubmit||'暂不配置')+' · 执行层待研发对齐</dd></div></dl>';
+  return '<dl class="dsc-values"><div><dt>已审可重新送审</dt><dd>'+esc(setup?.resubmit||'暂不配置')+'</dd></div><div><dt>数据类型</dt><dd>'+esc(setup?.type||'业务数据')+'</dd></div></dl>';
 }
 
 function correctionEntry(id) {
@@ -4491,13 +4508,13 @@ function dsFormOpen(origin='resource',editId='') {
   const method=composeSources?'关联已有送审源':prev?.method||'';
   const fields=prev?.fields?.map(f=>({...dsEmptyField(),...f}))||[dsEmptyField()];
   s.temp.dsForm={
-    origin,editId,composeSources,sourceOnly:false,priority:editId?r12SourcePriority(editId,editId).value:1,name:prev?.name||'',admins:[...(prev?.admins||['当前用户'])],tags:[...new Set([...(prev?.tags||[]),...(keep.bizData?.type?[keep.bizData.type]:[])])],project:prev?.project||'',
+    origin,editId,composeSources,sourceOnly:false,priority:editId?r12SourcePriority(editId,editId).value:1,name:prev?.name||'',admins:[...(prev?.admins||['当前用户'])],tags:[...new Set(prev?.tags||[])].filter(t=>!['业务数据','订正数据'].includes(t)),project:prev?.project||'',
     auditObject:prev?.auditObject||keep.auditObject||'内容',type:prev?.type||'业务数据集',scenario:prev?.scenario||'',flowId:prev?.flowId||'',method,fields,
     sourceKind:dsfSourceKind(prev?.sourceKind),sourceId:prev?.sourceId||'',
     sourceRef:keep.sourceRef||FLOW_SOURCE.datasets.find(d=>d.id===prev?.sourceId)?.code||'',
     odps:{table:'',partition:'',cycle:'',auth:'应用账号授权',mapping:false,...keep.odps},upload:keep.upload||null,
     parsed:!!(editId&&method&&method!=='API'&&fields.some(f=>f.name)),advanced:JSON.parse(JSON.stringify(keep.advanced||{})),
-    bizData:{advanced:false,type:'业务数据',resubmit:'',...(keep.bizData||{})},
+    bizData:{advanced:false,type:'业务数据',resubmit:'',...(keep.bizData||keep.legacyApiSettings||{})},
     sourceMembers:editId?structuredClone(r8GetPackage(editId)?.members||[]):[],sourceSearch:'',live:false,tagName:'',tagColor:'红',projectDraft:'',pop:'',error:''
   };
   s.modal=origin==='task'?'ds-form':'';
@@ -4549,9 +4566,9 @@ function dsfBase(a){
     dsfSelect('tagColor',tagKey(a.tagColor),Object.keys(sourceTagPalette),'标签颜色')+'<small>使用场景：数据集 / 任务</small>'+dsfAct('保存标签','tag-add')+dsfLink('取消','pop','')+'</div>':'';
   const projectInput=a.pop==='project-new'?'<div class="dsf-inline">'+dsfInput('projectDraft',a.projectDraft,'项目名称','演练项目名称','maxlength="48"')+
     dsfAct('保存项目','project-add')+dsfLink('取消','pop','')+'</div>':'';
-  return '<div class="dsf-base">'+dsfRow('数据集名称',dsfInput('name',a.name,'数据集名称','请输入','maxlength="80"'),'*')+
+  return (a.allowUnassignedFlow?'<p class="info">先保存普通数据集，再回到上一层关联流程。</p>':'')+'<div class="dsf-base">'+dsfRow('数据集名称',dsfInput('name',a.name,'数据集名称','请输入','maxlength="80"'),'*')+
     dsfRow('管理员',dsfPicker(a,'admins','管理员',['当前用户','推荐运营','推荐产品']),'*')+
-    (!a.live&&!a.sourceOnly?dsfRow('所属流程','<select class="f-in" data-dsf="flowId" aria-label="所属流程" '+(a.editId&&r12DatasetFlowLocked(a.editId)?'disabled':'')+'><option value="">请选择所属流程</option>'+dsFlows().map(f=>'<option value="'+esc(f.id)+'" '+(String(f.id)===String(a.flowId)?'selected':'')+'>'+esc(f.name+(f.bizId?' · BIZ '+f.bizId:''))+'</option>').join('')+'</select><small>任务在所属流程内使用此数据集；标签仅用于分类。</small>','*'):'')+
+    (!a.live&&!a.sourceOnly&&!a.allowUnassignedFlow?dsfRow('所属流程','<select class="f-in" data-dsf="flowId" aria-label="所属流程" '+(a.editId&&r12DatasetFlowLocked(a.editId)?'disabled':'')+'><option value="">请选择所属流程</option>'+dsFlows().map(f=>'<option value="'+esc(f.id)+'" '+(String(f.id)===String(a.flowId)?'selected':'')+'>'+esc(f.name+(f.bizId?' · BIZ '+f.bizId:''))+'</option>').join('')+'</select><small>任务在所属流程内使用此数据集；标签仅用于分类。</small>','*'):'')+
     (!a.live&&!a.composeSources?dsfRow('优先级','<input class="f-in" type="number" step="any" data-dsf="priority" aria-label="数据集优先级" value="'+esc(r10Finite(a.priority)?a.priority:'')+'" placeholder="请输入优先级"><small>数字越大越优先；关联任务统一使用，不在任务中重复配置。</small>'+(a.editId?r12PriorityConflictHTML(a.editId,a.editId):''),'*'):'')+
     dsfRow('标签',window.nexTagPicker.control('dataset',a.tags||[])+'<small class="nt10-help">选填，按类型选择。仅用于查询与统计。</small>')+
     dsfRow('关联项目','<div class="dsf-inline">'+dsfSelect('project',a.project,[['','请选择'],...new Set([...(s.dsProjects||[]),...(a.project?[a.project]:[])])],'关联项目')+dsfLink('新建项目','pop','project-new')+'</div>'+projectInput)+
@@ -4571,7 +4588,8 @@ function dsfProposal(a){
     (a.sourceKind?picker+dsfRow('数据集code',code,'*'):'')+'</div>';
 }
 function dsfBizSettings(a){
-  return '<section class="ds-bizsettings">'+dsfRow('已审可重新送审',dsfSelect('biz:resubmit',a.bizData.resubmit,[['','暂不配置'],'是','否'],'已审可重新送审')+'<small>可选项。过滤放在数据集还是分配环节、所需字段与执行规则待研发对齐；本演练只保存配置。</small>')+
+  return '<section class="ds-bizsettings">'+dsfRow('已审可重新送审',dsfSelect('biz:resubmit',a.bizData.resubmit,[['','暂不配置'],'是','否'],'已审可重新送审')+'<small>可选项。本演练保存配置，执行规则待研发对齐。</small>')+
+    dsfRow('数据类型',dsfChoose('biz:type',a.bizData.type||'业务数据','数据类型',['业务数据','订正数据']),'*')+
     '<details class="dsc-example"><summary>覆盖 · 规则待核</summary><div class="dsc-coverage">'+correctionCoverage()+'</div></details></section>';
 }
 
@@ -4672,9 +4690,9 @@ function dsFormView(){
   const general=a.type==='通用数据集',recommended=!general&&a.scenario==='信息流推荐'&&!a.live,compose=a.composeSources&&!a.live&&!a.sourceOnly;
   const hasImport=general||recommended,api=hasImport&&a.method==='API',flow=dsFlows().find(x=>x.id===a.flowId);
   const mode=dsfLink(a.live?'返回迁移方案':'查看现网','mode');
-  const imports=compose?dsfRow('送审源',r9SourceForm(a),'*')+(recommended?dsfBizSettings(a):'')+(a.sourceMembers?.length?dsfAdvanced(a):''):
+  const imports=compose?dsfRow('送审源',r9SourceForm(a),'*')+(a.sourceMembers?.length?dsfAdvanced(a):''):
     hasImport?dsfRow('数据导入',dsfChoose('method',a.method,'数据导入',DS_IMPORTS.filter(x=>x!=='关联已有送审源')),'*')+
-    (recommended&&api?dsfProposal(a):'')+(recommended?dsfBizSettings(a):'')+(a.method?'<div class="dsf-import">'+(api?dsfFields(a):a.method==='ODPS'?dsfOdps(a):dsfUpload(a))+'</div>'+dsfAdvanced(a):''):'';
+    (recommended&&api?dsfProposal(a):'')+(api&&!a.live?dsfBizSettings(a):'')+(a.method?'<div class="dsf-import">'+(api?dsfFields(a):a.method==='ODPS'?dsfOdps(a):dsfUpload(a))+'</div>'+dsfAdvanced(a):''):'';
   return '<section class="dsf-form" aria-label="'+(a.sourceOnly?'添加送审源':'添加数据集')+'">'+(a.origin==='task'?'<header class="f-dhead"><h3>'+esc(a.editId?'编辑数据集':'添加数据集')+'</h3>'+dsfLink('关闭','cancel')+'</header>':'')+
     '<div class="dsf-mode"><small>'+esc(a.live?'NEX 现网对照 · testbiz':a.sourceOnly?'配置送审源 · API / ODPS / 文件接入':'信息流迁移方案')+'</small>'+mode+'</div>'+dsfBase(a)+(a.live?'':dsfRow('审核对象',reviewObjectControl(a.auditObject,'class="f-in" data-dsf="auditObject" aria-label="审核对象"',[flow?.auditObject,...assetAllIds().map(id=>dsBizCriteriaData(id).object)])))+'<hr>'+(general?'':dsfBusiness(a))+imports+
     (a.error?'<p class="dsf-alert" role="alert">'+esc(a.error)+'</p>':'')+'<footer class="dsf-footer">'+dsfAct(a.sourceOnly?'保存送审源':compose?'保存数据集':'保存','save','',true)+dsfAct('取消','cancel')+'</footer></section>';
@@ -4711,12 +4729,13 @@ async function dsfParseFile(a){
 function dsfError(a){
   if(!a.name.trim())return '请填写数据集名称。';
   if(!a.admins.length)return '请选择管理员。';
-  if(!a.live&&!a.sourceOnly&&!dsFlows().some(f=>String(f.id)===String(a.flowId)))return '请选择所属流程。';
+  if(!a.live&&!a.sourceOnly&&!a.allowUnassignedFlow&&!dsFlows().some(f=>String(f.id)===String(a.flowId)))return '请选择所属流程。';
   if(!a.live&&!a.composeSources&&!r10Finite(a.priority))return '请填写数据集优先级。';
   if(a.live)return '当前为现网对照。请返回迁移方案后保存本地数据集。';
 
   if(a.type==='业务数据集'&&a.scenario!=='信息流推荐')return '请选择应用场景。';
   if(!a.method)return '请选择数据导入方式。';
+  if(a.method==='API'&&!['业务数据','订正数据'].includes(a.bizData?.type))return '请选择数据类型。';
   if(a.method==='关联已有送审源'){if((a.sourceMembers||[]).some(m=>!r10Finite(m.priority)))return '请填写每个送审源的优先级。';const issue=r8PackageIssue({members:a.sourceMembers||[]});if(issue)return issue;}
   if(a.type==='业务数据集'&&a.method==='API'){
     if(!DS_BIZ_SOURCES.includes(a.sourceKind))return '请选择数据来源。';
@@ -4786,7 +4805,7 @@ function dsFormAction(action,id=''){
     case 'save':{
       a.error=dsfError(a);if(a.error)break;
       const isRecommended=a.type==='业务数据集'&&a.scenario==='信息流推荐';
-      const record={...(isRecommended?{bizData:{...a.bizData,advanced:false,type:a.tags.includes('订正数据')?'订正数据':a.tags.includes('业务数据')?'业务数据':'',resubmit:a.bizData.resubmit||''}}:{}),advanced:{...(a.advanced.ext?{ext:true,extGroups:a.advanced.extGroups}:{}),...(a.advanced.circle?{circle:true,circleGroups:a.advanced.circleGroups}:{})},...(a.method==='ODPS'?{odps:{...a.odps}}:{}),...(a.method==='本地上传'?{upload:{...a.upload}}:{}),...(isRecommended&&a.method==='API'&&a.sourceRef?{sourceRef:a.sourceRef.trim()}:{})};
+      const record={...(a.method==='API'?{bizData:{advanced:false,type:a.bizData.type||'业务数据',resubmit:a.bizData.resubmit||''}}:{}),advanced:{...(a.advanced.ext?{ext:true,extGroups:a.advanced.extGroups}:{}),...(a.advanced.circle?{circle:true,circleGroups:a.advanced.circleGroups}:{})},...(a.method==='ODPS'?{odps:{...a.odps}}:{}),...(a.method==='本地上传'?{upload:{...a.upload}}:{}),...(isRecommended&&a.method==='API'&&a.sourceRef?{sourceRef:a.sourceRef.trim()}:{})};
       a.error=dsCommit({origin:a.origin,editId:a.editId,name:a.name.trim(),admins:[...a.admins],tags:[...a.tags],project:a.project,
         sourceOnly:!!a.sourceOnly,priority:a.priority,type:a.type,method:a.method,flowId:a.flowId,scenario:a.scenario,fields:a.fields.map(f=>({name:f.name.trim(),type:a.method==='关联已有送审源'?f.type:f.indexed?f.type:'对象',description:f.description,indexed:f.indexed,primary:f.primary})),
         sourceKind:a.method==='API'&&a.type==='业务数据集'?a.sourceKind:'',sourceId:a.method==='API'&&a.type==='业务数据集'?a.sourceId:'',record})||'';
@@ -4812,7 +4831,7 @@ function dsFormChange(key,value){
   }
   if(key.startsWith('biz:')){
     const prop=key.slice(4);
-    if(prop==='advanced'||prop==='type'&&['业务数据','订正数据'].includes(value)||prop==='resubmit'&&['是','否'].includes(value))a.bizData[prop]=value;
+    if(prop==='advanced'||prop==='type'&&['业务数据','订正数据'].includes(value)||prop==='resubmit'&&['','是','否'].includes(value))a.bizData[prop]=value;
     return true;
   }
   if(key.startsWith('adv:')){
@@ -4990,22 +5009,24 @@ function dsFormChange(key,value){
     dsFormOpen('resource');
     if(session.sourceOnly)Object.assign(s.temp.dsForm,{sourceOnly:true,composeSources:false,method:'',type:'通用数据集'});
     if(session.flowId)s.temp.dsForm.flowId=session.flowId;
+    if(session.allowUnassignedFlow)Object.assign(s.temp.dsForm,{allowUnassignedFlow:true,flowId:''});
     if(session.schemaSeed){const base=session.schemaSeed;Object.assign(s.temp.dsForm,{type:'通用数据集',method:'API',fields:(base.fields||[]).map(f=>({...f,type:({'布尔':'布尔类型'})[f.type]||f.type,indexed:f.type!=='对象'?true:!!f.indexed})),auditObject:base.auditObject||'内容',tags:[...(base.tags||[])]});}
     s.page=session.savedPage;
     session.mode='create';
   }
-  function openSession(mode,callback,{flowId='',single=false,purpose='',schemaSeed=null,sourceOnly=false}={}) {
+  function openSession(mode,callback,{flowId='',single=false,purpose='',schemaSeed=null,sourceOnly=false,allowUnassignedFlow=false,onCancel=null}={}) {
     if(session)return false;
-    notice='';session={mode,callback,single,purpose,schemaSeed,sourceOnly,flowId:String(flowId||''),savedPage:s.page,previousTemp:s.temp};
+    notice='';session={mode,callback,single,purpose,schemaSeed,sourceOnly,allowUnassignedFlow,onCancel,flowId:String(flowId||''),savedPage:s.page,previousTemp:s.temp};
     s.temp={};s.modal='';
     return true;
   }
   function finishSession(result,shouldCommit=false) {
-    const {callback,savedPage,previousTemp,parentSession}=session;
+    const {callback,savedPage,previousTemp,parentSession,onCancel}=session;
     session=null;s.page=savedPage;s.temp=previousTemp;s.modal='';dismissDialog();
     if(parentSession){session=parentSession.session;s.page=parentSession.page;s.temp=parentSession.temp;s.modal=parentSession.modal;notice=parentSession.notice;}
     render();
     if(shouldCommit&&typeof callback==='function')callback(result);
+    else if(!shouldCommit&&typeof onCancel==='function')onCancel();
   }
   function createSource(callback,options={}) {
     const parentSession={session,page:s.page,temp:s.temp,modal:s.modal,notice};
@@ -5147,7 +5168,31 @@ function dsFormChange(key,value){
       s.dsTags=dsTagOptions().filter(t=>t.name!==name);persist();return '';
     }
   };
-  window.nexDatasets=Object.freeze({tagCatalog,editFormTags:anchor=>{const form=s.temp.dsForm;if(form)window.nexTagPicker.open(anchor,{selected:form.tags||[],onSave:labels=>{form.tags=labels;form.pop='';render();}});},mount,unmount,sources:()=>structuredClone(rawResources()),createSource,refresh:render,showCatalog:()=>{s.page='catalog';render();},addDemoResource:(id,data)=>{if(!s.dsCatalog[id]){s.dsCatalog[id]=structuredClone(data);persist();}return publicAsset(id);},list:()=>structuredClone(resources()),groups:()=>structuredClone(dsGroups()),flows:()=>structuredClone(dsFlows()),pick:choose,create,syncTasks});
+function dsSaveFlowDataset(input){
+      const requested=[...new Set((input.datasetIds||[]).map(String))],flows=dsFlows();
+      let flow=input.mode==='existing'?flows.find(f=>String(f.id)===String(input.flowId)):null;
+      if(input.mode==='existing'&&!flow)return {error:'请选择所属流程。'};
+      const sources=requested.map(id=>assetMeta(id));
+      if(sources.some((d,i)=>!d||String(d.id||requested[i])!==requested[i]))return {error:'所选数据集已失效，请重新选择。'};
+      if(sources.some(d=>d.flowId))return {error:'所选数据集已关联流程，请重新选择未归属的数据集。'};
+      const existing=flow?r12FlowDatasets(flow.id):[];
+      if(!existing.length&&!requested.length)return {error:'请至少关联一个普通数据集。'};
+      if(!flow){
+        const name=String(input.name||'').trim(),bizId=String(input.bizId||'').trim(),group=dsGroups().find(g=>String(g.id)===String(input.groupId));
+        if(!name)return {error:'请输入流程名称。'};if(!group)return {error:'请选择所属分组。'};
+        if(flows.some(f=>f.name===name&&String(f.groupId)===String(group.id)))return {error:'该分组已存在同名流程。'};
+        if(bizId&&flows.some(f=>String(f.bizId||'')===bizId))return {error:'该 BIZ 流程 ID 已映射，请选择已有流程。'};
+        let serial=(s.dsFlows||[]).length+1;while(flows.some(f=>f.id==='NEX-FL-'+String(serial).padStart(4,'0')))serial++;
+        flow={id:'NEX-FL-'+String(serial).padStart(4,'0'),name,bizId,groupId:String(group.id),auditObject:'内容',admins:['当前用户'],creator:'当前用户',status:'',workMode:'',auditMode:''};
+      }
+      const previousFlows=s.dsFlows,previousCatalog=s.dsCatalog;
+      if(!flows.some(f=>f.id===flow.id))s.dsFlows=[...(s.dsFlows||[]),flow];
+      s.dsCatalog={...(s.dsCatalog||{})};requested.forEach((id,i)=>{s.dsCatalog[id]={...sources[i],flowId:String(flow.id)};});
+      storageError='';persist();if(storageError){s.dsFlows=previousFlows;s.dsCatalog=previousCatalog;return {error:'保存失败，请重试。'};}
+      return {id:String(flow.id)};
+    }
+
+  window.nexDatasets=Object.freeze({saveFlowDataset:dsSaveFlowDataset,tagCatalog,editFormTags:anchor=>{const form=s.temp.dsForm;if(form)window.nexTagPicker.open(anchor,{selected:form.tags||[],onSave:labels=>{form.tags=labels;form.pop='';render();}});},mount,unmount,sources:()=>structuredClone(rawResources()),createSource,refresh:render,showCatalog:()=>{s.page='catalog';render();},addDemoResource:(id,data)=>{if(!s.dsCatalog[id]){s.dsCatalog[id]=structuredClone(data);persist();}return publicAsset(id);},list:()=>structuredClone(resources()),groups:()=>structuredClone(dsGroups()),flows:()=>structuredClone(dsFlows()),pick:choose,create,syncTasks});
 })();
 
   </script>
@@ -10303,7 +10348,7 @@ function openTaskDetail(task, tab='数据列表') {
       (show.includes('annotationAt')?dateRange('标注完成时间','annotationFrom','annotationTo'):'')+
       '<button class="btn">查询</button><button type="button" id="detail-reset" class="reset">重置筛选</button><button type="button" id="detail-filter-fields" class="action">筛选设置</button></form>'+
       (view.answer?'<p class="tdv-meta">筛选标注结果　'+esc(view.answer)+'</p>':'')+
-      '<div class="detail-listbar"><button class="btn secondary" id="detail-sample">生成演练样本</button><button class="btn secondary" id="r12-pool-preview">数据池圈选预览</button><button class="btn secondary" id="vw-reject">条件驳回</button><button class="action" id="detail-columns">列表设置</button></div>'+
+      '<div class="detail-listbar"><button class="btn secondary" id="detail-sample">生成演练样本</button><button class="btn secondary" id="vw-reject">条件驳回</button><button class="action" id="detail-columns">列表设置</button></div>'+
       '<div class="tablewrap"><table class="detail-table"><thead><tr>'+keys.map(key=>'<th class="'+(['video','cover','gallery'].includes(key)?'r5-media-cell':['account','title'].includes(key)?'r5-identity-cell':'')+'">'+detailColumns[key]+'</th>').join('')+
       '<th>操作</th></tr></thead><tbody>'+ (found.map(r=>'<tr>'+keys.map(key=>'<td class="'+(['video','cover','gallery'].includes(key)?'r5-media-cell':['account','title'].includes(key)?'r5-identity-cell':'')+'">'+(['video','cover','gallery'].includes(key)?viewMediaCell(task,r,key):esc(cell(r,key)))+'</td>').join('')+
       '<td><button class="action" data-detail-record="'+esc(r.id)+'">查看</button>'+
@@ -10316,7 +10361,6 @@ function openTaskDetail(task, tab='数据列表') {
     $('#detail-reset').onclick=()=>{Object.assign(view,{annotator:'',annotationFrom:'',annotationTo:'',id:'',stage:'',status:'',answer:'',answerQuestion:'',from:'',to:''});renderData();};
     $('#detail-columns').onclick=columnSettings;
     $('#detail-sample').onclick=addSample;
-    $('#r12-pool-preview').onclick=()=>r12ShowSelectionPreview(task);
     $('#vw-reject').onclick=()=>vwRejectCases(task,found,Object.keys(view).some(k=>!['tab','node'].includes(k)&&view[k]),render);
     root.querySelectorAll('[data-vw-edit]').forEach(b=>b.onclick=()=>vwCaseWork(task,samples().find(r=>r.id===b.dataset.vwEdit),true,render));
     root.querySelectorAll('[data-vw-release]').forEach(b=>b.onclick=()=>{const row=samples().find(r=>r.id===b.dataset.vwRelease);if(!row?.claimant)return;
@@ -10327,10 +10371,10 @@ function openTaskDetail(task, tab='数据列表') {
   function addSample() {
     const sources=taskDatasetBindings(task).filter(b=>!b.packageArchived);
     if(!sources.length||!stages().length){toast('请先选择送审数据和节点');return;}
-    modal('向共享数据池送入演练数据','<form id="detail-sample-form"><label class="field"><span>送审源</span><select name="batch">'+sources.map((b,i)=>'<option value="'+i+'">'+esc(b.name)+' · '+esc(b.id)+'</option>').join('')+'</select></label><label class="field"><span>内容类型</span><select name="contentType"><option>图文</option><option>视频</option></select></label><p class="info">生成后按各关联任务的圈选条件分配。缺少规则 / 算子结果时标记为待判断，不自动进入任务。</p></form>','<button class="btn secondary" data-close>取消</button><button class="btn" type="submit" form="detail-sample-form">生成</button>');
+    modal('向共享数据池送入演练数据','<form id="detail-sample-form"><label class="field"><span>送审源</span><select name="batch">'+sources.map((b,i)=>'<option value="'+i+'">'+esc(b.name)+' · '+esc(b.id)+'</option>').join('')+'</select></label><label class="field"><span>内容类型</span><select name="contentType"><option>图文</option><option>视频</option></select></label><p class="info">生成后进入引用该数据集的关联任务；机审、人审条件分配在各节点内配置。</p></form>','<button class="btn secondary" data-close>取消</button><button class="btn" type="submit" form="detail-sample-form">生成</button>');
     $('#detail-sample-form').onsubmit=event=>{event.preventDefault();const data=new FormData(event.target),b=sources[Number(data.get('batch'))],row=r12IngestSample(task,b,data.get('contentType'));
       close();Object.assign(view,{tab:'数据列表',id:'',stage:'',status:'',answer:'',answerQuestion:'',from:'',to:''});render();
-      const own=row.scopeOutcomes.find(s=>String(s.taskId)===String(task.id));toast('数据已入池；当前任务：'+(own?.state==='matched'?'已接入':own?.state==='pending'?'待判断':'未命中圈选条件'));
+      const own=row.scopeOutcomes.find(s=>String(s.taskId)===String(task.id));toast('数据已入池，当前任务已接入。');
     };
   }
 
@@ -10405,7 +10449,7 @@ function openTaskDetail(task, tab='数据列表') {
     const machineSplit=isMachine&&task.flow.assignment==='条件分配';
     const groups=machineSplit?revMachineGroups(task.flow):dist?.mode==='条件分配'?(dist.groups?.length?dist.groups:[{name:'条件分配',conditions:dist.conditions,join:dist.join}]):[{name:'全量'}];
     rev8NormalizeMachine(task);
-    const head=isMachine?['任务分配名称 / ID','关联算子','机审算力策略','进度','状态','操作']:isHuman?['任务分配名称 / ID','优先级','分配条件','标注人员/组','进度','状态','操作']:['任务分配名称 / ID','抽检比例','进度','状态','操作'];
+    const head=isMachine?['任务分配名称 / ID','关联算子','进度','状态','操作']:isHuman?['任务分配名称 / ID','优先级','分配条件','标注人员/组','进度','状态','操作']:['任务分配名称 / ID','抽检比例','进度','状态','操作'];
     function update(){
       const chosen=form.elements.data.value;view.assignmentData=chosen;
       const query={id:form.elements.id.value.trim(),name:form.elements.name.value.trim(),status:form.elements.status.value};view.assignmentFilters[node]=query;
@@ -10420,7 +10464,7 @@ function openTaskDetail(task, tab='数据列表') {
           return [ref?.name||condition.label||condition.field||condition.featureId,condition.output,condition.relation,condition.value??condition.values?.join('、')].filter(v=>v!=null&&v!=='').join(' ');
         }).join(g.join==='OR'?' 或 ':' 且 ');
         const cells=[esc(name)+(id?'<small>'+esc(id)+'</small>':'')+(isMachine&&description?'<small title="'+esc(description)+'">'+esc(description)+'</small>':'')];
-        if(isMachine)cells.push(esc(rev8BindingSummary(rev8MachineBindings(task,machineSplit?g:null))),esc(r12ComputeLabel(r12ComputeTarget(task,machineSplit?g:null).computeStrategyId))+'<div><button class="action" data-cp-adjust="'+i+'">调整</button><button class="action" data-cp-task-preview="'+i+'">分档预览</button></div>');
+        if(isMachine)cells.push(esc(rev8BindingSummary(rev8MachineBindings(task,machineSplit?g:null))));
         else if(isHuman){
           const member=g.members||task.flow.members;
           const liveName=member&&typeof auMemberLabel==='function'?auMemberLabel(member):'';
@@ -10432,8 +10476,6 @@ function openTaskDetail(task, tab='数据列表') {
         return [cells];
       });
       $('#detail-node-rows').innerHTML=tableGrid(head,table)+'<div class="vw-muted" style="margin-top:12px">共 '+table.length+' 条 / 全部 '+groups.length+' 条</div>';
-      root.querySelectorAll('[data-cp-adjust]').forEach(b=>b.onclick=()=>r12ComputeTaskAction(task,machineSplit?groups[Number(b.dataset.cpAdjust)]:null,update));
-      root.querySelectorAll('[data-cp-task-preview]').forEach(b=>b.onclick=()=>r12ComputeTaskPreview(task,machineSplit?groups[Number(b.dataset.cpTaskPreview)]:null));
       root.querySelectorAll('[data-vw-assignment]').forEach(b=>b.onclick=()=>{const key=b.dataset.vwAssignment;(task.assignmentPaused||={})[key]=!task.assignmentPaused[key];write();update();});
     }
     form.onsubmit=e=>{e.preventDefault();update();};
@@ -10630,8 +10672,8 @@ function rev8RenderScenarios(){
   const panel=document.createElement('details');panel.id='rev8-scenes';panel.className='rev8-scenes';
   try{panel.open=localStorage.getItem('nex-scenarios-open.v1')!=='false';}catch{panel.open=true;}
   const entries=[
-    ['01','一审迁入','选择流程数据集，圈选当前流程的数据，再配置机审和人审。','create','参照 105317 创建'],
-    ['02','新增数据来源','新建数据集关联所属流程；引用流程数据集的任务自动共享，并按各自条件圈选。','sources','维护数据集送审源'],
+    ['01','一审迁入','选择已有或新建流程数据集，再配置机审和人审。','create','参照 105317 创建'],
+    ['02','新增数据来源','新建数据集关联所属流程，引用流程数据集的任务自动共享。','sources','维护数据集送审源'],
     ['03','调整机审规则','进入条件分配的子任务，分别配置题目和算子；共用算子在算子管理维护。','rules','配置机审子任务'],
     ['04','调整数据优先级','数据集优先级在资源侧统一维护，任务只读；流程数据集不另设优先级。','priority','打开数据视图']
   ];
@@ -11196,9 +11238,9 @@ function rev8MachineAssignment(host,flow) {
   const groups=revMachineGroups(flow);
   function draw(){
     host.innerHTML='<div class="rev-assignment r8-machine-assignment"><div class="r8-assignment-head"><button class="soft-btn" data-new-condition>＋ 添加分配条件</button><small>先分配数据，再为每个子任务配置题目与算子</small></div>'+
-      '<div class="tablewrap"><table><thead><tr><th>子任务名称</th><th>优先级</th><th>分配条件</th><th>机审算力策略 <span class="r8-new">NEW</span></th><th>题目及算子 <span class="r8-new">NEW</span></th><th>操作</th></tr></thead><tbody>'+
-      groups.map((g,i)=>'<tr><td>'+esc(g.name)+(g.bizTaskId?'<small class="r8-binding-meta">BIZ '+esc(g.bizTaskId)+'</small>':'')+(g.demoOnly?'<small class="r8-demo-label">演示配置</small>':'')+'</td><td>'+esc(g.priority)+'</td><td>'+esc(auditDescribeGroup(g)||'—')+'</td><td>'+esc(r12ComputeLabel(g.computeStrategyId))+'</td><td><strong>'+g.bindings.length+' 项引用</strong><small class="r8-binding-meta">'+esc(rev8BindingSummary(g.bindings))+'</small></td><td><button class="action" data-r8-config="'+i+'">配置子任务</button><button class="action" data-r8-remove="'+i+'">删除</button></td></tr>').join('')+
-      (!groups.length?'<tr><td colspan="6" class="empty">添加条件后，在子任务内配置题目及算子</td></tr>':'')+'</tbody></table></div></div>';
+      '<div class="tablewrap"><table><thead><tr><th>子任务名称</th><th>优先级</th><th>分配条件</th><th>题目及算子 <span class="r8-new">NEW</span></th><th>操作</th></tr></thead><tbody>'+
+      groups.map((g,i)=>'<tr><td>'+esc(g.name)+(g.bizTaskId?'<small class="r8-binding-meta">BIZ '+esc(g.bizTaskId)+'</small>':'')+(g.demoOnly?'<small class="r8-demo-label">演示配置</small>':'')+'</td><td>'+esc(g.priority)+'</td><td>'+esc(auditDescribeGroup(g)||'—')+'</td><td><strong>'+g.bindings.length+' 项引用</strong><small class="r8-binding-meta">'+esc(rev8BindingSummary(g.bindings))+'</small></td><td><button class="action" data-r8-config="'+i+'">配置子任务</button><button class="action" data-r8-remove="'+i+'">删除</button></td></tr>').join('')+
+      (!groups.length?'<tr><td colspan="5" class="empty">添加条件后，在子任务内配置题目及算子</td></tr>':'')+'</tbody></table></div></div>';
     host.querySelector('[data-new-condition]').onclick=()=>edit(-1);
     host.querySelectorAll('[data-r8-config]').forEach(b=>b.onclick=()=>edit(Number(b.dataset.r8Config)));
     host.querySelectorAll('[data-r8-remove]').forEach(b=>b.onclick=()=>{groups.splice(Number(b.dataset.r8Remove),1);sync();draw();});
@@ -11210,11 +11252,9 @@ function rev8MachineAssignment(host,flow) {
     wideModal('机审子任务配置','<div class="rev-assign-dialog r8-machine-dialog">'+
       auTaskRow('子任务名称 <b>*</b>','<input id="rv-group-name" class="condition-input" placeholder="请输入子任务名称" value="'+esc(group.name)+'">')+
       auTaskRow('优先级 <b>*</b>','<input id="rv-group-order" class="small-select" type="number" min="1" value="'+esc(group.priority)+'">')+
-      r12ComputeControl(group)+
       auTaskRow('分配条件 <b>*</b>','<div id="rv-group-rules"></div>')+
       '<div id="r8-group-bindings"></div><p class="error" id="rv-group-error" role="alert"></p></div>',
       '<button class="btn secondary" data-close>取消</button><button class="btn" id="rv-condition-save">保存子任务</button>','r8-machine-dialog-drawer');
-    r12BindComputeControl($('.r8-machine-dialog'),group);
     auditDrawSets($('#rv-group-rules'),sets);
     const refresh=()=>{const target=$('#r8-group-bindings');target.innerHTML=rev8BindingPanel(group);rev8BindBindings(target,group,refresh);};refresh();
     $('#rv-condition-save').onclick=()=>{
@@ -11979,7 +12019,7 @@ function renderMachineNode() {
   rev8NormalizeMachine(taskDraft);
   const e=taskDraft.flow;e.shortCircuit??=true;
   $('#node-config').innerHTML=`${nodeConfigTabs()}${rev8MachineScenarioNote()}${nodeTemplateSummary()}
-    <div class="task-row"><label>任务分配 <b>*</b></label><div><div class="task-controls">${radios('assignment',['全量分配','条件分配'],e.assignment)}</div>${e.assignment==='条件分配'?'<div id="split-rules" class="task-subpanel"></div>':r12ComputeControl(e)+'<div id="r8-all-bindings"></div>'}</div></div>
+    <div class="task-row"><label>任务分配 <b>*</b></label><div><div class="task-controls">${radios('assignment',['全量分配','条件分配'],e.assignment)}</div>${e.assignment==='条件分配'?'<div id="split-rules" class="task-subpanel"></div>':'<div id="r8-all-bindings"></div>'}</div></div>
     <div class="task-row"><label>数据优先级 ⓘ <b>*</b></label><div><div class="task-controls v5-priority">${radios("priority", ["先送先审", "后送先审", "自定义字段排序"], e.priority)}<span class="divider"></span><label><input type="checkbox" id="custom-priority" ${e.customPriority ? "checked" : ""}>自定义规则</label></div>${"自定义字段排序" === e.priority ? `<div class="task-controls"><select class="small-select" id="sort-field">${fieldOptions(e.sortField)}</select><select class="small-select" id="sort-order">${options(["降序", "升序"], e.sortOrder)}</select></div>` : ""}${e.customPriority ? '<div id="priority-rules" class="task-subpanel"></div>' : ""}</div></div><hr class="task-divider"><h3 class="machine-advanced-heading">高级配置</h3><div class="task-row"><label id="machine-short-circuit-label">是否短路</label><div class="task-controls" role="radiogroup" aria-labelledby="machine-short-circuit-label">${radios("machine-short-circuit", ["短路", "不短路"], e.shortCircuit ? "短路" : "不短路")}</div></div><div class="task-row"><label>计算失败处理策略 <b>*</b></label><select class="small-select" id="task-failure">${options(["送人审", "维持机审", "通过", "不通过"], e.failure)}</select></div><div class="task-row"><label>His库覆盖 <b>*</b></label><div><div class="task-controls">${switchButton("his-switch", e.his, "His库覆盖")}<span class="muted">开启后，可选择 His 库进行覆盖</span></div>${e.his ? `<select id="his-library" class="small-select" style="margin-top:12px;width:100%"><option value="">请选择 His 库</option>${options(["内容审核历史结果库（演示）", "商品审核历史结果库（演示）"], e.hisLibrary)}</select>` : ""}</div></div></div></section>`;
   document.querySelectorAll('[name=assignment]').forEach(input=>input.onchange=()=>{e.assignment=input.value;rev8NormalizeMachine(taskDraft);renderMachineNode();});
   if(e.assignment==='条件分配')renderSplit();else{
@@ -11993,7 +12033,6 @@ function renderMachineNode() {
   $('#task-failure').onchange=event=>e.failure=event.target.value;
   $('#his-switch').onclick=()=>{e.his=!e.his;renderMachineNode();};
   if($('#his-library'))$('#his-library').onchange=event=>e.hisLibrary=event.target.value;
-  if(e.assignment!=='条件分配')r12BindComputeControl($('#node-config'),e);
   bindNodeConfigTabs();if(e.customPriority)renderPriorities();bindNodeTemplateActions();
 }
 function operatorResults(e) {
@@ -12204,7 +12243,7 @@ function flowRuleHTML(e, t, a) {
 }
 function simpleRules(e, t, a = !1) {
   (($(e).innerHTML =
-    `${t.map((e, t) => `<div class="task-priority-row"><select class="small-select" data-simple="${t}" data-sk="field">${fieldOptions(e.field)}</select><select class="small-select" data-simple="${t}" data-sk="relation">${options(ruleRelations, e.relation)}</select><input class="condition-input" data-simple="${t}" data-sk="value" value="${esc(e.value)}" placeholder="逻辑值">${a ? `<label class="r12-sort-value"><input class="small-select" type="number" step="any" data-simple="${t}" data-sk="sortPriority" aria-label="排序优先级" value="${e.sortPriority??''}" placeholder="排序优先级">${e.sortPriority==null&&e.level?`<small>原排序值 ${esc(e.level)} · 待确认</small>`:''}</label>` : '<span class="muted">且</span>'}<button class="ghost-btn" data-simple-remove="${t}">×</button></div>`).join("")}<button class="soft-btn" data-simple-add>＋ 添加规则</button><div class="inline-block-note">${a ? "按顺序匹配，首条命中的数字排序值生效，数字越大越优先。此处只配置数据排序，机审算力策略单独配置；原排序值未确认前保留。" : "全部条件满足的数据进入机审节点。"}</div>`),
+    `${t.map((e, t) => `<div class="task-priority-row"><select class="small-select" data-simple="${t}" data-sk="field">${fieldOptions(e.field)}</select><select class="small-select" data-simple="${t}" data-sk="relation">${options(ruleRelations, e.relation)}</select><input class="condition-input" data-simple="${t}" data-sk="value" value="${esc(e.value)}" placeholder="逻辑值">${a ? `<label class="r12-sort-value"><input class="small-select" type="number" step="any" data-simple="${t}" data-sk="sortPriority" aria-label="排序优先级" value="${e.sortPriority??''}" placeholder="排序优先级">${e.sortPriority==null&&e.level?`<small>原排序值 ${esc(e.level)} · 待确认</small>`:''}</label>` : '<span class="muted">且</span>'}<button class="ghost-btn" data-simple-remove="${t}">×</button></div>`).join("")}<button class="soft-btn" data-simple-add>＋ 添加规则</button><div class="inline-block-note">${a ? "按顺序匹配，首条命中的数字排序值生效，数字越大越优先。此处只配置数据排序；原排序值未确认前保留。" : "全部条件满足的数据进入机审节点。"}</div>`),
     $(e)
       .querySelectorAll("[data-simple]")
       .forEach(
@@ -13688,7 +13727,7 @@ function r9MergeResources(raw){
 }
 function r9UnifiedCatalog(filters){
   const f=filters.applied||{},q=(a,b)=>!b||String(a||'').toLowerCase().includes(String(b).toLowerCase());
-  const source=window.nexDatasets.list(),list=source.filter(d=>q(d.id,f.id)&&q(d.name,f.name)&&q(d.record?.sourceRef||d.sourceCode||'',f.code)&&(!f.flow||d.flowId===f.flow)&&(!f.type||(f.type==='Excel'?'本地上传':f.type)===d.method)&&(!f.object||(d.auditObject||'内容')===f.object)&&(!f.label||(d.tags||[]).includes(f.label))&&(!f.dataType||(d.tags||[]).includes(f.dataType)||d.record?.bizData?.type===f.dataType)&&(!f.source||d.sourceKind===f.source)&&(!filters.mine||(d.admins||[]).some(n=>['当前用户','业务空间管理员','演练运营'].includes(n))));
+  const source=window.nexDatasets.list(),list=source.filter(d=>q(d.id,f.id)&&q(d.name,f.name)&&q(d.record?.sourceRef||d.sourceCode||'',f.code)&&(!f.flow||d.flowId===f.flow)&&(!f.type||(f.type==='Excel'?'本地上传':f.type)===d.method)&&(!f.object||(d.auditObject||'内容')===f.object)&&(!f.label||(d.tags||[]).includes(f.label))&&(!f.dataType||(d.method==='API'&&d.record?.bizData?.type===f.dataType))&&(!f.source||d.sourceKind===f.source)&&(!filters.mine||(d.admins||[]).some(n=>['当前用户','业务空间管理员','演练运营'].includes(n))));
   const flows=window.nexDatasets.flows();
   return '<div class="dc-scroll"><table class="f-table dc-results r9-dataset-table"><thead><tr>'+['数据集ID','数据集名称','所属流程','优先级','类型','导入方式','数据量','标签','关联任务','管理员','操作'].map(h=>'<th>'+h+'</th>').join('')+'</tr></thead><tbody>'+list.map(d=>{
     const legacy=!!r8GetPackage(d.id),state=legacy?null:r12SourcePriority(d.id,d.id),flow=flows.find(f=>String(f.id)===String(d.flowId));
@@ -13898,16 +13937,16 @@ function r8LegacyTags(item){
   const flow=flows.find(f=>String(f.id)===String(item.flowId));const group=groups.find(g=>String(g.id)===String(item.groupId||flow?.groupId));
   return [group?'分组：'+group.name:'',flow?'流程：'+flow.name+(flow.bizId?'（BIZ '+flow.bizId+'）':''):''].filter(Boolean);
 }
-function r8TaskTags(task){return [...new Set([...(task.tags||[]),...(task.statsTagsEdited?[]:r8LegacyTags(task))])];}
+function r8TaskTags(task){return [...new Set([...(task.tags||[]),...(task.statsTagsEdited?[]:r8LegacyTags(task))])].filter(t=>!['业务数据','订正数据'].includes(t));}
 function r8SaveTaskTags(task,labels){
   // Statistical labels never change the task's existing BIZ/template mapping.
-  task.tags=[...new Set(labels)];task.statsTagsEdited=true;
+  task.tags=[...new Set(labels)].filter(t=>!['业务数据','订正数据'].includes(t));task.statsTagsEdited=true;
 }
 
 const r9TagSections=[['group','业务分组'],['flow','业务流程'],['type','数据分类'],['other','其他标签']];
 function r9TagOptions(selected=[]){
   const catalog=window.nexDatasets.tagCatalog.list(),groups=window.nexDatasets.groups(),flows=window.nexDatasets.flows();
-  return [...new Set([...catalog.map(t=>t.name),...selected])].map(name=>{
+  return [...new Set([...catalog.map(t=>t.name),...selected])].filter(t=>!['业务数据','订正数据'].includes(t)).map(name=>{
     const group=groups.find(g=>name==='分组：'+g.name);
     const flow=flows.find(f=>name==='流程：'+f.name+(f.bizId?'（BIZ '+f.bizId+'）':''));
     const parent=flow&&groups.find(g=>String(g.id)===String(flow.groupId));
@@ -13922,7 +13961,7 @@ window.nexTagPicker=(()=>{
   let active=null;
   const entry=name=>r9TagOptions([name]).find(item=>item.name===name);
   function control(scope,names=[]){
-    const chosen=[...new Set(names)],items=chosen.slice(0,2).map(entry);
+    const chosen=[...new Set(names)].filter(t=>!['业务数据','订正数据'].includes(t)),items=chosen.slice(0,2).map(entry);
     return '<button type="button" class="nt10-control" data-nt10-open="'+esc(scope)+'" role="combobox" aria-haspopup="dialog" aria-expanded="false" aria-label="选择标签"><span class="nt10-control-value">'+(items.length?items.map(item=>'<span class="nt10-value" title="'+esc(item.name)+'">'+esc(item.title)+'</span>').join('')+(chosen.length>2?'<span class="nt10-more">+'+(chosen.length-2)+'</span>':''):'<span class="nt10-placeholder">请选择标签，可多选</span>')+'</span><span class="nt10-caret">⌄</span></button>';
   }
   function close(restore=true){
@@ -13932,7 +13971,7 @@ window.nexTagPicker=(()=>{
   }
   function open(anchor,{selected=[],onSave}={}){
     if(active?.anchor===anchor){close();return;}close(false);
-    const state={selected:new Set(selected),category:'all',query:'',mode:'browse',newName:'',newCategory:'other',newColor:'purple',error:''};
+    const state={selected:new Set(selected.filter(t=>!['业务数据','订正数据'].includes(t))),category:'all',query:'',mode:'browse',newName:'',newCategory:'other',newColor:'purple',error:''};
     const panel=document.createElement('div');panel.className='nt10-dropdown';panel.setAttribute('role','dialog');panel.setAttribute('aria-label','分类选择标签');
     // The native dataset dialog delegates all form changes; keep this popover's
     // temporary controls local until the user applies the selected labels.
@@ -13952,13 +13991,13 @@ window.nexTagPicker=(()=>{
         else sections.push([label,rows]);
       }
       const body=panel.querySelector('.nt10-list');body.innerHTML=sections.length?sections.map(([label,items])=>'<section><h4>'+esc(label)+'</h4>'+items.map(t=>'<label class="nt10-option"><input type="checkbox" data-nt10-tag="'+esc(t.name)+'" '+(state.selected.has(t.name)?'checked':'')+'><span><strong>'+esc(t.title)+'</strong>'+((t.kind==='flow'&&t.parent)||t.id?'<small>'+esc([t.parent,t.id?'BIZ '+t.id:''].filter(Boolean).join(' · '))+'</small>':'')+'</span></label>').join('')+'</section>').join(''):'<div class="nt10-empty">没有匹配标签</div>';
-      body.querySelectorAll('[data-nt10-tag]').forEach(input=>input.onchange=()=>{const name=input.dataset.nt10Tag;input.checked?state.selected.add(name):state.selected.delete(name);if(input.checked&&['业务数据','订正数据'].includes(name)){state.selected.delete(name==='业务数据'?'订正数据':'业务数据');resultList();}panel.querySelector('.nt10-count').textContent='已选 '+state.selected.size+' 项';});
+      body.querySelectorAll('[data-nt10-tag]').forEach(input=>input.onchange=()=>{const name=input.dataset.nt10Tag;input.checked?state.selected.add(name):state.selected.delete(name);panel.querySelector('.nt10-count').textContent='已选 '+state.selected.size+' 项';});
     }
     function draw(){
       const palette=window.nexDatasets.tagCatalog.palette();
       panel.innerHTML='<header><strong>'+(state.mode==='new'?'新建标签':'选择标签')+'</strong><button type="button" class="action" data-nt10-mode="'+(state.mode==='new'?'browse':'new')+'">'+(state.mode==='new'?'返回选择':'＋ 新建标签')+'</button></header>'+(state.mode==='new'?
         '<div class="nt10-create"><label>标签类型<select id="nt10-create-category">'+categories.map(([k,n])=>'<option value="'+k+'" '+(state.newCategory===k?'selected':'')+'>'+n+'</option>').join('')+'</select></label><label>标签名称<input id="nt10-create-name" maxlength="40" placeholder="请输入标签名称" value="'+esc(state.newName)+'"></label><div class="nt10-colors"><span>标签颜色</span>'+Object.entries(palette).map(([k,v])=>'<button type="button" data-nt10-color="'+esc(k)+'" class="'+(state.newColor===k?'active':'')+'" style="--nt10-color:'+esc(v)+'" aria-label="'+esc(k)+'" aria-pressed="'+(state.newColor===k)+'"></button>').join('')+'</div><p id="nt10-create-error" role="alert">'+esc(state.error)+'</p></div><footer><span>创建后可在任务、数据集中复用</span><button type="button" class="btn" id="nt10-create-save">创建并选中</button></footer>':
-        '<div class="nt10-search"><input type="search" aria-label="搜索标签" placeholder="搜索标签、所属分组或 BIZ ID" value="'+esc(state.query)+'"></div><nav aria-label="标签类型">'+[['all','全部'],...categories].map(([k,n])=>'<button type="button" data-nt10-kind="'+k+'" aria-pressed="'+(state.category===k)+'">'+n+'</button>').join('')+'</nav>'+(state.category==='type'?'<small class="nt10-type-hint">业务数据与订正数据二选一</small>':'')+'<div class="nt10-list"></div><p class="nt10-selection-error" role="alert"></p><footer><span class="nt10-count">已选 '+state.selected.size+' 项</span><button type="button" class="action" id="nt10-clear">清空</button><span class="nt10-spacer"></span><button type="button" class="btn secondary" id="nt10-cancel">取消</button><button type="button" class="btn" id="nt10-apply">确定</button></footer>');
+        '<div class="nt10-search"><input type="search" aria-label="搜索标签" placeholder="搜索标签、所属分组或 BIZ ID" value="'+esc(state.query)+'"></div><nav aria-label="标签类型">'+[['all','全部'],...categories].map(([k,n])=>'<button type="button" data-nt10-kind="'+k+'" aria-pressed="'+(state.category===k)+'">'+n+'</button>').join('')+'</nav>'+'<div class="nt10-list"></div><p class="nt10-selection-error" role="alert"></p><footer><span class="nt10-count">已选 '+state.selected.size+' 项</span><button type="button" class="action" id="nt10-clear">清空</button><span class="nt10-spacer"></span><button type="button" class="btn secondary" id="nt10-cancel">取消</button><button type="button" class="btn" id="nt10-apply">确定</button></footer>');
       panel.querySelector('[data-nt10-mode]').onclick=()=>{state.mode=state.mode==='new'?'browse':'new';if(state.mode==='new')state.newCategory=state.category==='all'?'other':state.category;state.error='';draw();if(state.mode==='new')panel.querySelector('#nt10-create-name').focus();};
       if(state.mode==='new'){
         panel.querySelector('#nt10-create-name').oninput=e=>state.newName=e.target.value;
@@ -13974,7 +14013,7 @@ window.nexTagPicker=(()=>{
         panel.querySelectorAll('[data-nt10-kind]').forEach(b=>b.onclick=()=>{state.category=b.dataset.nt10Kind;draw();});
         panel.querySelector('#nt10-clear').onclick=()=>{state.selected.clear();draw();};
         panel.querySelector('#nt10-cancel').onclick=()=>close();
-        panel.querySelector('#nt10-apply').onclick=()=>{if(state.selected.has('业务数据')&&state.selected.has('订正数据')){panel.querySelector('.nt10-selection-error').textContent='业务数据和订正数据只保留一种，请调整后确定。';return;}const values=[...state.selected];close(false);onSave?.(values);};resultList();
+        panel.querySelector('#nt10-apply').onclick=()=>{const values=[...state.selected];close(false);onSave?.(values);};resultList();
       }
       fit();
     }
@@ -14041,7 +14080,6 @@ function r8OpenPackageEditor(id='',onSave){
 function r8SetTaskSource(task,source){
   const key=String(source.id),previousId=r9TaskDatasetId(task);
   const scopedDataset=window.nexDatasets.list().find(d=>String(d.id)===key);if(!task.flowId||String(scopedDataset?.flowId||'')!==String(task.flowId))return '请选择当前流程内的数据集。';
-  if(previousId&&previousId!==key&&r12Selection(task).mode==='conditions')task.dataSelection={mode:'conditions',sets:[],continuous:true};
   if(source.type==='package'||r8GetPackage(key)){const p=r8GetPackage(key),error=r8PackageIssue(p);if(error)return error;if(!(task.detailSamples||[]).length&&previousId!==key)task.datasetBindings=[];task.dataSource={type:'package',id:p.id};task.packageBindingKey||=uid();task.datasetOverrides||={};task.dataset=p.name;task.datasetBindings=r8ResolvePackage(task);return '';}
   const ds=r8Dataset(key);if(!ds)return '请选择有效数据集。';const old=previousId===key?task.datasetBindings?.find(b=>String(b.id)===key):null;task.dataSource={type:'dataset',id:key};task.dataset=ds.name;task.datasetBindings=r10AnnotateBindings(task,[{...(old||{}),id:key,name:ds.name,batchId:old?.batchId||'DATA-'+uid()}]);return '';
 }
@@ -14060,17 +14098,18 @@ function r8ChooseSource(task,onChange){
 
 function r8RenderTaskSource(){
   const panel=document.getElementById('task-dataset-field');if(!panel)return;
-  const history=(taskDraft.detailSamples||[]).length>0,selectedId=r9TaskDatasetId(taskDraft),flowMode=taskDraft.dataSource?.type==='flow',flow=r12Flow(taskDraft.flowId),dataset=!flowMode?window.nexDatasets.list().find(d=>String(d.id)===selectedId):null;
-  const count=flowMode?r12FlowDatasets(taskDraft.flowId).length:taskDatasetBindings(taskDraft).filter(b=>!b.packageArchived).length;
-  panel.innerHTML='<span>取数方式 <b class="required">*</b></span><div class="task-controls"><label><input type="radio" name="r12-source-type" value="dataset" '+(!flowMode?'checked':'')+' '+(history?'disabled':'')+'> 普通数据集</label><label><input type="radio" name="r12-source-type" value="flow" '+(flowMode?'checked':'')+' '+(history?'disabled':'')+'> 流程数据集</label></div><div class="dataset-actions">'+(!flowMode?'<button type="button" class="btn secondary" id="r8-task-pick" '+(history||!flow?'disabled':'')+'>'+(dataset?'更换数据集':'选择数据集')+'</button>':'')+'<button type="button" class="btn secondary" id="r8-task-create" '+(!flow||history&&!flowMode?'disabled':'')+'>新建数据集</button>'+(flowMode?'<button type="button" class="action" id="r12-refresh-flow">刷新流程数据集</button>':dataset?'<button type="button" class="action" id="r12-manage-priorities">管理数据集优先级</button>':'')+'</div>'+
-    (flowMode?'<div class="r9-source-selected"><strong>'+esc(flow?.name||'请先选择所属流程')+' · 流程数据集</strong><small>当前 '+count+' 个独立数据集。新建数据集关联此流程后自动加入；标签不决定取数范围。</small></div>':dataset?'<div class="r9-source-selected"><strong>'+esc(dataset.name)+(count>1?' 等 '+count+' 个数据集':'')+'</strong><small>'+esc(dataset.id)+' · '+esc(flow?.name||'所属流程待确认')+'</small></div>':'<p class="muted">'+(flow?'单选一个普通数据集。':'请先选择所属流程。')+'</p>')+
-    ((dataset||flowMode)?(typeof r12PriorityTable==='function'?r12PriorityTable(taskDraft):'')+r12SelectionHTML(taskDraft):'');
-  panel.querySelectorAll('[name=r12-source-type]').forEach(el=>el.onchange=()=>{if(el.value==='flow'){if(flow)r12UseFlowPool(taskDraft);else taskDraft.dataSource={type:'flow',id:''};}else{taskDraft.dataSource=null;taskDraft.dataset='';taskDraft.datasetBindings=[];}renderTaskDatasets();});
+  const history=(taskDraft.detailSamples||[]).length>0,selectedId=r9TaskDatasetId(taskDraft),flowMode=taskDraft.dataSource?.type==='flow',flow=r12Flow(taskDraft.flowId),dataset=!flowMode?nexDatasets.list().find(d=>String(d.id)===selectedId):null;
+  const count=flowMode?r12FlowDatasets(taskDraft.dataSource.id).length:taskDatasetBindings(taskDraft).filter(b=>!b.packageArchived).length;
+  panel.innerHTML='<span>取数方式 <b class="required">*</b></span><div class="task-controls"><label><input type="radio" name="r12-source-type" value="dataset" '+(!flowMode?'checked':'')+' '+(history?'disabled':'')+'> 普通数据集</label><label><input type="radio" name="r12-source-type" value="flow" '+(flowMode?'checked':'')+' '+(history?'disabled':'')+'> 流程数据集</label></div><div class="dataset-actions">'+
+    (flowMode?'<button type="button" class="btn secondary" id="r13-flow-pick" '+(history?'disabled':'')+'>选择已有流程数据集</button><button type="button" class="btn secondary" id="r13-flow-new" '+(history?'disabled':'')+'>新建流程数据集</button>':'<button type="button" class="btn secondary" id="r8-task-pick" '+(history||!flow?'disabled':'')+'>'+(dataset?'更换数据集':'选择已有数据集')+'</button><button type="button" class="btn secondary" id="r8-task-create" '+(!flow||history?'disabled':'')+'>新建数据集</button>')+'</div>'+
+    (flowMode&&flow?'<div class="r9-source-selected"><strong>'+esc(flow.name)+' · 流程数据集</strong><small>BIZ '+esc(flow.bizId||'未映射')+' · 当前 '+count+' 个独立数据集。后续关联此流程的数据集自动加入。</small></div>':dataset?'<div class="r9-source-selected"><strong>'+esc(dataset.name)+(count>1?' 等 '+count+' 个数据集':'')+'</strong><small>'+esc(dataset.id)+' · '+esc(flow?.name||'所属流程待确认')+'</small></div>':'<p class="muted">'+(flowMode?'请选择已有流程数据集，或新建。':flow?'单选一个普通数据集。':'请先选择所属流程。')+'</p>')+
+    ((dataset||flowMode&&flow)?r12PriorityTable(taskDraft):'');
+  const owner=document.getElementById('task-owner-flow')?.closest('.r12-flow-field');if(owner)owner.hidden=flowMode;
+  panel.querySelectorAll('[name=r12-source-type]').forEach(el=>el.onchange=()=>{if(el.value==='flow'){taskDraft.dataSource={type:'flow',id:''};taskDraft.dataset='';taskDraft.datasetBindings=[];taskDraft.flowId='';taskDraft.groupId='';}else{taskDraft.dataSource=null;taskDraft.dataset='';taskDraft.datasetBindings=[];}renderTaskBasics();});
+  panel.querySelector('#r13-flow-pick')?.addEventListener('click',()=>r13ChooseFlowDataset(taskDraft,renderTaskBasics));
+  panel.querySelector('#r13-flow-new')?.addEventListener('click',()=>r13CreateFlowDataset(taskDraft,renderTaskBasics));
   panel.querySelector('#r8-task-pick')?.addEventListener('click',()=>r8ChooseSource(taskDraft,renderTaskDatasets));
-  panel.querySelector('#r8-task-create').onclick=()=>window.nexDatasets.create(ds=>{if(taskDraft.dataSource?.type==='flow'){taskDraft.datasetBindings=r12ResolveFlowBindings(taskDraft);}else{const error=r8SetTaskSource(taskDraft,{type:'dataset',id:ds.id});if(error)toast(error);}renderTaskDatasets();},{flowId:taskDraft.flowId});
-  panel.querySelector('#r12-manage-priorities')?.addEventListener('click',()=>r12OpenSourcePriority(selectedId,renderTaskDatasets));
-  panel.querySelector('#r12-refresh-flow')?.addEventListener('click',renderTaskDatasets);
-  r12BindSelection();
+  panel.querySelector('#r8-task-create')?.addEventListener('click',()=>nexDatasets.create(ds=>{const error=r8SetTaskSource(taskDraft,{type:'dataset',id:ds.id});if(error)toast(error);renderTaskDatasets();},{flowId:taskDraft.flowId}));
 }
 
 function r8ValidateTaskSource(task){
@@ -14202,18 +14241,7 @@ let r12ComputeStrategies=readLocal(R12_COMPUTE_KEY,[{
   tiers:r12ComputeTierNames.map((name,i)=>({name,global:{join:'AND',rules:[{...r12ComputeRule('source_dataset_id','DEMO-DISABLED'),relation:'不等于'}]},join:'AND',sets:[{id:'demo-'+i,join:'AND',rules:i===0?[r12ComputeRule('demo_urgency','紧急')]:i===1?[r12ComputeRule('content_type','视频')]:i===2?[r12ComputeRule('content_type','图文')]:[r12ComputeRule('source_dataset_id','DEMO-ARCHIVE')]}]}))
 }]);
 function r12ComputeStrategy(id){return r12ComputeStrategies.find(s=>s.id===id);}
-function r12ComputeTarget(task,group){return group||task.flow;}
-function r12ComputeLabel(id){return r12ComputeStrategy(id)?.name||(id?'原策略已失效':'待配置');}
-function r12ComputeRefs(id){
-  return tasks.flatMap(t=>!t.flow?.nodes?.includes('机审')?[]:(t.flow.assignment==='条件分配'?revMachineGroups(t.flow).map(g=>({task:t,group:g,name:g.name})): [{task:t,group:null,name:'全量机审'}]).filter(r=>r12ComputeTarget(r.task,r.group).computeStrategyId===id));
-}
-function r12ComputeOptions(id){return '<option value="">请选择算力策略</option>'+r12ComputeStrategies.map(s=>'<option value="'+esc(s.id)+'" '+(id===s.id?'selected':'')+'>'+esc(s.name)+'</option>').join('')+(id&&!r12ComputeStrategy(id)?'<option value="'+esc(id)+'" selected>原策略已失效</option>':'');}
-function r12ComputeControl(target){return '<div class="task-row r12-compute-control"><label>机审算力策略 <span class="r8-new">NEW</span></label><div><div class="task-controls"><select class="small-select" data-r12-compute-select aria-label="机审算力策略">'+r12ComputeOptions(target.computeStrategyId||'')+'</select><button type="button" class="action" data-r12-compute-view>查看策略</button></div><small class="muted">按所选策略的条件分档；与数据优先级分别配置。</small></div></div>';}
-function r12BindComputeControl(host,target){
-  const select=host.querySelector('[data-r12-compute-select]');if(!select)return;
-  select.onchange=()=>{target.computeStrategyId=select.value;};
-  host.querySelector('[data-r12-compute-view]').onclick=()=>{if(!select.value){toast('请先选择算力策略');return;}r12OpenComputeStrategy(select.value,false,()=>{select.innerHTML=r12ComputeOptions(target.computeStrategyId||'');});};
-}
+function r13CurrentComputeStrategy(){return r12ComputeStrategies.find(s=>s.id==='DEMO-CONTENT'&&(s.object||'内容')==='内容')||r12ComputeStrategies.find(s=>(s.object||'内容')==='内容');}
 function r12ComputeItems(){
   const fields=new Map();
   const add=(id,name,scope='业务')=>{if(id&&!fields.has(String(id)))fields.set(String(id),{id:String(id),name:name||id,scope});};
@@ -14304,6 +14332,7 @@ function r12ComputeError(s){
   return '';
 }
 function r12OpenComputeStrategy(id='',editable=false,onSave){
+  const currentConfig=r13CurrentComputeStrategy();if(!id&&currentConfig)id=currentConfig.id;if(id&&currentConfig&&id!==currentConfig.id)editable=false;
   const old=r12ComputeStrategy(id),model=structuredClone(old||{id:'COMPUTE-'+uid(),code:'content_'+Date.now().toString(36),object:'内容',name:'',fulfillDatasetTier:false,fallback:'三档',tiers:r12ComputeTierNames.map(name=>({name,global:{join:'AND',rules:[]},join:'AND',sets:[]}))});
   if(!old)editable=true;
   wideModal((editable?(old?'编辑':'新建'):'查看')+'机审算力配置','<div class="r12-compute-editor"><div class="r12-compute-basics"><label class="field"><span>策略名称 <b class="required">*</b></span><input id="cp-name" value="'+esc(model.name)+'" '+(!editable?'readonly':'')+'></label><label class="field"><span>审核对象</span><input value="内容" readonly></label></div><div class="r12-compute-notice">分档结构参考 BIZ；当前条件为演示配置。资源配额和多档命中的裁定规则待核实。</div><div class="task-row"><label>是否履约数据集档位</label><div><div class="task-controls">'+['否','是'].map(v=>'<label><input type="radio" name="cp-fulfill" value="'+v+'" '+((model.fulfillDatasetTier?'是':'否')===v?'checked':'')+' '+(!editable?'disabled':'')+'> '+v+'</label>').join('')+'</div><small class="muted" id="cp-fulfill-hint">开启后需接入送审源档位映射，数字优先级不转换成档位。</small></div></div><div class="task-row"><label>所有档位均未命中的兜底档位</label><select id="cp-fallback" class="small-select" '+(!editable?'disabled':'')+'>'+options(r12ComputeTierNames,model.fallback)+'</select></div><div class="task-tabs r12-compute-tabs">'+model.tiers.map((t,i)=>'<button type="button" data-cp-tier="'+i+'" class="'+(i===0?'active':'')+'">'+t.name+'</button>').join('')+'</div><div id="cp-tier-editor"></div><p id="cp-error" class="error" role="alert"></p></div>',
@@ -14317,22 +14346,13 @@ function r12OpenComputeStrategy(id='',editable=false,onSave){
   $('#cp-preview').onclick=()=>r12ComputePreview(model);
   $('#cp-save')?.addEventListener('click',()=>{const error=r12ComputeError(model);if(error){$('#cp-error').textContent=error;return;}model.name=model.name.trim();model.updated=new Date().toLocaleString('sv-SE');model.updatedBy='演练运营';const candidate=r12ComputeStrategies.filter(x=>x.id!==model.id).concat(model);if(!writeLocal(R12_COMPUTE_KEY,candidate))return;r12ComputeStrategies=candidate;close();onSave?.(model);if(current==='机审算力配置')r12RenderCompute();toast('机审算力配置已保存');});
 }
-function r12ComputeUsage(id){const refs=r12ComputeRefs(id);wideModal('关联机审任务','<div class="tablewrap"><table><thead><tr><th>NEX 任务</th><th>机审任务</th><th>操作</th></tr></thead><tbody>'+(refs.length?refs.map((r,i)=>'<tr><td>'+esc(r.task.name)+'<small>'+esc(r.task.id)+'</small></td><td>'+esc(r.name)+'</td><td><button class="action" data-cp-open-task="'+i+'">查看任务</button></td></tr>').join(''):'<tr><td colspan="3" class="empty">暂无任务引用</td></tr>')+'</tbody></table></div>','<button class="btn secondary" data-close>关闭</button>');document.querySelectorAll('[data-cp-open-task]').forEach(b=>b.onclick=()=>{const task=refs[Number(b.dataset.cpOpenTask)].task;close();current='任务管理';sidebar();openTaskDetail(task,'控制台');});}
 function r12RenderCompute(){
-  $('#main').innerHTML='<div class="r12-compute-heading"><h1>机审算力配置</h1><span class="r8-new">NEW</span></div><div class="r12-compute-notice">统一维护四档分配条件，机审任务引用策略。配置为演示数据。</div><form id="cp-filter"><div class="filters"><label class="filter">Code<input name="code" placeholder="请输入"></label><label class="filter">策略名称<input name="name" placeholder="请输入"></label><label class="filter">审核对象<input value="内容" readonly></label></div><div class="toolbar"><button class="btn">查询</button><button class="reset" type="reset">重置筛选</button><button type="button" class="btn create" id="cp-new">新建配置</button></div></form><div id="cp-list"></div>';
+  const currentConfig=r13CurrentComputeStrategy();
+  $('#main').innerHTML='<div class="r12-compute-heading"><h1>机审算力配置</h1><span class="r8-new">NEW</span></div><div class="r12-compute-notice">按审核对象统一维护四档分配条件。配置为演示数据。</div><form id="cp-filter"><div class="filters"><label class="filter">Code<input name="code" placeholder="请输入"></label><label class="filter">配置名称<input name="name" placeholder="请输入"></label><label class="filter">审核对象<input value="内容" readonly></label></div><div class="toolbar"><button class="btn">查询</button><button class="reset" type="reset">重置筛选</button><button type="button" class="btn create" id="cp-edit-current">'+(currentConfig?'编辑内容配置':'创建内容配置')+'</button></div></form><div id="cp-list"></div>';
   const form=$('#cp-filter');
-  function draw(){const f=Object.fromEntries(new FormData(form)),list=r12ComputeStrategies.filter(s=>s.code.includes(f.code||'')&&s.name.includes(f.name||''));$('#cp-list').innerHTML='<div class="tablewrap"><table><thead><tr><th>Code</th><th>审核对象</th><th>策略名称</th><th>关联机审任务</th><th>最近修改人</th><th>最近修改时间</th><th>操作</th></tr></thead><tbody>'+list.map(s=>'<tr><td>'+esc(s.code)+'</td><td>'+esc(s.object)+'</td><td>'+esc(s.name)+'<small class="r12-compute-muted">演示配置</small></td><td><button class="action" data-cp-usage="'+esc(s.id)+'">'+r12ComputeRefs(s.id).length+' 个</button></td><td>'+esc(s.updatedBy||'—')+'</td><td>'+esc(s.updated||'—')+'</td><td><button class="action" data-cp-view="'+esc(s.id)+'">查看</button><button class="action" data-cp-edit="'+esc(s.id)+'">编辑</button></td></tr>').join('')+(!list.length?'<tr><td colspan="7" class="empty">暂无匹配配置</td></tr>':'')+'</tbody></table></div><div class="pagination"><span class="total">共 '+list.length+' 条</span></div>';
-  $('#cp-list').querySelectorAll('[data-cp-view]').forEach(b=>b.onclick=()=>r12OpenComputeStrategy(b.dataset.cpView,false));$('#cp-list').querySelectorAll('[data-cp-edit]').forEach(b=>b.onclick=()=>r12OpenComputeStrategy(b.dataset.cpEdit,true));$('#cp-list').querySelectorAll('[data-cp-usage]').forEach(b=>b.onclick=()=>r12ComputeUsage(b.dataset.cpUsage));}
-  form.onsubmit=e=>{e.preventDefault();draw();};form.onreset=()=>setTimeout(draw,0);$('#cp-new').onclick=()=>r12OpenComputeStrategy('',true);draw();
-}
-function r12ComputeTaskAction(task,group,refresh){
-  const target=r12ComputeTarget(task,group),draft={computeStrategyId:target.computeStrategyId||''};
-  wideModal('调整机审算力策略','<p>'+esc(task.name)+' / '+esc(group?.name||'全量机审')+'</p>'+r12ComputeControl(draft)+'<p class="muted">保存后任务引用新策略，已完成的审核结果保留。</p>','<button class="btn secondary" data-close>取消</button><button class="btn" id="cp-task-save">保存</button>');r12BindComputeControl($('.drawerbody'),draft);
-  $('#cp-task-save').onclick=()=>{target.computeStrategyId=draft.computeStrategyId;if(!writeLocal(TASK_KEY,tasks))return;close();refresh();toast('已更新机审算力策略');};
-}
-function r12ComputeTaskPreview(task,group){
-  const strategy=r12ComputeStrategy(r12ComputeTarget(task,group).computeStrategyId);if(!strategy){toast('请先配置机审算力策略');return;}
-  const records=(task.detailSamples||[]).filter(r=>!group||String(r.assignmentId||'')===String(group.id));r12ComputePreview(strategy,records,'机审分档预览 · '+(group?.name||'全量机审'));
+  function draw(){const f=Object.fromEntries(new FormData(form)),list=r12ComputeStrategies.filter(s=>s.code.includes(f.code||'')&&s.name.includes(f.name||''));$('#cp-list').innerHTML='<div class="tablewrap"><table><thead><tr><th>Code</th><th>审核对象</th><th>配置名称</th><th>适用范围</th><th>最近修改人</th><th>最近修改时间</th><th>操作</th></tr></thead><tbody>'+list.map(s=>{const current=s.id===currentConfig?.id;return '<tr><td>'+esc(s.code)+'</td><td>'+esc(s.object)+'</td><td>'+esc(s.name)+'<small class="r12-compute-muted">'+(current?'当前统一配置 · 演示':'历史演示配置')+'</small></td><td>'+esc(current?(s.object||'内容')+'审核':'仅保留历史记录')+'</td><td>'+esc(s.updatedBy||'—')+'</td><td>'+esc(s.updated||'—')+'</td><td><button class="action" data-cp-view="'+esc(s.id)+'">查看</button>'+(current?'<button class="action" data-cp-edit="'+esc(s.id)+'">编辑</button>':'')+'</td></tr>';}).join('')+(!list.length?'<tr><td colspan="7" class="empty">暂无匹配配置</td></tr>':'')+'</tbody></table></div><div class="pagination"><span class="total">共 '+list.length+' 条</span></div>';
+  $('#cp-list').querySelectorAll('[data-cp-view]').forEach(b=>b.onclick=()=>r12OpenComputeStrategy(b.dataset.cpView,false));$('#cp-list').querySelectorAll('[data-cp-edit]').forEach(b=>b.onclick=()=>r12OpenComputeStrategy(b.dataset.cpEdit,true));}
+  form.onsubmit=e=>{e.preventDefault();draw();};form.onreset=()=>setTimeout(draw,0);$('#cp-edit-current').onclick=()=>r12OpenComputeStrategy(currentConfig?.id||'',true);draw();
 }
 
 (builtinTemplates.unshift(graphicCommonTemplate),
@@ -14466,18 +14486,19 @@ function r12ResolveFlowBindings(task){
 }
 function r12UseFlowPool(task){task.dataSource={type:'flow',id:String(task.flowId)};task.flowBindingKey||=uid();task.dataset=(r12Flow(task.flowId)?.name||'')+' · 流程数据集';task.datasetBindings=r12ResolveFlowBindings(task);}
 function r12TaskPoolRecords(task){return taskDatasetBindings(task).flatMap(b=>r12PoolRecords(b.id));}
-function r12Selection(task){return task.dataSelection||{mode:'all',sets:[],continuous:true};}
+
+
 function r12SourceScopeError(task){
   if(!r12Flow(task.flowId))return '请先选择所属流程。';
   if(task.dataSource?.type==='flow'){if(String(task.dataSource.id)!==String(task.flowId))return '流程数据集与所属流程不一致，请重新选择。';}
   else{const dataset=window.nexDatasets.list().find(d=>String(d.id)===r9TaskDatasetId(task));if(!dataset||String(dataset.flowId)!==String(task.flowId))return '请选择当前流程内的数据集。';}
-  const selection=r12Selection(task);
-  if(selection.mode==='conditions'&&(!selection.sets?.length||selection.sets.some(s=>!s.rules?.length||s.rules.some(r=>!auditValidRule(r)))))return '请补全任务圈选条件。';
   return '';
 }
 function r12FlowOptions(selected){return '<option value="">请选择所属流程</option>'+window.nexDatasets.flows().map(f=>'<option value="'+esc(f.id)+'" '+(String(f.id)===String(selected)?'selected':'')+'>'+esc(f.name+(f.bizId?' · BIZ '+f.bizId:''))+'</option>').join('');}
-function r12ClearSource(task){task.dataSource=null;task.dataset='';task.datasetBindings=[];task.dataSelection={mode:'all',sets:[],continuous:true};}
-function r12SetFlow(task,id){const f=r12Flow(id),conditional=r12Selection(task).mode==='conditions',useFlow=task.dataSource?.type==='flow';task.flowId=f?String(f.id):'';task.groupId=f?String(f.groupId):'';r12ClearSource(task);if(conditional)task.dataSelection={mode:'conditions',sets:[],continuous:true};if(f&&useFlow)r12UseFlowPool(task);else{const pool=r12FlowDatasets(id);if(pool.length===1)r8SetTaskSource(task,{type:'dataset',id:pool[0].id});}}
+function r12ClearSource(task){task.dataSource=null;task.dataset='';task.datasetBindings=[];}
+
+function r12SetFlow(task,id){const f=r12Flow(id),useFlow=task.dataSource?.type==='flow';task.flowId=f?String(f.id):'';task.groupId=f?String(f.groupId):'';r12ClearSource(task);if(f&&useFlow)r12UseFlowPool(task);else{const pool=r12FlowDatasets(id);if(pool.length===1)r8SetTaskSource(task,{type:'dataset',id:pool[0].id});}}
+
 function r12CreateInFlow(id){
   const flow=r12Flow(id);if(!flow)return;
   window.nexDatasets.unmount();document.getElementById('nex-dataset-page')?.remove();
@@ -14486,11 +14507,12 @@ function r12CreateInFlow(id){
 window.nexCreateTaskInFlow=r12CreateInFlow;
 function r12OpenFlowStart(){
   const flows=window.nexDatasets.flows(),datasets=window.nexDatasets.list();
-  const d=r8Dialog('在流程中创建任务','<p class="muted">先确定流程，再从该流程的数据池圈选任务数据。</p><div class="r12-flow-cards">'+flows.map(f=>'<section><div><strong>'+esc(f.name)+'</strong><small>BIZ '+esc(f.bizId||'未映射')+' · '+datasets.filter(x=>String(x.flowId)===String(f.id)).length+' 个数据集 · '+tasks.filter(t=>String(t.flowId)===String(f.id)).length+' 个任务</small></div><button class="btn secondary" data-r12-create-flow="'+esc(f.id)+'">在此流程创建</button></section>').join('')+'</div>','<button class="btn secondary" data-r8-close>取消</button><button class="action" id="r12-open-flows">管理分组与流程</button>');
+  const d=r8Dialog('在流程中创建任务','<p class="muted">先确定流程，再引用该流程的数据集创建任务。</p><div class="r12-flow-cards">'+flows.map(f=>'<section><div><strong>'+esc(f.name)+'</strong><small>BIZ '+esc(f.bizId||'未映射')+' · '+datasets.filter(x=>String(x.flowId)===String(f.id)).length+' 个数据集 · '+tasks.filter(t=>String(t.flowId)===String(f.id)).length+' 个任务</small></div><button class="btn secondary" data-r12-create-flow="'+esc(f.id)+'">在此流程创建</button></section>').join('')+'</div>','<button class="btn secondary" data-r8-close>取消</button><button class="action" id="r12-open-flows">管理分组与流程</button>');
   d.querySelectorAll('[data-r12-create-flow]').forEach(b=>b.onclick=()=>{const id=b.dataset.r12CreateFlow;r8CloseDialog();r12CreateInFlow(id);});
   d.querySelector('#r12-open-flows').onclick=()=>{r8CloseDialog();window.nexDatasets.unmount();const c=document.createElement('div');c.id='nex-dataset-page';c.dataset.view='dsgroups';document.getElementById('main').replaceChildren(c);window.nexDatasets.mount(c,'dsgroups');};
 }
-function r12SelectionSummary(task){const s=r12Selection(task);return s.mode==='all'?'全部数据':auditDescribeGroup(s)||'尚未配置条件';}
+
+
 function r12ReadCondition(row,rule){
   const snap=row.submissionSnapshot;
   if(rule.source==='内容规则项')return snap?.results?.[rule.scope||'业务']?.[rule.field];
@@ -14517,60 +14539,28 @@ function r12RuleMatch(raw,rule){
     default:return null;
   }
 }
-function r12ScopeEvaluate(task,row){
-  if(!taskDatasetBindings(task).some(b=>String(b.id)===String(row.datasetId)&&!b.packageArchived))return {state:'excluded',reason:'来源不在任务数据池内'};
-  const select=r12Selection(task);if(select.mode!=='conditions')return {state:'matched',reason:'全量圈选'};
-  if(!select.sets?.length)return {state:'pending',reason:'圈选条件未配置'};
-  const missing=[],setStates=select.sets.map(set=>{
-    if(!set.rules?.length)return null;
-    const results=set.rules.map(rule=>{const result=r12RuleMatch(r12ReadCondition(row,rule),rule);if(result===null)missing.push(rule.label||rule.field||'条件结果');return result;});
-    if(set.join==='OR')return results.includes(true)?true:results.includes(null)?null:false;
-    return results.includes(false)?false:results.includes(null)?null:true;
-  });
-  const state=setStates.includes(true)?'matched':setStates.includes(null)?'pending':'excluded';
-  return {state,reason:state==='matched'?'命中圈选条件':state==='pending'?'缺少结果：'+[...new Set(missing)].join('、'):'未命中圈选条件'};
-}
+
+
 function r12PoolRecords(datasetId){try{return JSON.parse(localStorage.getItem('nex-flow-pool-records.v1')||'{}')[String(datasetId)]||[];}catch{return [];}}
 function r12SavePoolRecord(datasetId,row){let data={};try{data=JSON.parse(localStorage.getItem('nex-flow-pool-records.v1')||'{}');}catch{};(data[String(datasetId)]||=[]).push(structuredClone(row));localStorage.setItem('nex-flow-pool-records.v1',JSON.stringify(data));}
-function r12PreviewRows(task){
-  const saved=r12TaskPoolRecords(task);
-  if(saved.length)return {source:'数据池中已生成的演练数据',rows:saved};
-  const rows=taskDatasetBindings(task).filter(b=>!b.packageArchived).flatMap((b,i)=>['图文','视频'].map((type,k)=>{
-    const fields={...feedsMediaFields(i+k),source_dataset_id:b.id,content_type:type,black_shop:'否'};
-    return {id:'PREVIEW-'+b.id+'-'+k,datasetId:b.id,dataset:b.name,title:fields.title,sent:'当前演示',fields,submissionSnapshot:{demo:true,fields,results:{}}};
-  }));
-  return {source:'每个来源的图文 / 视频演示样本，非实际线上数据；未预置规则和算子结果',rows};
-}
-function r12PreviewHTML(task){
-  const preview=r12PreviewRows(task),rows=preview.rows,states=rows.map(r=>[r,r12ScopeEvaluate(task,r)]),counts={matched:0,pending:0,excluded:0};states.forEach(([,s])=>counts[s.state]++);
-  const label={matched:'进入任务',pending:'待判断',excluded:'不进入'};
-  return '<div class="r12-preview-summary"><span>进入任务 <b>'+counts.matched+'</b></span><span>不进入 <b>'+counts.excluded+'</b></span><span>待判断 <b>'+counts.pending+'</b></span></div><p class="muted">'+esc(preview.source)+'</p><div class="tablewrap"><table><thead><tr><th>数据 ID</th><th>送审源</th><th>内容类型</th><th>判断</th><th>依据</th></tr></thead><tbody>'+states.map(([r,s])=>'<tr><td>'+esc(r.id)+'</td><td>'+esc(r.dataset)+'</td><td>'+esc(r.submissionSnapshot?.fields?.content_type||r.fields?.content_type||'—')+'</td><td><span class="r12-state '+s.state+'">'+label[s.state]+'</span></td><td>'+esc(s.reason)+'</td></tr>').join('')+(states.length?'':'<tr><td colspan="5">请先选择数据集。</td></tr>')+'</tbody></table></div>';
-}
-function r12ShowSelectionPreview(task){r8Dialog('任务圈选预览',r12PreviewHTML(task),'<button class="btn" data-r8-close>关闭</button>');}
-function r12ConfigureSelection(){
-  const next=structuredClone(r12Selection(taskDraft));next.mode='conditions';next.continuous=true;if(!next.sets?.length)next.sets=[{id:uid(),join:'AND',rules:[auNewRule()]}];
-  wideModal('配置任务圈选','<p class="muted">这些条件决定数据是否进入本任务。机审、人审节点内的条件分配继续独立配置。</p><div id="r12-scope-sets"></div><p class="muted">内容规则和算子仅使用送审时已有结果；缺结果的数据标为待判断。</p><p class="task-error" id="r12-selection-error"></p>','<button class="btn secondary" data-close>取消</button><button class="btn" id="r12-selection-save">保存圈选条件</button>');
-  auditDrawSets(document.getElementById('r12-scope-sets'),next.sets);
-  document.getElementById('r12-selection-save').onclick=()=>{
-    if(!next.sets.length||next.sets.some(s=>!s.rules.length||s.rules.some(r=>!auditValidRule(r)))){document.getElementById('r12-selection-error').textContent='请补全每个条件组的条件、关系和值。';return;}
-    taskDraft.dataSelection=next;close();renderTaskDatasets();
-  };
-}
-function r12SelectionHTML(task){
-  const s=r12Selection(task);
-  return '<section class="r12-selection"><div class="r12-selection-head"><strong>任务圈选 <small class="v6-new">NEW</small></strong><button type="button" class="action" id="r12-preview">预览匹配数据</button></div><div class="task-controls"><label><input type="radio" name="r12-selection-mode" value="all" '+(s.mode!=='conditions'?'checked':'')+'> 全部数据</label><label><input type="radio" name="r12-selection-mode" value="conditions" '+(s.mode==='conditions'?'checked':'')+'> 按条件圈选</label></div><div class="r12-selection-summary">'+esc(r12SelectionSummary(task))+(s.mode==='conditions'?'<button type="button" class="action" id="r12-edit-selection">编辑条件</button>':'')+'</div><small>持续按条件匹配。新增来源进入共享池后，只有符合本任务条件的数据才进入任务；已完成记录不重新处理。</small></section>';
-}
-function r12BindSelection(){
-  document.querySelectorAll('[name=r12-selection-mode]').forEach(el=>el.onchange=()=>{if(el.value==='conditions'){renderTaskDatasets();r12ConfigureSelection();}else{taskDraft.dataSelection={...r12Selection(taskDraft),mode:'all',continuous:true};renderTaskDatasets();}});
-  document.getElementById('r12-edit-selection')?.addEventListener('click',r12ConfigureSelection);
-  document.getElementById('r12-preview')?.addEventListener('click',()=>r12ShowSelectionPreview(taskDraft));
-}
+
+
+
+
+
+
+
+
+
+
+
+
 function r12IngestSample(task,b,type='图文'){
   const datasetId=String(b.id),index=r12PoolRecords(datasetId).length,id='DEMO-'+uid().slice(1).toUpperCase(),sent=new Date().toLocaleString('sv-SE');
   const fields={source_dataset_id:b.id,outer_id:id,content_type:type,black_shop:'否',...feedsMediaFields(index)};
   const record={...feedsMediaRecord(index),id,instance:'SIM-'+id,dataset:b.name,datasetId:b.id,flowId:task.flowId,poolDatasetId:datasetId,sourcePriority:b.priority,sent,fields,submissionSnapshot:{demo:true,at:sent,fields:{...fields},results:{}},scopeOutcomes:[]};
   const eligible=tasks.filter(t=>String(t.flowId)===String(task.flowId)&&taskDatasetBindings(t).some(b=>!b.packageArchived&&String(b.id)===datasetId));
-  record.scopeOutcomes=eligible.map(candidate=>({taskId:candidate.id,taskName:candidate.name,...r12ScopeEvaluate(candidate,record)}));
+  record.scopeOutcomes=eligible.map(candidate=>({taskId:candidate.id,taskName:candidate.name,state:'matched',reason:'任务引用此数据集'}));
   for(const candidate of eligible){
     if(record.scopeOutcomes.find(s=>String(s.taskId)===String(candidate.id))?.state!=='matched')continue;
     const binding=taskDatasetBindings(candidate).find(x=>String(x.id)===String(b.id)),stages=candidate.flow.nodes||[];
@@ -14580,14 +14570,12 @@ function r12IngestSample(task,b,type='图文'){
   r12SavePoolRecord(datasetId,record);writeLocal(TASK_KEY,tasks);
   return record;
 }
-function r12ScopeTrace(task,row){
-  return '<div class="detailrow"><span>原送审源</span><strong>'+esc(row.dataset||row.datasetId||'—')+'</strong></div><div class="detailrow"><span>所属流程</span><strong>'+esc(r12Flow(task.flowId)?.name||'待关联')+'</strong></div><div class="detailrow"><span>当前任务圈选</span><strong>'+esc(r12SelectionSummary(task))+'</strong></div><div class="detailrow"><span>本条任务归属</span><strong>'+esc(row.scopeTaskName||task.name)+'</strong></div>';
-}
+function r12ScopeTrace(task,row){return '<div class="detailrow"><span>原送审源</span><strong>'+esc(row.dataset||row.datasetId||'—')+'</strong></div><div class="detailrow"><span>所属流程</span><strong>'+esc(r12Flow(task.flowId)?.name||'待关联')+'</strong></div><div class="detailrow"><span>任务归属</span><strong>'+esc(row.scopeTaskName||task.name)+'</strong></div>';}
 
 function r12InstallFlowExample(){
   if(R10_HAD_TASK_STORAGE)return;
   let changed=false;
-  tasks.forEach(t=>{if(r12Flow(t.flowId)&&t.dataSource?.type==='package'){r12UseFlowPool(t);t.dataSelection={mode:'all',sets:[],continuous:true};changed=true;}});
+  tasks.forEach(t=>{if(r12Flow(t.flowId)&&t.dataSource?.type==='package'){r12UseFlowPool(t);changed=true;}});
   if(changed){writeLocal(TASK_KEY,tasks);syncTaskDatasetReferences();}
 }
 
@@ -14596,6 +14584,52 @@ function r12ShowFlowInfo(id){
       const flow=r12Flow(id);if(!flow){toast('请先选择所属流程。');return;}
       const pool=r12FlowDatasets(id);r8Dialog(flow.name,'<p class="muted">BIZ '+esc(flow.bizId||'未映射')+' · '+pool.length+' 个数据集</p><div class="r12-flow-cards">'+pool.map(d=>'<section><div><strong>'+esc(d.name)+'</strong><small>'+esc(d.id)+' · '+Number(d.sourceCount||1)+' 个送审源</small></div></section>').join('')+'</div>','<button class="btn" data-r8-close>关闭</button>');
     }
+
+// A flow dataset is a live view of the independent datasets linked to a flow.
+function r13ApplyFlowDataset(task,id){
+  const flow=r12Flow(id);if(!flow)return false;
+  task.flowId=String(flow.id);task.groupId=String(flow.groupId);r12UseFlowPool(task);return true;
+}
+function r13MemberTable(members){
+  return '<div class="r13-members tablewrap"><table><thead><tr><th>数据集</th><th>数据集 ID</th><th>接入方式</th><th>优先级</th></tr></thead><tbody>'+members.map(d=>'<tr><td>'+esc(d.name)+'</td><td>'+esc(d.id)+'</td><td>'+esc(d.method||'—')+'</td><td>'+esc(r12SourcePriority(d.id,d.id).value??'待确认')+'</td></tr>').join('')+(members.length?'':'<tr><td colspan="4">暂无关联数据集</td></tr>')+'</tbody></table></div>';
+}
+function r13ChooseFlowDataset(task,onChange){
+  let selected=task.dataSource?.type==='flow'?String(task.dataSource.id):'',query='',expanded='';
+  function draw(){
+    const flows=nexDatasets.flows().filter(f=>r12FlowDatasets(f.id).length&&(f.name+' '+f.id+' '+(f.bizId||'')).toLowerCase().includes(query.toLowerCase()));
+    const body='<p class="muted">选择已有流程，引用其中全部独立数据集。数据集优先级沿用资源配置。</p><input class="r8-search" id="r13-flow-search" placeholder="搜索流程名称、ID 或 BIZ ID" value="'+esc(query)+'"><div class="tablewrap"><table><thead><tr><th>选择</th><th>流程名称</th><th>BIZ 流程 ID</th><th>数据集数</th><th>操作</th></tr></thead><tbody>'+flows.map(f=>'<tr><td><input type="radio" name="r13-existing-flow" value="'+esc(f.id)+'" '+(selected===String(f.id)?'checked':'')+' aria-label="选择'+esc(f.name)+'"></td><td class="r13-flow-name">'+esc(f.name)+'<small>'+esc(f.id)+'</small></td><td>'+esc(f.bizId||'未映射')+'</td><td>'+r12FlowDatasets(f.id).length+'</td><td><button type="button" class="action" data-r13-members="'+esc(f.id)+'">'+(expanded===String(f.id)?'收起成员':'查看成员')+'</button></td></tr>'+(expanded===String(f.id)?'<tr><td colspan="5">'+r13MemberTable(r12FlowDatasets(f.id))+'</td></tr>':'')).join('')+(flows.length?'':'<tr><td colspan="5">暂无可用流程数据集，请先新建。</td></tr>')+'</tbody></table></div><p class="task-error" id="r13-flow-error"></p>';
+    const d=r8Dialog('选择已有流程数据集',body,'<button type="button" class="btn secondary" data-r8-close>取消</button><button type="button" class="btn" id="r13-flow-select">确定</button>');
+    d.querySelector('#r13-flow-search').oninput=e=>{query=e.target.value;const pos=e.target.selectionStart;draw();const n=r8DialogRoot.querySelector('#r13-flow-search');n.focus();n.setSelectionRange(pos,pos);};
+    d.querySelectorAll('[name=r13-existing-flow]').forEach(el=>el.onchange=()=>selected=el.value);
+    d.querySelectorAll('[data-r13-members]').forEach(el=>el.onclick=()=>{expanded=expanded===el.dataset.r13Members?'':el.dataset.r13Members;draw();});
+    d.querySelector('#r13-flow-select').onclick=()=>{if(!selected||!r12FlowDatasets(selected).length){d.querySelector('#r13-flow-error').textContent='请选择一个已有流程数据集。';return;}r13ApplyFlowDataset(task,selected);r8CloseDialog();onChange?.();};
+  }
+  draw();
+}
+function r13CreateFlowDataset(task,onChange){
+  const draft={mode:'existing',flowId:task.flowId||'',name:'',groupId:task.groupId||'',bizId:'',selected:[],error:'',newSaved:[]};
+  function currentMembers(){return draft.mode==='existing'?r12FlowDatasets(draft.flowId):[];}
+  function draw(){
+    const available=r12IndependentDatasets().filter(d=>!d.flowId),base=currentMembers(),chosen=available.filter(d=>draft.selected.includes(String(d.id)));
+    const body='<div class="task-controls"><label><input type="radio" name="r13-flow-mode" value="existing" '+(draft.mode==='existing'?'checked':'')+'> 使用已有流程</label><label><input type="radio" name="r13-flow-mode" value="new" '+(draft.mode==='new'?'checked':'')+'> 新建流程</label></div>'+
+      (draft.mode==='existing'?'<label class="field"><span>所属流程 <b class="required">*</b></span><select id="r13-create-flow">'+r12FlowOptions(draft.flowId)+'</select></label>'+(base.length?'<p class="info">该流程已有 '+base.length+' 个数据集，可直接选用；也可以继续关联未归属的数据集。</p>':''):'<div class="r13-flow-grid"><label class="field"><span>流程名称 <b class="required">*</b></span><input id="r13-create-name" maxlength="80" value="'+esc(draft.name)+'" placeholder="请输入流程名称"></label><label class="field"><span>所属分组 <b class="required">*</b></span><select id="r13-create-group"><option value="">请选择分组</option>'+nexDatasets.groups().map(g=>'<option value="'+esc(g.id)+'" '+(String(g.id)===String(draft.groupId)?'selected':'')+'>'+esc(g.name)+'</option>').join('')+'</select></label><label class="field"><span>BIZ 流程 ID</span><input id="r13-create-biz" value="'+esc(draft.bizId)+'" placeholder="选填，填写已有映射"></label></div>')+
+      '<div class="r13-members-head"><strong>关联未归属的数据集</strong><button type="button" class="btn secondary" id="r13-new-member">新建普通数据集</button></div><div class="r13-pending-members">'+available.map(ds=>'<label><input type="checkbox" data-r13-member="'+esc(ds.id)+'" '+(draft.selected.includes(String(ds.id))?'checked':'')+'><span>'+esc(ds.name)+'<small>'+esc(ds.id)+' · 优先级 '+esc(r12SourcePriority(ds.id,ds.id).value??'待确认')+'</small></span></label>').join('')+(available.length?'':'<p class="muted">暂无未归属的数据集，可新建独立数据集。</p>')+'</div><p class="muted">已属于其他流程的数据集不会迁入。独立数据集一经保存会保留，取消本弹窗只取消流程关联和任务选择。</p><h4>保存后的动态成员（'+(base.length+chosen.length)+'）</h4>'+r13MemberTable([...base,...chosen])+'<p class="task-error" id="r13-create-error">'+esc(draft.error)+'</p>';
+    const d=r8Dialog('新建流程数据集',body,'<button type="button" class="btn secondary" data-r8-close>取消</button><button type="button" class="btn" id="r13-create-save">保存并选择</button>');
+    d.querySelectorAll('[name=r13-flow-mode]').forEach(el=>el.onchange=()=>{draft.mode=el.value;draft.error='';draw();});
+    d.querySelector('#r13-create-flow')?.addEventListener('change',e=>{draft.flowId=e.target.value;draft.error='';draw();});
+    d.querySelector('#r13-create-name')?.addEventListener('input',e=>draft.name=e.target.value);
+    d.querySelector('#r13-create-group')?.addEventListener('change',e=>draft.groupId=e.target.value);
+    d.querySelector('#r13-create-biz')?.addEventListener('input',e=>draft.bizId=e.target.value);
+    d.querySelectorAll('[data-r13-member]').forEach(el=>el.onchange=()=>{draft.selected=el.checked?[...new Set([...draft.selected,el.dataset.r13Member])]:draft.selected.filter(x=>x!==el.dataset.r13Member);draw();});
+    d.querySelector('#r13-new-member').onclick=()=>{r8CloseDialog();nexDatasets.create(ds=>{draft.selected.push(String(ds.id));draft.newSaved.push(String(ds.id));draw();},{allowUnassignedFlow:true,onCancel:draw});};
+    d.querySelector('#r13-create-save').onclick=()=>{
+      const result=nexDatasets.saveFlowDataset({mode:draft.mode,flowId:draft.flowId,name:draft.name,groupId:draft.groupId,bizId:draft.bizId,datasetIds:draft.selected});
+      if(result.error){draft.error=result.error;d.querySelector('#r13-create-error').textContent=result.error;return;}
+      r13ApplyFlowDataset(task,result.id);r8CloseDialog();syncTaskDatasetReferences();onChange?.();toast('已选择流程数据集，后续成员随所属流程自动更新。');
+    };
+  }
+  draw();
+}
 
 function followMigrationLink(){
   const hash=location.hash;
