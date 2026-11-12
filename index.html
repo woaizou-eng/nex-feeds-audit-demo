@@ -14776,9 +14776,9 @@ function r12ComputeDemoSamples(){return [
 function r12ComputePreview(strategy,records=r12ComputeDemoSamples(),title='示例数据试算'){
   wideModal(title,'<div class="info">仅根据已有字段和结果匹配，不执行机审。多档同时命中的裁定规则待核实。</div><div class="tablewrap"><table><thead><tr><th>数据 ID</th><th>内容类型</th><th>命中档位</th><th>试算结果</th></tr></thead><tbody>'+(records.length?records.map(r=>{const result=r12ComputeEvaluate(strategy,r);return '<tr><td>'+esc(r.id)+'</td><td>'+esc(r12ComputeRuleValue(r,{source:'送审字段',field:'content_type'})??'—')+'</td><td>'+esc(result.matches.join('、')||'—')+'</td><td><span class="r12-compute-'+result.kind+'">'+esc(result.label)+'</span></td></tr>';}).join(''):'<tr><td colspan="4" class="empty">本任务暂无演示记录，请先生成样本。</td></tr>')+'</tbody></table></div>','<button class="btn secondary" data-close>关闭</button>');
 }
-function r12ComputeError(s){
-  if(!s.name.trim())return '请填写策略名称。';
-  if(r12ComputeStrategies.some(x=>x.id!==s.id&&x.name===s.name.trim()))return '策略名称已存在。';
+function r12ComputeError(s,validateName=true){
+  if(validateName&&!s.name.trim())return '请填写策略名称。';
+  if(validateName&&r12ComputeStrategies.some(x=>x.id!==s.id&&x.name===s.name.trim()))return '策略名称已存在。';
   for(const tier of s.tiers)for(const set of [tier.global||{rules:[]},...tier.sets])for(const r of set.rules){if(!r.field||!String(r.value??'').trim())return '请补全'+tier.name+'的条件。';if(['大于','大于等于','小于','小于等于'].includes(r.relation)&&!Number.isFinite(Number(r.value)))return '数字比较请输入有效数值。';}
   return '';
 }
@@ -14820,7 +14820,7 @@ function r16RenderComputePage(){
   const old=r13CurrentComputeStrategy(),model=structuredClone(old||{id:'COMPUTE-'+uid(),code:'content_'+Date.now().toString(36),object:'内容',name:'内容机审算力配置',fulfillDatasetTier:false,fallback:'三档',tiers:r12ComputeTierNames.map(name=>({name,global:{join:'AND',rules:[]},join:'AND',sets:[]}))});
   model.object='内容';let active=0,dirty=false;
   $('#main').innerHTML=`<div class="r12-compute-heading"><h1>机审算力配置</h1><span class="r8-new">NEW</span></div>
-    <div class="r16-compute-page"><div class="r12-compute-basics"><label class="field"><span>配置名称 <b class="required">*</b></span><input id="cp-name" value="${esc(model.name)}"></label><label class="field"><span>审核对象</span><input id="cp-object" value="内容" readonly></label></div>
+    <div class="r16-compute-page">
     <div class="r12-compute-notice">按审核对象统一配置四档分配条件。当前为演示配置，试算不会调用机审服务。</div>
     <div class="task-row"><label>是否履约数据集档位</label><div><div class="task-controls">${['否','是'].map(v=>`<label><input type="radio" name="cp-fulfill" value="${v}" ${(model.fulfillDatasetTier?'是':'否')===v?'checked':''}> ${v}</label>`).join('')}</div><small class="muted">送审源档位需单独映射，数据集数字优先级不转换成算力档位。</small></div></div>
     <div class="task-row"><label>未命中的兜底档位</label><select id="cp-fallback" class="small-select">${options(r12ComputeTierNames,model.fallback)}</select></div>
@@ -14828,7 +14828,6 @@ function r16RenderComputePage(){
     <p class="error" id="cp-error" role="alert"></p><div class="r16-compute-actions"><small id="cp-save-state">${old?.updated?'上次保存：'+esc(old.updated):'尚未保存'}</small><span class="push"></span><button type="button" class="btn secondary" id="cp-preview">示例数据试算</button><button type="button" class="btn secondary" id="cp-reset">撤销修改</button><button type="button" class="btn" id="cp-save">保存配置</button></div></div>`;
   const draw=()=>r12ComputeTierEditor($('#cp-tier-editor'),model.tiers[active],true);draw();
   function mark(){dirty=true;$('#cp-save-state').textContent='有未保存的修改';$('#cp-error').textContent='';}
-  $('#cp-name').oninput=e=>{model.name=e.target.value;mark();};
   $('#cp-fallback').onchange=e=>{model.fallback=e.target.value;mark();};
   document.querySelectorAll('[name=cp-fulfill]').forEach(input=>input.onchange=()=>{model.fulfillDatasetTier=input.value==='是';mark();});
   document.querySelectorAll('[data-cp-tier]').forEach(button=>button.onclick=()=>{active=Number(button.dataset.cpTier);document.querySelectorAll('[data-cp-tier]').forEach(other=>other.classList.toggle('active',other===button));draw();});
@@ -14836,7 +14835,7 @@ function r16RenderComputePage(){
   $('#cp-preview').onclick=()=>r12ComputePreview(model);
   $('#cp-reset').onclick=()=>{r16RenderComputePage();if(dirty)toast('已恢复上次保存的配置');};
   $('#cp-save').onclick=()=>{
-    const error=r12ComputeError(model);if(error){$('#cp-error').textContent=error;return;}
+    const error=r12ComputeError(model,false);if(error){$('#cp-error').textContent=error;return;}
     model.name=model.name.trim();model.object='内容';model.updated=new Date().toLocaleString('sv-SE');model.updatedBy='演练运营';
     const candidate=r12ComputeStrategies.filter(x=>x.id!==model.id).concat(structuredClone(model));if(!writeLocal(R12_COMPUTE_KEY,candidate))return;
     r12ComputeStrategies=candidate;dirty=false;$('#cp-save-state').textContent='已保存：'+model.updated;$('#cp-error').textContent='';toast('机审算力配置已保存');
