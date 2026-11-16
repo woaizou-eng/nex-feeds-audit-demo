@@ -6683,9 +6683,20 @@ const migrationReports = (() => {
     return migratedMetric(k)?'<small class="r4-metric-badge" title="迁移新增指标，数据接入情况以实际数据源为准">迁移新增指标</small>':'';
   }
   const metricLabel=(k,name=k)=>'<span class="r4-metric-name">'+esc(name)+metricBadge(k)+'</span>';
+  // Retire only the two added default charts; keep their saved configurations recoverable.
+  function r24RetireAddedCharts(layout){
+    const retired=new Set(['r4-flow-funnel','r4-grade-pie']);
+    const removed=(layout.blocks||[]).filter(block=>retired.has(block.id));
+    if(!removed.length)return;
+    const key='nex-retired-report-default-charts-v1',archive=readLocal(key,[]);
+    for(const block of removed){
+      if(!archive.some(item=>item.report===layout.report&&item.block?.id===block.id))archive.push({report:layout.report,block:structuredClone(block),retiredAt:new Date().toISOString()});
+    }
+    if(!writeLocal(key,archive))return;
+    layout.blocks=layout.blocks.filter(block=>!retired.has(block.id));save();
+  }
+
   function defaultVisual(i){
-    if(i===0)return {id:'r4-flow-funnel',type:0,title:'审核流转漏斗',metrics:[...funnelOrder]};
-    if(i===3)return {id:'r4-grade-pie',type:5,title:'择优等级分布',dimension:'grade',metrics:pieMetrics('grade')};
     if(i===4)return {id:'r4-human-pie',type:5,title:'人审结果分布',dimension:'human',metrics:pieMetrics('human')};
   }
   function ensureVisual(l,i){
@@ -6796,7 +6807,6 @@ const migrationReports = (() => {
   function seedBlocks(i){
     const m=reportMetrics[i],title=['流转监控数据','实时人审数据','实时人审数据','择优数据','内容质量概况'][i];
     return [
-      ...(i===3?[defaultVisual(i)]:[]),
       {id:'initial-metrics',type:1,title,metrics:[...m]},
       {id:'initial-trend',type:3,title:'数据趋势',metrics:i===3?pickGradeLevels.map(g=>'人审'+g+'率'):i===0?['送审次数','机审完成次数','人审完成次数']:m.slice(0,3)},
       {id:'initial-details',type:2,title:'数据明细',metrics:[...m]}
@@ -6806,6 +6816,7 @@ const migrationReports = (() => {
     if(index()===1)return r9WorkLayout();
     const i=index();let l=layouts.find(x=>x.report===reportNames[i]);
     if(!l){l={report:reportNames[i],blocks:seedBlocks(i),search:[...searchSets[i]]};layouts.push(l);}
+    r24RetireAddedCharts(l);
     ensureVisual(l,i);
     if(i===3&&!l.fiveGradeVersion){
       const legacyMetrics=pickMetrics.filter(k=>!/^人审D/.test(k));
