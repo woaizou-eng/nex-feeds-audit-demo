@@ -4416,7 +4416,7 @@ function dsgList(ui) {
     ['流程名称','NEX 流程 ID','BIZ 流程 ID','分组名称','审核对象','管理员','状态','作业方式','审核模式','共享数据集','任务数','操作'];
   const rows=records.map(record=>{
     if(group){const members=flows.filter(flow=>flow.groupId===record.id),count=dsgCount(members);return [link(record.name,'dsg-filter',record.id),esc(record.id),dsgId(record),dsgShown(record,'code'),esc(dsgObject(record)),dsgShown(record,'admin'),String(members.length),String(count.datasets),String(count.tasks),link('查看流程','dsg-filter',record.id)+link('编辑','dsg-edit-group',record.id)];}
-    return [link(record.name,'dsg-detail',record.id),esc(record.id),dsgId(record),esc(dsGroupName(record.groupId)),esc(dsgObject(record)),dsgShown(record,'admin'),dsgShown(record,'status'),dsgShown(record,'workMode'),dsgShown(record,'auditMode'),String(dsgData(record.id).length),String(getTasksForFlow(record.id).length),link('新建任务','dsg-create-task',record.id)+link('查看','dsg-detail',record.id)+link('编辑','dsg-edit-flow',record.id)];
+    return [link(record.name,'dsg-detail',record.id)+(record.r19SourceComplete===false?'<small>任务清单待核对</small>':''),esc(record.id),dsgId(record),esc(dsGroupName(record.groupId)),esc(dsgObject(record)),dsgShown(record,'admin'),dsgShown(record,'status'),dsgShown(record,'workMode'),dsgShown(record,'auditMode'),String(dsgData(record.id).length),String(getTasksForFlow(record.id).length),link('新建任务','dsg-create-task',record.id)+link('查看','dsg-detail',record.id)+link('编辑','dsg-edit-flow',record.id)];
   });
   return title+tabs([['group','分组列表'],['flow','流程列表']],ui.tab,'dsg-tab')+dsgFilters(ui,all)+actions+
     '<div class="dc-scroll">'+table(columns,rows,'dg-list dg6-list'+(group?'':' dg6-flows'))+'</div>'+(records.length?'':'<p class="dc-empty">暂无符合条件的'+kind+'。</p>')+
@@ -4437,7 +4437,7 @@ function dsgDetail(flow) {
   const datasets=dsgData(flow.id),tasks=getTasksForFlow(flow.id);
   const meta=[['所属分组',esc(dsGroupName(flow.groupId))],['审核对象',esc(dsgObject(flow))],['管理员',dsgShown(flow,'admin')],['状态',dsgShown(flow,'status')],['作业方式',dsgShown(flow,'workMode')],['审核模式',dsgShown(flow,'auditMode')]];
   return '<header class="dc-title"><h2>'+esc(flow.name)+'</h2><div class="f-actions">'+btn('新建任务','dsg-create-task',flow.id,true)+btn('编辑','dsg-edit-flow',flow.id)+btn('返回流程列表','dsg-back-flows')+'</div></header>'+
-    '<p class="dg-meta">NEX 流程 ID　'+esc(flow.id)+'　·　BIZ 流程 ID　'+dsgId(flow)+'</p><dl class="dg6-details">'+meta.map(([key,value])=>'<div><dt>'+key+'</dt><dd>'+value+'</dd></div>').join('')+'</dl>'+
+    (flow.r19SourceComplete===false?'<p class="info">'+esc(flow.r19SourceNote||'任务清单待核对')+'</p>':'')+'<p class="dg-meta">NEX 流程 ID　'+esc(flow.id)+'　·　BIZ 流程 ID　'+dsgId(flow)+'</p><dl class="dg6-details">'+meta.map(([key,value])=>'<div><dt>'+key+'</dt><dd>'+value+'</dd></div>').join('')+'</dl>'+
     '<h3 class="dg-section">共享数据集（'+datasets.length+'）</h3>'+(datasets.length?'<div class="dc-scroll">'+table(['数据集名称','数据集 ID','导入方式'],datasets.map(item=>[link(item.name,'asset-detail',item.id),esc(item.id),esc(item.method||'—')]))+'</div>':'<p class="dc-empty">暂无挂靠此流程的数据集。</p>')+
     '<h3 class="dg-section">所属任务（'+tasks.length+'）</h3>'+(tasks.length?'<div class="dc-scroll">'+table(['任务名称','任务 ID'],tasks.map(item=>[esc(item.name),esc(item.id)]))+'</div>':'<p class="dc-empty">暂无归入此流程的任务。</p>');
 }
@@ -7747,7 +7747,7 @@ function renderParameters() {
 }
 function renderOutputs() {
   if ("内容规则" === draft.source)
-    return void ($("#operator-output").innerHTML = "");
+    return void ($("#operator-output").innerHTML = r19OperatorOutputHTML(draft));
   const e = "view" === editMode;
   (($("#operator-output").innerHTML =
     `<div class="op-form-row"><label>结果项配置</label><div><div id="output-cards">${draft.outputs.map((t, a) => `<div class="output-card"><div class="output-card-title">结果项配置${a + 1}${e ? "" : `<button data-remove-output="${a}" aria-label="删除结果项 ${a + 1}">♧</button>`}</div><div class="output-grid"><label>名称 <b>*</b><input class="condition-input" data-output="${a}" data-key="name" value="${esc(t.name)}" placeholder="请输入" ${e ? "disabled" : ""}></label><label>用途 <b>*</b><select class="small-select" data-output="${a}" data-key="usage" ${e ? "disabled" : ""}>${options(["作业结果", "辅助信息"], t.usage)}</select></label><label>结果转化方式 <b>*</b><select class="small-select" data-output="${a}" data-key="transform" ${e ? "disabled" : ""}>${options(["JSON映射", "原始值"], t.transform)}</select></label><label>结果类型 <b>*</b><select class="small-select" data-output="${a}" data-key="type" ${e ? "disabled" : ""}>${options(["字符串数组", "字符串", "数值", "布尔值", "对象"], t.type)}</select></label><label>取数路径 <b>*</b><input class="condition-input" data-output="${a}" data-key="path" value="${esc(t.path)}" placeholder="如 result" ${e ? "disabled" : ""}></label></div></div>`).join("")}</div>${e ? "" : '<button class="soft-btn" id="add-output">添加配置</button>'}</div></div><div class="op-form-row"><label>结果数据标准化</label><div><div class="standard-tip">ⓘ 配置为本地演示。output 中 result 为结果，confidence 为置信度，extra 为扩展信息。</div><pre class="standard-json">${esc(JSON.stringify({ result: { status: "approved", category: "normal" }, confidence: 0.98, extra: { reasoning: "内容符合规范" } }, null, 2))}</pre></div></div>`),
@@ -8484,7 +8484,7 @@ function compareCondition(e, t, a) {
       throw Error("暂不支持的关系");
   }
 }
-function evaluateOperator(e, t) {
+function r19EvaluateOperatorBase(e, t) {
   if (!e.conditionGroups?.length) return evaluateFlatOperator(e, t);
   const a = [],
     n = [];
@@ -8522,6 +8522,7 @@ function evaluateOperator(e, t) {
     shorted: a.some(trace => trace.status === "跳过"),
   };
 }
+function evaluateOperator(e,t){return r19EvaluateOperator(e,t);}
 function evaluateFlatOperator(e, t) {
   const a = [],
     n = [];
@@ -8612,6 +8613,7 @@ function sampleInput(e) {
             : a.values;
     t[e.field] = n;
   }
+  if(e.mockRevision===19&&e.mockOutput?.mode==='grade')t[e.mockOutput.field]='A';
   return t;
 }
 function debug(e) {
@@ -12400,6 +12402,196 @@ function renderMachineNode() {
   if($('#his-library'))$('#his-library').onchange=event=>e.hisLibrary=event.target.value;
   bindNodeConfigTabs();if(e.customPriority)renderPriorities();bindNodeTemplateActions();
 }
+// Rev19: locally simulated rule definitions and configured operators.
+// Names describe migration scenarios; IDs and values are demo data, not production exports.
+function r19BuildOperators(){
+  const featureMap={}, operatorMap={}, featureRows=[], operatorRows=[];
+  const enumRule=(key,name,labels,extra={})=>{
+    const f=makeFeature('MOCK-R19-RULE-'+key.toUpperCase(),name,'mock_r19_'+key,labels,{
+      scope:'业务',bizLine:'feeds',enabled:true,demoOnly:true,group:'内容',
+      description:'迁移演示规则；字段、枚举和阈值为模拟配置，不代表 BIZ 生产参数。',
+      scenes:['路由','机审','检索'],...extra
+    });
+    featureMap[key]=f.id;featureRows.push(f);return f;
+  };
+  const numberRule=(key,name,extra={})=>enumRule(key,name,[],{
+    component:'数字类型大小关系',dataType:'DOUBLE',valueMode:'输入值',
+    relations:['大于','大于等于','小于','小于等于','等于','不等于','等于空值','不等于空值'],...extra
+  });
+  const passRule=(key,name,extra={})=>enumRule(key,name,['正常','风险'],extra);
+  passRule('white_border','白边图组合特征');
+  enumRule('title_quality','标题质量标签',['正常','文案无逻辑','无意义标题','标题夸张','标题违禁词']);
+  enumRule('cover_quality','封面图质量标签',['正常','封面牛皮癣','封面低俗','封面引人不适','封面违禁词']);
+  enumRule('body_quality','正文图质量标签',['正常','正文低俗','正文引人不适','正文违禁词','正文水印']);
+  numberRule('resolution','图片短边分辨率（模拟）',{scope:'官方'});
+  passRule('same_item','挂品是否同款内容特征');
+  numberRule('duplicate','信息流内容重复分（模拟）');
+  enumRule('category','机审类目拦截特征',['普通类目','处方药','特殊用品','限制类目']);
+  numberRule('blur','内容图清晰度分（模拟）');
+  passRule('relevance','信息流内容商品相关性');
+  passRule('aesthetic','内容基础美观特征');
+  passRule('cover_relevance','信息流商品封面相关性');
+  passRule('content_relevance','信息流商品内容相关性');
+  enumRule('bad_ai','图文劣质 AI 识别',['正常','高准命中','高召疑似']);
+  enumRule('video_bad_ai','视频劣质 AI 识别',['正常','高准命中','高召疑似']);
+  passRule('video_ppt','视频 PPT 静态画面识别');
+  numberRule('video_clarity','视频清晰度分（模拟）',{scope:'官方'});
+  passRule('audio','视频音画质量');
+  passRule('sensitive_text','内容敏感词检测',{scope:'官方'});
+  enumRule('cover_change','封面变更类型',['未变更','新增封面','替换封面','清空封面']);
+  enumRule('history_approved','历史审核结论',['无结果','通过','不通过']);
+  enumRule('brand_trusted','品牌豁免资格',['普通品牌','已配置豁免品牌']);
+  enumRule('hotspot','热点内容类型',['普通内容','热点图文','热点视频']);
+  enumRule('merchant_tier','商家分层',['普通商家','重点商家','白名单商家']);
+  enumRule('rx_drug','处方药信息展示',['不涉及','信息完整','信息不完整']);
+  enumRule('multi_item','内容挂品数量类型',['单品','多品','未挂品']);
+  enumRule('adult_whitelist','特殊用品开白状态',['不涉及','已开白','未开白']);
+  enumRule('new_product','商品新发状态',['普通商品','新发商品']);
+  enumRule('product_pool','商品入池状态',['在池','不在池']);
+  enumRule('black_shop','店铺风控命中',['未命中','命中']);
+  enumRule('second_edit','内容编辑类型',['首次送审','内容二编','封面二编']);
+  enumRule('submit_source','送审来源分层',['千牛','逛逛','机构','自供给','光合','评价']);
+  enumRule('ai_account','账号 AI 素材属性',['普通账号','AI 素材账号']);
+  numberRule('quality_score','内容质量分（模拟）');
+  enumRule('selection_grade','择优候选评级',['S','A','B','C','D'],{enums:['S','A','B','C','D'].map(value=>({label:value,value}))});
+  passRule('storytelling','择优内容表达完整度');
+  passRule('originality','择优内容原创性');
+  passRule('product_exposure','择优商品展示完整度');
+  passRule('ad_legal','广告素材资质完整度');
+  passRule('ad_claims','广告素材宣传用语');
+  passRule('ad_watermark','广告素材水印干扰');
+  passRule('ad_brand','广告素材品牌一致性');
+  passRule('ad_link','广告素材站外引流');
+  passRule('ad_price','广告素材价格表达');
+  passRule('ad_sensitive','广告素材禁限内容');
+  passRule('caption','视频字幕可读性');
+  numberRule('duration','视频时长（模拟）',{scope:'官方',dataType:'INT'});
+  passRule('content_safety','内容安全基础检测',{scope:'官方'});
+  passRule('technical_format','媒体格式可用性',{scope:'官方'});
+  enumRule('review_reason','待人工复核类型',['正常','引人不适','低俗色情','牛皮癣','质量分','违禁词','相关性','PPT']);
+
+  const byKey=key=>featureRows.find(f=>f.id===featureMap[key]);
+  const condition=(spec,index,opKey)=>{
+    const [key,relation,values]=spec, f=byKey(key);
+    if(!f)throw Error('Rev19 mock rule missing: '+key);
+    return {id:'MOCK-R19-C-'+opKey+'-'+index,featureId:f.id,relation,
+      values:(Array.isArray(values)?values:[values]).map(String),failure:'维持机审'};
+  };
+  const good=key=>[key,'包含',['0']];
+  const number=(key,relation,value)=>[key,relation,[String(value)]];
+  const riskFree=(key)=>[key,'不包含',byKey(key).enums.slice(1).map(e=>e.value)];
+  const common=[good('content_safety'),good('technical_format'),good('sensitive_text')];
+  const graphic=[...common,good('white_border'),riskFree('title_quality'),riskFree('cover_quality'),riskFree('body_quality'),number('resolution','大于等于',540),number('blur','大于等于',60),good('aesthetic'),riskFree('bad_ai')];
+  const product=[good('same_item'),good('relevance'),good('cover_relevance'),good('content_relevance')];
+  const video=[...common,riskFree('title_quality'),riskFree('cover_quality'),good('video_ppt'),number('video_clarity','大于等于',60),good('audio'),good('caption'),number('duration','大于',0),riskFree('video_bad_ai')];
+  const normalGraphic=[...graphic,...product,number('duplicate','小于',0.9)];
+  const normalVideo=[...video,...product,number('duplicate','小于',0.9)];
+  function op(key,name,specs,description,output={mode:'binary',values:['通过','不通过']}){
+    const id='MOCK-R19-OP-'+key.toUpperCase();
+    operatorMap[key]=id;
+    operatorRows.push({id,name:name+'（演示）',source:'内容规则',scope:'业务',admin:'演练运营',
+      created:'2026-11-16 09:00:00',scene:['机审'],enabled:true,demoOnly:true,configVersion:3,
+      description:description+'；演示条件和数值可在算子中修改，不代表生产规则。',
+      conditions:specs.map((s,i)=>condition(s,i+1,key)),join:'AND',shortCircuit:true,parameters:[],outputs:[],
+      mockOutput:output,mockRevision:19});
+    return id;
+  }
+  op('first_graphic','一审图文去劣',normalGraphic,'覆盖基础质量、商品相关性、重复检测与劣质 AI');
+  op('first_video','一审视频去劣',normalVideo,'覆盖视频清晰度、音画、字幕、PPT、商品相关性与重复检测');
+  op('rx_graphic','一审处方药图文',[...graphic,['rx_drug','包含',['0','1']],good('same_item')],'增加处方药信息完整度检查');
+  op('cache_graphic','缓存重送图文',[...graphic,good('same_item')],'重送数据重新检查内容质量，模拟不重复执行去重');
+  op('cache_video','缓存重送视频',[...video,good('same_item')],'重送数据重新检查视频质量，模拟不重复执行去重');
+  op('review_graphic','评价图文质量',graphic.filter(s=>!['cover_quality','white_border'].includes(s[0])),'评价场景组合示例，独立显示未配置的规则');
+  op('vip_graphic','重点商家图文',[...graphic,...product],'重点商家场景独立组合，仍保留基础安全检查');
+  op('vip_video','重点商家视频',[...video.filter(s=>s[0]!=='video_bad_ai'),...product,['video_bad_ai','不包含',['1']]],'高召疑似转人工，排除明确风险');
+  op('guang_graphic','逛逛图文',[...graphic,number('duplicate','小于',0.95)],'面向逛逛送审的内容质量组合');
+  op('guang_video','逛逛视频',[...video,number('duplicate','小于',0.95)],'面向逛逛送审的视频质量组合');
+  op('strict_graphic','图文重点复核',[...normalGraphic,number('quality_score','大于等于',80)],'疑似风险场景增加模拟质量分门槛');
+  op('strict_video','视频重点复核',[...normalVideo,number('quality_score','大于等于',80)],'疑似风险场景增加模拟质量分门槛');
+  op('second_graphic','二审图文复核',[...normalGraphic,number('quality_score','大于等于',70)],'二审独立质量与商品关系复核组合');
+  op('second_video','二审视频复核',[...normalVideo,number('quality_score','大于等于',70)],'二审独立视频复核组合');
+  op('cover_graphic','封面变更图文',[...common,riskFree('cover_quality'),good('cover_relevance'),number('resolution','大于等于',540)],'对变更封面的质量、可读性与商品关系复核');
+  op('cover_video','封面变更视频',[...common,riskFree('cover_quality'),good('cover_relevance'),good('caption')],'视频封面变更专用检查组合');
+  const grade={mode:'grade',values:['S','A','B','C','D'],field:byKey('selection_grade').field,featureId:featureMap.selection_grade,rejected:'D'};
+  const graded=(rules)=>[...rules,['selection_grade','包含',['S','A','B','C','D']]];
+  op('select_graphic','择优图文评级',graded([...graphic,good('storytelling'),good('originality'),good('product_exposure')]),'质量检查通过时采用模拟候选评级 S/A/B/C/D；未通过记 D',grade);
+  op('select_video','择优视频评级',graded([...video,good('storytelling'),good('originality'),good('product_exposure')]),'视频质量检查通过时采用模拟候选评级 S/A/B/C/D；未通过记 D',grade);
+  op('select_unlinked_graphic','未挂品择优图文评级',graded([...graphic,good('storytelling'),good('originality')]),'未挂品场景不配置商品展示检查，保留候选五档评级',grade);
+  op('select_unlinked_video','未挂品择优视频评级',graded([...video,good('storytelling'),good('originality')]),'未挂品场景不配置商品展示检查，保留候选五档评级',grade);
+  const ad=[good('ad_legal'),good('ad_claims'),good('ad_watermark'),good('ad_brand'),good('ad_link'),good('ad_price'),good('ad_sensitive')];
+  op('ad_graphic','广告素材图文审核',[...graphic,...ad],'广告素材基础质量、资质、宣传用语、品牌及价格表达检查');
+  op('ad_video','广告素材视频审核',[...video,...ad],'广告视频基础质量、资质、宣传用语、音画与字幕检查');
+  op('question_image','图片题质量判断',[good('white_border'),riskFree('cover_quality'),riskFree('body_quality'),number('blur','大于等于',60)],'图片类题目的独立判断');
+  op('question_title','标题题质量判断',[riskFree('title_quality'),good('sensitive_text')],'标题类题目的独立判断');
+  op('question_product','商品题一致性判断',product,'商品类题目的独立判断');
+  op('question_video','视频题质量判断',[good('video_ppt'),number('video_clarity','大于等于',60),good('audio'),good('caption')],'视频类题目的独立判断');
+  const selected={mode:'selection',values:['入选','不入选'],approved:'入选',rejected:'不入选'};
+  op('select_question_image','择优图片题判断',[good('aesthetic'),good('originality'),number('blur','大于等于',70)],'具体图片题输出入选或不入选，与通用五档评级分开',selected);
+  op('select_question_video','择优视频题判断',[good('storytelling'),good('originality'),number('video_clarity','大于等于',70)],'具体视频题输出入选或不入选，与通用五档评级分开',selected);
+  op('unlinked_graphic','未挂品图文去劣',[...graphic,number('duplicate','小于',0.9)],'未挂品任务不检查商品相关性');
+  op('unlinked_video','未挂品视频去劣',[...video,number('duplicate','小于',0.9)],'未挂品任务不检查商品相关性');
+  op('human_only_graphic','仅人审图文预检查',common,'仅做格式及基础风险提示，人工结果为最终结果');
+  op('human_only_video','仅人审视频预检查',[...common,number('duration','大于',0)],'仅做视频格式及基础风险提示，人工结果为最终结果');
+  op('history','历史结果复用条件',[['history_approved','包含',['1']],good('black_shop')],'用于演示已审通过且未命中风控的历史结果引用');
+  op('ai_graphic','AI 素材图文专审',[...graphic,number('quality_score','大于等于',75)],'AI 图文专审质量组合');
+  op('ai_video','AI 素材视频专审',[...video,number('quality_score','大于等于',75)],'AI 视频专审质量组合');
+  op('special_product','特殊用品开白检查',[['adult_whitelist','包含',['0','1']],good('content_safety')],'开白状态与基础安全联合判断');
+
+  function resolve(context={}){
+    const flow=context.flow||{}, sourceTask=context.sourceTask||{},name=String(sourceTask.name||'');
+    const flowId=String(flow.bizId||flow.id||context.flowId||'').replace(/^.*-B/,'');
+    const kind=context.contentType==='视频'?'video':'graphic',isSelection=['106597','111847'].includes(flowId);
+    let key='first_'+kind;
+    if(flowId==='115543')key='ad_'+kind;
+    else if(isSelection)key=(flowId==='111847'?'select_unlinked_':'select_')+kind;
+    else if(flowId==='106431')key='second_'+kind;
+    else if(flowId==='111630')key='unlinked_'+kind;
+    else if(flowId==='106001')key='human_only_'+kind;
+    if(!isSelection&&flowId!=='115543'){
+      if(/处方药/.test(name)&&kind==='graphic')key='rx_graphic';
+      else if(/缓存|洗白/.test(name))key='cache_'+kind;
+      else if(/评价/.test(name)&&kind==='graphic')key='review_graphic';
+      else if(/严格|疑似牛|高召/.test(name))key='strict_'+kind;
+      else if(/top|重点商家|SSKA|KA|T8|T7/i.test(name))key='vip_'+kind;
+      else if(/逛逛/.test(name))key='guang_'+kind;
+      else if(/封面.*变更|封面变/.test(name))key='cover_'+kind;
+      else if(/AI素材|AI账号|aigc/i.test(name))key='ai_'+kind;
+    }
+    const main=operatorRows.find(o=>o.id===operatorMap[key]);
+    const questionOperators=(context.questions||[]).map(q=>{
+      let qkey=isSelection?(kind==='video'?'select_question_video':'select_question_image'):'question_image';
+      if(!isSelection){
+        if(/商品/.test(q.name))qkey='question_product';
+        else if(/标题|文案/.test(q.name))qkey='question_title';
+        else if(/视频/.test(q.name))qkey='question_video';
+      }
+      return {questionName:q.name,operatorId:operatorMap[qkey],output:'审核结果'};
+    });
+    return {caseOperatorId:main.id,questionOperators,ruleIds:main.conditions.map(c=>c.featureId),
+      caseResultOptions:[...(main.mockOutput?.values||['通过','不通过'])]};
+  }
+  return {features:featureRows,operators:operatorRows,resolve,featureMap,operatorMap,catalogVersion:'r19-v1'};
+}
+function r19EvaluateOperator(e,t){
+  const base=e.conditionGroups?.length?r19EvaluateOperatorBase(e,t):evaluateFlatOperator(e,t);
+  if(!e.mockOutput||e.mockRevision!==19)return base;
+  const output=e.mockOutput;
+  if(base.result==='维持机审')return base;
+  if(output.mode==='selection')return {...base,result:base.result==='通过'?output.approved:output.rejected};
+  if(output.mode==='grade'){
+    if(base.result==='不通过')return {...base,result:output.rejected||'D'};
+    const grade=String(t[output.field]??'');
+    return output.values.includes(grade)?{...base,result:grade}:{...base,result:'维持机审'};
+  }
+  return base;
+}
+function r19OperatorOutputHTML(op){
+  if(op?.mockRevision!==19||!op.mockOutput)return '';
+  const output=op.mockOutput;
+  const text=output.mode==='grade'?'检查通过后读取候选评级；不满足检查为 D，缺少结果则维持机审。':output.mode==='selection'?'条件满足为入选，不满足为不入选，缺少结果则维持机审。':'条件满足为通过，不满足为不通过，缺少结果则维持机审。';
+  return '<div class="op-form-row"><label>结果项</label><div><strong>审核结果</strong><p>'+output.values.map(v=>'<span class="task-tag">'+esc(v)+'</span>').join(' ')+'</p><div class="muted">'+text+'</div><p class="muted">模拟规则配置，可编辑和本地调试。</p></div></div>';
+}
+
 function operatorResults(e) {
   return e
     ? "内容规则" === e.source || e.conditions?.length
@@ -14902,6 +15094,267 @@ function r16LegacyComputeList(){
   form.onsubmit=e=>{e.preventDefault();draw();};form.onreset=()=>setTimeout(draw,0);$('#cp-edit-current').onclick=()=>r12OpenComputeStrategy(currentConfig?.id||'',true);draw();
 }
 
+
+// BEGIN REV19 CONFIGURED CATALOG
+const r19LiveSources=[{"bizId":"106597","flowId":"106597","name":"信息流择优审核流程","groupId":"80003740","groupName":"","mode":"信息流-AI审-单人审-内容","observedAt":"2026-11-16","complete":true,"tasks":[{"id":"2036048","name":"基础AI审任务-图文","stage":"机审","priority":1,"status":"已上线"},{"id":"2036199","name":"基础AI审任务_视频","stage":"机审","priority":1,"status":"已上线"},{"id":"2036405","name":"基础AI审任务_content","stage":"机审","priority":1,"status":"已上线","template":"【图文】信息流择优","contentType":"图文","templateObservedAt":"2026-11-16"},{"id":"2043633","name":"择优免机审","stage":"免机审","priority":1,"status":"已上线","template":"【图文】信息流择优","contentType":"图文","templateObservedAt":"2026-11-16"},{"id":"2049745","name":"机动任务-视频（园艺）","stage":"免机审","priority":1,"status":"已上线"},{"id":"2094220","name":"1","stage":"免机审","priority":2,"status":"暂停"},{"id":"2036060","name":"【P1】服饰-内容单品图文","stage":"人审","priority":1,"status":"已上线"},{"id":"2036186","name":"【P1】箱包服配鞋-内容单品图文","stage":"人审","priority":1,"status":"已上线"},{"id":"2036187","name":"【P1】标品-内容单品图文","stage":"人审","priority":1,"status":"已上线"},{"id":"2036189","name":"【P1】美妆个护-内容单品图文","stage":"人审","priority":1,"status":"已上线"},{"id":"2036193","name":"【P1】食品生鲜-内容单品图文","stage":"人审","priority":1,"status":"已上线"},{"id":"2036381","name":"【P1】服饰-千牛&自供给视频（含多品）","stage":"人审","priority":1,"status":"已上线"},{"id":"2036386","name":"【P1】箱包服配鞋-千牛&自供给视频（含多品）","stage":"人审","priority":1,"status":"已上线"},{"id":"2036387","name":"【P1】标品整体-千牛&自供给视频（含多品）","stage":"人审","priority":1,"status":"已上线"},{"id":"2036397","name":"【P1】服饰-光合视频","stage":"人审","priority":1,"status":"已上线"},{"id":"2036403","name":"【P1】箱包服配鞋-光合视频","stage":"人审","priority":1,"status":"已上线"},{"id":"2036404","name":"【P1】标品整体-光合视频","stage":"人审","priority":1,"status":"已上线"},{"id":"2037344","name":"【P1】男装童装-内容单品图文","stage":"人审","priority":1,"status":"已上线"},{"id":"2068890","name":"千牛临时订正-视频","stage":"人审","priority":1,"status":"已上线"},{"id":"2068891","name":"千牛临时订正-图文内容","stage":"人审","priority":1,"status":"已上线"},{"id":"2079899","name":"千牛临时订正-图文素材","stage":"人审","priority":1,"status":"已上线"},{"id":"2091803","name":"【P1】玩具潮玩非SA视频复审","stage":"人审","priority":1,"status":"已上线"},{"id":"2104186","name":"【P1】标品整体-千牛&自供给视频（含多品）_copy","stage":"人审","priority":1,"status":"暂停"},{"id":"2036367","name":"【P2】服饰-高爆内容图文","stage":"人审","priority":2,"status":"已上线"},{"id":"2036369","name":"【P2】箱包服配鞋-高爆内容图文","stage":"人审","priority":2,"status":"已上线"},{"id":"2036370","name":"【P2】标品-高爆内容图文","stage":"人审","priority":2,"status":"已上线"},{"id":"2036378","name":"【P2】美妆个护-高爆内容图文","stage":"人审","priority":2,"status":"已上线"},{"id":"2036380","name":"【P2】食品生鲜-高爆内容图文","stage":"人审","priority":2,"status":"已上线"},{"id":"2036394","name":"【P2】服饰-高爆视频","stage":"人审","priority":2,"status":"已上线"},{"id":"2036395","name":"【P2】箱包服配鞋-高爆视频","stage":"人审","priority":2,"status":"已上线"},{"id":"2036396","name":"【P2】标品整体-高爆视频","stage":"人审","priority":2,"status":"已上线"},{"id":"2037346","name":"【P2】男装童装-高爆内容图文","stage":"人审","priority":2,"status":"已上线"},{"id":"2046726","name":"【P2】箱包服配鞋-IC视频","stage":"人审","priority":2,"status":"已上线"},{"id":"2046727","name":"【P2】标品整体-IC视频","stage":"人审","priority":2,"status":"已上线"},{"id":"2083977","name":"【P3】标品-内容图文（买家秀）","stage":"人审","priority":2,"status":"已上线"},{"id":"2083978","name":"【P3】箱包服配鞋-内容图文（买家秀）","stage":"人审","priority":2,"status":"已上线"},{"id":"2097238","name":"【P2】服饰-高爆素材图文","stage":"人审","priority":2,"status":"已上线"},{"id":"2097239","name":"【P2】箱包服配鞋-高爆素材图文","stage":"人审","priority":2,"status":"已上线"},{"id":"2097240","name":"【P2】标品-高爆素材图文","stage":"人审","priority":2,"status":"已上线"},{"id":"2097241","name":"【P2】美妆个护-高爆素材图文","stage":"人审","priority":2,"status":"已上线"},{"id":"2097242","name":"【P2】食品生鲜-高爆素材图文","stage":"人审","priority":2,"status":"已上线"},{"id":"2097243","name":"【P2】男装童装-高爆素材图文","stage":"人审","priority":2,"status":"已上线"},{"id":"2097470","name":"【P2】服饰-高爆视频_copy","stage":"人审","priority":2,"status":"暂停"},{"id":"2101069","name":"【P2】标品整体-IC视频_copy","stage":"人审","priority":2,"status":"暂停"},{"id":"2036194","name":"【P2】服饰-多品图文","stage":"人审","priority":3,"status":"已上线"},{"id":"2036362","name":"【P2】箱包服配鞋-多品图文","stage":"人审","priority":3,"status":"已上线"},{"id":"2036363","name":"【P2】标品-多品图文","stage":"人审","priority":3,"status":"已上线"},{"id":"2036365","name":"【P2】美妆个护-多品图文","stage":"人审","priority":3,"status":"已上线"},{"id":"2036389","name":"【P2】服饰-ic图文","stage":"人审","priority":3,"status":"已上线"},{"id":"2036390","name":"【P2】箱包服配鞋-ic图文","stage":"人审","priority":3,"status":"已上线"},{"id":"2036391","name":"【P2】标品-ic图文","stage":"人审","priority":3,"status":"已上线"},{"id":"2036392","name":"【P2】美妆个护-ic图文","stage":"人审","priority":3,"status":"已上线"},{"id":"2036393","name":"【P2】食品生鲜-ic图文","stage":"人审","priority":3,"status":"已上线"},{"id":"2037345","name":"【P2】男装童装-多品图文","stage":"人审","priority":3,"status":"已上线"},{"id":"2037347","name":"【P2】男装童装-ic图文","stage":"人审","priority":3,"status":"已上线"},{"id":"2046725","name":"【P2】服饰-IC视频","stage":"人审","priority":3,"status":"已上线"},{"id":"2101208","name":"【P2】美妆个护-ic图文_copy","stage":"人审","priority":3,"status":"暂停"},{"id":"2101209","name":"【P2】美妆个护-ic图文_copy","stage":"人审","priority":3,"status":"暂停"},{"id":"2101210","name":"【P2】美妆个护-ic图文_copy","stage":"人审","priority":3,"status":"暂停"},{"id":"2041371","name":"【P3】服饰-内容图文（买家秀）","stage":"人审","priority":4,"status":"已上线"},{"id":"2036873","name":"【P5】兜底任务-图文素材","stage":"人审","priority":5,"status":"已上线"},{"id":"2036878","name":"【P5】兜底任务-图文内容","stage":"人审","priority":5,"status":"已上线"},{"id":"2036882","name":"【P5】兜底任务-视频","stage":"人审","priority":5,"status":"已上线"},{"id":"2036056","name":"择优视频模版参考_copy","stage":"人审","priority":99,"status":"暂停"},{"id":"2036057","name":"择优图文pic打标模板_copy","stage":"人审","priority":99,"status":"暂停"},{"id":"2036058","name":"择优图文content打标模板_copy","stage":"人审","priority":99,"status":"暂停"},{"id":"2036059","name":"择优视频模版参考_copy_copy","stage":"人审","priority":99,"status":"暂停"}]},{"bizId":"111847","flowId":"111847","name":"信息流择优审核流程（未挂品）","groupId":"80003740","groupName":"择优","mode":"信息流-AI审-单人审-内容","observedAt":"2026-11-16","complete":true,"tasks":[{"id":"2074508","name":"择优机审","stage":"机审","priority":1,"status":"暂停"},{"id":"2074525","name":"基础AI审任务_未挂品视频","stage":"机审","priority":1,"status":"已上线"},{"id":"2074526","name":"基础AI审任务_未挂品图文","stage":"机审","priority":1,"status":"已上线"},{"id":"2073373","name":"未挂品免机审-图文","stage":"免机审","priority":1,"status":"已上线"},{"id":"2073374","name":"未挂品免机审-视频","stage":"免机审","priority":1,"status":"已上线"},{"id":"2078166","name":"未挂品图文_机构","stage":"人审","priority":1,"status":"已上线"},{"id":"2078168","name":"未挂品视频_机构","stage":"人审","priority":1,"status":"已上线"},{"id":"2079626","name":"未挂品图文_数码热点","stage":"人审","priority":1,"status":"已上线"},{"id":"2079698","name":"未挂品视频_数码热点","stage":"人审","priority":1,"status":"已上线"},{"id":"2082521","name":"未挂品图文_回扫","stage":"人审","priority":1,"status":"已上线"},{"id":"2082523","name":"未挂品视频_回扫","stage":"人审","priority":1,"status":"已上线"},{"id":"2091439","name":"未挂品图文_日清","stage":"人审","priority":1,"status":"已上线"},{"id":"2091442","name":"未挂品视频_日清","stage":"人审","priority":1,"status":"已上线"},{"id":"2073378","name":"未挂品图文","stage":"人审","priority":2,"status":"已上线"},{"id":"2073379","name":"未挂品视频","stage":"人审","priority":2,"status":"已上线"},{"id":"2073377","name":"【P5】兜底任务-图文素材_copy","stage":"人审","priority":5,"status":"暂停"}]},{"bizId":"106236","flowId":"106236","name":"内容一审（免审拒绝）流程","groupId":"80002620","groupName":"推荐一审","mode":"信息流-内容一审","observedAt":"2026-11-16","complete":true,"tasks":[{"id":"2081205","name":"千牛重复素材订正","stage":"免机审","priority":1,"status":"已上线","template":null,"contentType":null,"templateObservedAt":"2026-11-16"},{"id":"2093343","name":"疑似AI账号命中高召批量订正","stage":"免机审","priority":1,"status":"已上线","template":null,"contentType":null,"templateObservedAt":"2026-11-16"},{"id":"2105085","name":"丧葬用品批量不通过","stage":"免机审","priority":1,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-16"},{"id":"2034593","name":"一审图文免机审任务","stage":"免机审","priority":5,"status":"已上线"},{"id":"2034594","name":"一审视频免机审任务","stage":"免机审","priority":5,"status":"已上线"}]},{"bizId":"106224","flowId":"106224","name":"内容一审（免审通过）流程","groupId":"80002620","groupName":"推荐一审","mode":"信息流-内容一审","observedAt":"2026-11-16","complete":true,"tasks":[{"id":"2034567","name":"图文免机审任务","stage":"免机审","priority":1,"status":"已上线"},{"id":"2034569","name":"视频免机审任务","stage":"免机审","priority":2,"status":"已上线"},{"id":"2034571","name":"图文免人审任务","stage":"免人审","priority":1,"status":"已上线"},{"id":"2034573","name":"视频免人审任务","stage":"免人审","priority":2,"status":"已上线"}]},{"bizId":"106001","flowId":"106001","name":"内容一审（仅人审）流程","groupId":"80002620","groupName":"推荐一审","mode":"信息流-内容一审","observedAt":"2026-11-16","complete":true,"tasks":[{"id":"2032895","name":"视频免审任务","stage":"免机审","priority":1,"status":"已上线"},{"id":"2033749","name":"图文免审任务","stage":"免机审","priority":1,"status":"已上线"},{"id":"2070177","name":"self_aigc回捞送一审（视频）","stage":"人审","priority":1,"status":"已上线"},{"id":"2070179","name":"self_aigc回捞送一审（图文）","stage":"人审","priority":1,"status":"已上线"},{"id":"2035468","name":"存量pv送审-视频人审任务","stage":"人审","priority":2,"status":"已上线"},{"id":"2035469","name":"存量pv送审-图文人审任务","stage":"人审","priority":2,"status":"已上线"},{"id":"2061331","name":"头部商家不通过内容复核-视频（fashion88）","stage":"人审","priority":3,"status":"已上线"},{"id":"2061332","name":"头部商家不通过内容复核-图文（fashion88）","stage":"人审","priority":3,"status":"已上线"},{"id":"2076958","name":"图文劣质AI回刷送一审","stage":"人审","priority":4,"status":"已上线"},{"id":"2036928","name":"头部商家不通过内容复核-视频","stage":"人审","priority":10,"status":"已上线"},{"id":"2036929","name":"头部商家不通过内容复核-图文","stage":"人审","priority":10,"status":"已上线"},{"id":"2072952","name":"评价生图回捞再审","stage":"人审","priority":10,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-16"}]},{"bizId":"111630","flowId":"111630","name":"内容一审（未挂品）流程","groupId":"80002620","groupName":"推荐一审","mode":"信息流-内容一审","observedAt":"2026-11-16","complete":true,"tasks":[{"id":"2082981","name":"未挂品素材-图文存量回刷-一次性","stage":"机审","priority":1,"status":"暂停"},{"id":"2072025","name":"未挂品素材-图文机审任务","stage":"机审","priority":5,"status":"已上线"},{"id":"2072026","name":"未挂品素材-视频机审任务","stage":"机审","priority":5,"status":"已上线"},{"id":"2098853","name":"热点素材_图文免机审","stage":"免机审","priority":1,"status":"已上线"},{"id":"2098854","name":"热点素材_视频免机审","stage":"免机审","priority":1,"status":"已上线"},{"id":"2072023","name":"未挂品素材-图文人审任务","stage":"人审","priority":15,"status":"已上线"},{"id":"2072024","name":"未挂品素材-视频人审任务","stage":"人审","priority":15,"status":"已上线"},{"id":"2098851","name":"热点素材-图文免人审任务","stage":"免人审","priority":2,"status":"已上线"},{"id":"2098852","name":"热点素材-视频免人审任务","stage":"免人审","priority":2,"status":"已上线"},{"id":"2072233","name":"未挂品素材-图文免人审任务","stage":"免人审","priority":3,"status":"已上线"},{"id":"2072234","name":"未挂品素材-视频免人审任务","stage":"免人审","priority":3,"status":"已上线"}]},{"bizId":"105317","flowId":"105317","name":"内容一审流程","groupId":"80002620","groupName":"推荐一审","mode":"信息流-内容一审","observedAt":"2026-11-16","complete":true,"tasks":[{"id":"2031414","name":"一审图文机审任务（处方药）","stage":"机审","priority":1,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2045564","name":"信息流人审缓存洗白送审-图文","stage":"机审","priority":1,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2045565","name":"信息流人审缓存洗白送审-视频","stage":"机审","priority":1,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2070879","name":"评价内容豁免去重/封面相关性/封面牛皮癣","stage":"机审","priority":1,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2096806","name":"光合视频（重点商家SSKA/KA/T8/T7及review账号）豁免高召模型","stage":"机审","priority":1,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2101592","name":"测试","stage":"机审","priority":1,"status":"暂停"},{"id":"2104015","name":"123","stage":"机审","priority":1,"status":"暂停"},{"id":"2104379","name":"12","stage":"机审","priority":1,"status":"暂停"},{"id":"2033185","name":"头图短视频封面变更机审","stage":"机审","priority":3,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2045140","name":"一审图文top商家分层任务","stage":"机审","priority":3,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2045143","name":"一审视频top商家分层任务","stage":"机审","priority":3,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2031415","name":"一审图文机审任务（逛逛）","stage":"机审","priority":4,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2031417","name":"一审视频机审任务（逛逛）","stage":"机审","priority":4,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2031416","name":"一审图文机审任务（兜底）","stage":"机审","priority":5,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2031650","name":"一审视频机审任务（兜底）","stage":"机审","priority":5,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2087495","name":"不在池商品关联SA主图放开一审图文--严格审(疑似牛/低/引/AI)","stage":"机审","priority":6,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2087496","name":"不在池商品关联SA主图放开一审视频--严格审(疑似牛/低/引/AI)","stage":"机审","priority":6,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2031419","name":"品牌针对主图豁免910（苹果910，Fendi1005）","stage":"免机审","priority":1,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2095780","name":"live图免机审任务_copy","stage":"免机审","priority":1,"status":"暂停"},{"id":"2098687","name":"热点图文免机审","stage":"免机审","priority":1,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2098702","name":"热点视频免机审","stage":"免机审","priority":1,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2105070","name":"双11古人aigc免机审_图文","stage":"免机审","priority":1,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2105071","name":"双11古人aigc免机审_视频","stage":"免机审","priority":1,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2105360","name":"千牛子渠道命中高召视频模型_不通过","stage":"免机审","priority":1,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2109223","name":"AI账号命中高准2.0和高召模型图文_不通过","stage":"免机审","priority":1,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2109329","name":"AI账号命中高准2.0和高召模型视频_不通过","stage":"免机审","priority":1,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2031420","name":"【勿动】淘宝超级直播预告-视频免机审","stage":"免机审","priority":2,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2063112","name":"静菡（P0热点、F88、SAB新品）图文任务","stage":"人审","priority":1,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2063116","name":"静菡（P0热点、F88、SAB新品）视频任务","stage":"人审","priority":1,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2067733","name":"AI素材专审任务（图文）","stage":"人审","priority":1,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2067737","name":"AI素材专审任务（视频）","stage":"人审","priority":1,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2071180","name":"评价内容豁免去重/封面牛皮癣-图文人审任务","stage":"人审","priority":1,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2097092","name":"AI素材高召模型送人审_视频","stage":"人审","priority":1,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2104380","name":"11","stage":"人审","priority":1,"status":"暂停"},{"id":"2104381","name":"1","stage":"人审","priority":1,"status":"暂停"},{"id":"2104448","name":"1","stage":"人审","priority":1,"status":"暂停"},{"id":"2031421","name":"一审图文人审任务-top商家特殊","stage":"人审","priority":2,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2031427","name":"一审视频人审任务-top商家特殊","stage":"人审","priority":2,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2034473","name":"一审图文人审任务-大促高优","stage":"人审","priority":2,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2034476","name":"一审视频人审任务-大促高优","stage":"人审","priority":2,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2031422","name":"一审图文人审任务-多品","stage":"人审","priority":3,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2031428","name":"一审视频人审任务-多品","stage":"人审","priority":3,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2031423","name":"一审图文人审任务-开白情趣用品","stage":"人审","priority":4,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2031424","name":"一审图文人审任务-处方药审核","stage":"人审","priority":5,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2096388","name":"先发后审图文捞回审核任务","stage":"人审","priority":5,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2096389","name":"先发后审视频捞回审核任务","stage":"人审","priority":5,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2048449","name":"一审图文人审任务-智能派单（引人不适）","stage":"人审","priority":6,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2048452","name":"一审视频人审任务-智能派单（引人不适）","stage":"人审","priority":6,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2050910","name":"一审图文人审任务-智能派单（低俗色情）","stage":"人审","priority":7,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2050911","name":"一审视频人审任务-智能派单（低俗色情）","stage":"人审","priority":7,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2063521","name":"一审图文人审任务-智能派单（牛皮癣）","stage":"人审","priority":8,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2063523","name":"一审视频人审任务-智能派单（牛皮癣）","stage":"人审","priority":8,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2063528","name":"一审视频人审任务-智能派单（PPT）","stage":"人审","priority":9,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2064418","name":"一审图文人审任务-智能派单（质量分）","stage":"人审","priority":10,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2064419","name":"一审视频人审任务-智能派单（质量分）","stage":"人审","priority":10,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2064420","name":"一审图文人审任务-智能派单（违禁词）","stage":"人审","priority":11,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2064422","name":"一审视频人审任务-智能派单（违禁词）","stage":"人审","priority":11,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2064423","name":"一审图文人审任务-智能派单（相关性）","stage":"人审","priority":12,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2064424","name":"一审视频人审任务-智能派单（相关性）","stage":"人审","priority":12,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2031425","name":"一审图文人审任务-逛逛","stage":"人审","priority":14,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2031429","name":"一审视频人审任务-逛逛","stage":"人审","priority":14,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2031426","name":"一审图文人审任务-兜底","stage":"人审","priority":15,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2031430","name":"一审视频人审任务-兜底","stage":"人审","priority":15,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2072205","name":"评价内容豁免去重/封面相关性/封面牛皮癣-图文免人审任务","stage":"免人审","priority":1,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2095779","name":"苹果910一审图文免人审","stage":"免人审","priority":1,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2098696","name":"热点图文免人审","stage":"免人审","priority":1,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2098698","name":"热点视频免人审","stage":"免人审","priority":1,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2105073","name":"双11古人aigc免人审通过_视频","stage":"免人审","priority":1,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2105074","name":"双11古人aigc免人审通过_图文","stage":"免人审","priority":1,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2031431","name":"一审图文二编免人审任务","stage":"免人审","priority":2,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2031432","name":"一审图文免人审任务","stage":"免人审","priority":3,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2031433","name":"一审视频免人审任务","stage":"免人审","priority":3,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2033213","name":"头图短视频默认封面从有值变为空值免人审","stage":"免人审","priority":4,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2081837","name":"新发商品图文免人审","stage":"免人审","priority":5,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2081838","name":"新发商品视频免人审","stage":"免人审","priority":5,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2031435","name":"【勿动】淘宝超级直播预告-视频免人审","stage":"免人审","priority":6,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2086692","name":"不在池商品关联SA主图放开一审图文免人审","stage":"免人审","priority":7,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2087132","name":"不在池商品关联SA主图放开一审视频免人审","stage":"免人审","priority":7,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2086919","name":"一审历史通过免人审","stage":"免人审","priority":8,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2096386","name":"先发后审图文免人审任务","stage":"免人审","priority":10,"status":"暂停"},{"id":"2096387","name":"先发后审视频免人审任务","stage":"免人审","priority":10,"status":"暂停"},{"id":"2095243","name":"一审命中黑店铺图文免人审拒绝","stage":"免人审","priority":15,"status":"已上线","template":"【图文】素材质量标注模板","contentType":"图文","templateObservedAt":"2026-11-05"},{"id":"2095244","name":"一审命中黑店铺视频免人审拒绝","stage":"免人审","priority":15,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-05"},{"id":"2095234","name":"test","stage":"免人审","priority":99,"status":"暂停"}]},{"bizId":"106431","flowId":"106431","name":"内容二审流程","groupId":"80004161","groupName":"推荐二审","mode":"信息流-内容二审","observedAt":"2026-11-16","complete":true,"tasks":[{"id":"2036200","name":"视频清晰度拦截","stage":"机审","priority":1,"status":"已上线"},{"id":"2036201","name":"低质图片内容机审-新","stage":"机审","priority":2,"status":"已上线"},{"id":"2036202","name":"信息流二审机审任务-视频","stage":"机审","priority":3,"status":"暂停"},{"id":"2036203","name":"信息流二审机审任务-图文","stage":"机审","priority":3,"status":"暂停"},{"id":"2091604","name":"舆情负反馈-图文","stage":"免机审","priority":1,"status":"已上线"},{"id":"2091605","name":"舆情负反馈-视频","stage":"免机审","priority":1,"status":"已上线"},{"id":"2095207","name":"低质图文内容负反馈超过100直接拦截","stage":"免机审","priority":1,"status":"已上线"},{"id":"2095208","name":"低质视频内容负反馈超过100直接拦截","stage":"免机审","priority":1,"status":"已上线"},{"id":"2105076","name":"双11古人aigc免机审_图文","stage":"免机审","priority":1,"status":"已上线"},{"id":"2105077","name":"双11古人aigc免机审_视频","stage":"免机审","priority":1,"status":"已上线"},{"id":"2036204","name":"实时高曝负反馈免机审-图文","stage":"免机审","priority":2,"status":"已上线"},{"id":"2036205","name":"实时高曝负反馈免机审-视频","stage":"免机审","priority":2,"status":"已上线"},{"id":"2036206","name":"【勿动】淘宝超级直播预告视频免二审机审","stage":"免机审","priority":3,"status":"已上线"},{"id":"2036207","name":"劣质ai召回内容机审-图文","stage":"免机审","priority":3,"status":"已上线"},{"id":"2036208","name":"劣质ai召回内容机审-视频","stage":"免机审","priority":3,"status":"已上线"},{"id":"2036209","name":"劣质AI机审处置-图文","stage":"免机审","priority":4,"status":"已上线"},{"id":"2036210","name":"劣质AI机审处置-视频","stage":"免机审","priority":4,"status":"已上线"},{"id":"2036211","name":"观人镜机审拦截-图文","stage":"免机审","priority":5,"status":"已上线"},{"id":"2036212","name":"观人镜机审拦截-视频","stage":"免机审","priority":5,"status":"已上线"},{"id":"2097644","name":"修正917BUG劣质AI回捞通过-图文","stage":"免机审","priority":9,"status":"已上线"},{"id":"2100516","name":"高招存量图文内容曝光PV等于0及发布时间超过90天2批直接拦截","stage":"免机审","priority":9,"status":"已上线"},{"id":"2104747","name":"高招存量视频高优先级内容直接拦截","stage":"免机审","priority":9,"status":"已上线"},{"id":"2112072","name":"二审机审兜底—视频","stage":"免机审","priority":10,"status":"已上线"},{"id":"2112093","name":"二审机审兜底—图文","stage":"免机审","priority":10,"status":"已上线"},{"id":"2048595","name":"高危负反馈PV大于20-图文","stage":"人审","priority":1,"status":"已上线"},{"id":"2048597","name":"高危负反馈PV大于20-视频","stage":"人审","priority":1,"status":"已上线"},{"id":"2091790","name":"舆情负反馈-图文","stage":"人审","priority":1,"status":"已上线"},{"id":"2091791","name":"舆情负反馈-视频","stage":"人审","priority":1,"status":"已上线"},{"id":"2036213","name":"二审多品任务-视频","stage":"人审","priority":2,"status":"已上线"},{"id":"2036214","name":"二审多品任务-图文","stage":"人审","priority":2,"status":"已上线"},{"id":"2036215","name":"0页高曝任务-视频","stage":"人审","priority":2,"status":"已上线"},{"id":"2036216","name":"0页高曝任务-图文","stage":"人审","priority":2,"status":"已上线"},{"id":"2036217","name":"高危负反馈任务-图文","stage":"人审","priority":3,"status":"已上线"},{"id":"2036218","name":"高危负反馈任务-视频","stage":"人审","priority":3,"status":"已上线"},{"id":"2097020","name":"流量激增图文任务_未挂品","stage":"人审","priority":3,"status":"已上线"},{"id":"2097021","name":"流量激增视频任务_未挂品","stage":"人审","priority":3,"status":"已上线"},{"id":"2036219","name":"高曝任务-图文","stage":"人审","priority":4,"status":"已上线"},{"id":"2036220","name":"高曝任务-视频","stage":"人审","priority":4,"status":"已上线"},{"id":"2095213","name":"流量激增图文任务","stage":"人审","priority":4,"status":"已上线"},{"id":"2095215","name":"流量激增视频任务","stage":"人审","priority":4,"status":"已上线"},{"id":"2097497","name":"高召模型送审 -图文917（纯增）_copy","stage":"人审","priority":4,"status":"暂停"},{"id":"2036221","name":"头图送审任务-视频","stage":"人审","priority":5,"status":"已上线"},{"id":"2097402","name":"高召模型送审 -图文917（纯增）","stage":"人审","priority":5,"status":"已上线"},{"id":"2036222","name":"相似图模型召回任务-图文","stage":"人审","priority":6,"status":"已上线"},{"id":"2084096","name":"AI渠道高爆送审-图文","stage":"人审","priority":6,"status":"已上线"},{"id":"2084098","name":"AI渠道高爆送审-视频","stage":"人审","priority":6,"status":"已上线"},{"id":"2093227","name":"高召模型送审（含存/增）-图文","stage":"人审","priority":6,"status":"已上线"},{"id":"2093616","name":"高招模型存量劣质AI送审-视频","stage":"人审","priority":6,"status":"已上线"},{"id":"2093882","name":"高召模型AI送审-图文第二波一次性","stage":"人审","priority":6,"status":"已上线"},{"id":"2036223","name":"负反馈历史待审任务-图文","stage":"人审","priority":7,"status":"已上线"},{"id":"2036224","name":"负反馈历史待审任务-视频","stage":"人审","priority":7,"status":"已上线"},{"id":"2082837","name":"不挂品图文不审核相关性","stage":"人审","priority":7,"status":"已上线"},{"id":"2082840","name":"不挂品视频不审核相关性","stage":"人审","priority":7,"status":"已上线"},{"id":"2036225","name":"劣质AI免人审-图文","stage":"免人审","priority":1,"status":"已上线"},{"id":"2036226","name":"劣质AI免人审-视频","stage":"免人审","priority":1,"status":"已上线"},{"id":"2097646","name":"双11古人aigc免人审_图文","stage":"免人审","priority":1,"status":"已上线"},{"id":"2098721","name":"命中高召且是疑似AI商家不通过_图文","stage":"免人审","priority":1,"status":"已上线"},{"id":"2105081","name":"双11古人aigc免人审_视频","stage":"免人审","priority":1,"status":"已上线"},{"id":"2106627","name":"高召劣质AI头部和IC免人审通过-一次性","stage":"免人审","priority":1,"status":"已上线","template":"【视频】素材质量标注模板","contentType":"视频","templateObservedAt":"2026-11-16"},{"id":"2036227","name":"【勿动】淘宝超级直播预告视频免二审人审","stage":"免人审","priority":2,"status":"已上线"}]},{"bizId":"115543","flowId":"115543","name":"广告素材审核","groupId":"80013184","groupName":"广告素材审核（演示分组）","mode":"信息流广告审核-单AI审","observedAt":"2026-11-16","complete":false,"tasks":[]}];
+// Rev19: real BIZ inventory, deliberately local simulation configurations.
+// Depends on r19LiveSources (generated from verified snapshots) and r19BuildOperators().
+// Inject immediately before the existing boot expression, then call r19InstallConfiguredCatalog().
+const R19_CATALOG_VERSION='biz-configured-catalog-v1';
+const R19_CATALOG_MARKER='nex-installed-'+R19_CATALOG_VERSION;
+const r19Clone=value=>structuredClone(value);
+
+function r19ContentType(source){
+  const explicit=String(source.contentType||source.mediaType||'');
+  if(['图文','视频','综合'].includes(explicit))return explicit;
+  const verified=typeof checkedBizTemplates!=='undefined'?checkedBizTemplates.tasks.find(t=>String(t.id)===String(source.id)):null;
+  const template=String(source.template||source.templateName||verified?.template||'');
+  if(/视频/.test(template))return '视频';
+  if(/图文|图片|图集/.test(template))return '图文';
+  const name=String(source.name||'');
+  if(/视频|切片/.test(name)&&!/图文/.test(name))return '视频';
+  if(/图文|图片|图集/.test(name)&&!/视频/.test(name))return '图文';
+  return '综合';
+}
+function r19SourceStage(source){return {'标注':'人审','人工审核':'人审','机器审核':'机审','免标注':'免人审'}[source.stage]||source.stage;}
+function r19SourcePaused(source){return /暂停|下线|停用|禁用/.test(String(source.status||''));}
+function r19Slug(value){return String(value).replace(/[^a-zA-Z0-9_-]/g,'-');}
+function r19Rule(field,value,relation='等于'){
+  return {id:uid(),auVersion:1,source:'送审字段',scope:'业务',field,relation,value:String(value)};
+}
+function r19SourcePriority(source,index){
+  const value=source.priority;
+  return value!==null&&value!==undefined&&value!==''&&Number.isFinite(Number(value))&&Number(value)>0?Number(value):index+1;
+}
+function r19ExecutionPriorities(groups){
+  const order=groups.map((group,index)=>({group,index})).sort((a,b)=>Number(a.group.source.priority??a.index+1)-Number(b.group.source.priority??b.index+1)||a.index-b.index);
+  order.forEach(({group},index)=>{group.priority=order.length-index;});
+  return groups;
+}
+function r19Provenance(flow,source){
+  return {flowId:String(flow.bizId||flow.flowId||flow.id),taskId:String(source.id),name:source.name,stage:r19SourceStage(source),
+    priority:source.priority??null,status:source.status||'',template:source.template||source.templateName||'',
+    capturedAt:flow.capturedAt||flow.verifiedAt||flow.observedAt||flow.date||'',configuration:'本地模拟配置；非生产配置导入'};
+}
+function r19Members(type,flow){
+  const preferred=/择优/.test(flow.name)?'85004':type==='视频'?'85002':'85001';
+  const skills=nexPeople.skills(),skill=skills.find(s=>String(s.id)===preferred);
+  if(skill)return {mode:'技能标签',ids:[String(skill.id)],labels:[skill.name]};
+  const people=nexPeople.members().slice(0,2);
+  return {mode:'指定成员',ids:people.map(p=>String(p.id)),labels:people.map(p=>p.name)};
+}
+function r19Preset(flow,type){
+  const select=['106597','111847'].includes(String(flow.bizId||flow.flowId||flow.id));
+  const id=select?(type==='视频'?'preset-select-video':'preset-select-graphic'):(type==='视频'?'preset-feed-video':'preset-feed-graphic');
+  const preset=migrationPresets.find(p=>p.id===id);
+  const template=instantiateTemplate(preset);
+  if(type==='综合'){
+    template.name=(select?'择优':'内容审核')+'综合素材（模拟）';
+    template.materials.push({id:uid(),type:'视频',name:'内容视频',field:'base_url'});
+  }
+  return {presetId:id,template};
+}
+
+// These are meaningful example dimensions inferred from task names. They are not claims
+// that the live task uses these exact predicates or values.
+function r19Route(flow,source,type){
+  if(source.mockConfiguration?.route?.length)return r19Clone(source.mockConfiguration.route);
+  const name=String(source.name||''),rules=[];
+  if(type!=='综合')rules.push(r19Rule('content_type',type));
+  if(['111847','111630'].includes(String(flow.bizId||flow.flowId||flow.id))||/未挂品/.test(name))rules.push(r19Rule('has_item','否'));
+  else if(/挂品|单品|多品|商品|主图/.test(name)&&!/不挂品|未挂品/.test(name))rules.push(r19Rule('has_item','是'));
+  const categories=['服饰','美妆','数码','运动','家居','食品','母婴','宠物','汽车','家电','珠宝','生鲜'];
+  const category=categories.find(value=>name.includes(value));
+  if(category)rules.push(r19Rule('category_name',category));
+  const channel=/千牛/.test(name)?'千牛':/逛逛/.test(name)?'逛逛':/自供给/.test(name)?'自供给':/机构/.test(name)?'机构':/光合/.test(name)?'光合':/共享链路/.test(name)?'共享链路':'';
+  if(channel)rules.push(r19Rule('source_channel',channel));
+  if(/top|SSKA|重点商家|T8|T7|KA/i.test(name))rules.push(r19Rule('merchant_tier','重点商家'));
+  if(/多品/.test(name))rules.push(r19Rule('item_count','1','大于'));
+  else if(/单品/.test(name))rules.push(r19Rule('item_count','1'));
+  if(/热点|P0|F88|SAB新品|大促/.test(name))rules.push(r19Rule('campaign_type',/大促/.test(name)?'大促高优':'热点新品'));
+  if(/黑店铺/.test(name))rules.push(r19Rule('black_shop','是'));
+  if(/二编|订正|修改|变更/.test(name))rules.push(r19Rule('resubmit','是'));
+  if(/历史通过|缓存|洗白|去重/.test(name))rules.push(r19Rule('history_result','通过'));
+  const risk=/处方药/.test(name)?'处方药':/情趣/.test(name)?'情趣用品':/引人不适/.test(name)?'引人不适':/低俗色情|低俗/.test(name)?'低俗色情':/牛皮癣/.test(name)?'牛皮癣':/违禁词/.test(name)?'违禁词':/相关性/.test(name)?'相关性':/质量分/.test(name)?'质量分低':/PPT/.test(name)?'PPT视频':/AI|aigc/i.test(name)?'疑似劣质AI':'';
+  if(risk)rules.push(r19Rule('risk_hint',risk,'包含'));
+  if(/先发后审|捞回|召回/.test(name))rules.push(r19Rule('submission_scene','召回复审'));
+  if(/品牌|苹果|Fendi/i.test(name))rules.push(r19Rule('brand_whitelist','是'));
+  if(/新发/.test(name))rules.push(r19Rule('is_new_item','是'));
+  if(/直播/.test(name))rules.push(r19Rule('content_scene','直播预告'));
+  if(!rules.length)rules.push(r19Rule('submission_scene','常规送审'));
+  return rules;
+}
+function r19TaskBindings(source,flow,type,presetId,questions,library){
+  const context={flow,sourceTask:source,contentType:type,presetId,questions};
+  const resolved=library.resolve(context)||{};
+  const caseOperatorId=resolved.caseOperatorId;
+  if(!caseOperatorId)throw Error('Rev19 未找到机审算子：'+source.id+' '+source.name);
+  const select=['106597','111847'].includes(String(flow.bizId||flow.flowId||flow.id));
+  const binding={id:uid(),targetKind:'case',question:'',referenceKind:'operator',operator:String(caseOperatorId),referenceScope:'业务',applicationObject:'case结果过滤',result:resolved.caseOutput||'审核结果',caseResultOptions:resolved.caseResultOptions||(select?['S','A','B','C','D']:['通过','不通过'])};
+  const bindings=[binding];
+  for(const item of resolved.questionOperators||[]){
+    const question=questions.find(q=>String(q.id)===String(item.questionId||'')||q.name===item.questionName);
+    if(!question||question.type==='文本')continue;
+    bindings.push({id:uid(),targetKind:'question',question:question.id,referenceKind:'operator',operator:String(item.operatorId),referenceScope:'业务',applicationObject:'case结果过滤',result:item.output||'审核结果'});
+  }
+  return {bindings,resolved};
+}
+function r19MachineGroup(source,flow,type,index,presetId,questions,library){
+  const {bindings,resolved}=r19TaskBindings(source,flow,type,presetId,questions,library);
+  const conditions=r19Route(flow,source,type);
+  if(resolved.routeRules?.length)conditions.push(...r19Clone(resolved.routeRules));
+  return {id:'R19-M-'+source.id,bizTaskId:String(source.id),name:source.name,demoOnly:true,
+    priority:r19SourcePriority(source,index),join:'AND',conditions,bindings,source:r19Provenance(flow,source)};
+}
+function r19HumanGroup(source,flow,type,index){
+  return {id:'R19-H-'+source.id,bizTaskId:String(source.id),name:source.name,demoOnly:true,
+    priority:r19SourcePriority(source,index),join:'AND',conditions:r19Route(flow,source,type),members:r19Members(type,flow),source:r19Provenance(flow,source)};
+}
+function r19Exemption(source,flow,type,index){
+  const stage=r19SourceStage(source),name=String(source.name),override=source.mockConfiguration?.output;
+  const result=override?.result||(/不通过|拒绝|黑店铺/.test(name)||String(flow.bizId||flow.flowId||flow.id)==='106236'?'不通过':'通过');
+  const category=result==='通过'?'审核通过原因':stage==='免机审'?'机审拒绝原因':'审核拒绝原因';
+  const reason=(window.reviewTaxonomy?.reasons()||[]).find(r=>r.category===category&&(!r.object||r.object==='内容'));
+  const output={result,reasonIds:reason?[String(reason.id)]:[],reasonLabels:reason?{[reason.id]:reason.name||reason.label||reason.reason}:{},customReason:'本地模拟：'+name,...r19Clone(override||{})};
+  return {id:'R19-E-'+source.id,bizTaskId:String(source.id),name:source.name,priority:r19SourcePriority(source,index),enabled:!r19SourcePaused(source),demoOnly:true,
+    updated:flow.capturedAt||flow.verifiedAt||'2026-11-16',groups:[{id:uid(),join:'AND',rules:r19Route(flow,source,type)}],output,source:r19Provenance(flow,source)};
+}
+function r19Fields(){
+  const definitions=[['outer_id','送审唯一 ID'],['source_dataset_id','送审源 ID'],['content_type','内容类型'],['title','内容标题'],['summary','内容摘要'],['account_name','账号名'],
+    ['has_item','是否挂品'],['category_name','内容类目'],['source_channel','发布渠道'],['merchant_tier','商家分层'],['item_count','关联商品数量','整数'],['campaign_type','活动分层'],
+    ['black_shop','风险名单'],['resubmit','是否订正重送'],['history_result','历史审核结果'],['risk_hint','模拟风险提示'],['submission_scene','送审场景'],['brand_whitelist','品牌白名单'],
+    ['is_new_item','是否新发商品'],['content_scene','内容场景'],['base_sku_name','关联商品名称'],['demo_content_context','用户店铺与类目信息'],['pics','内容图片','数组'],['image_url','图片地址','数组'],['cover','视频封面'],['base_url','内容视频地址'],['clip_url','候选切片地址'],['clip_range','切片时间范围']];
+  return definitions.map(([name,description,type='字符串'])=>({name,description,type,primary:name==='outer_id',indexed:!['pics','image_url','cover','base_url','clip_url'].includes(name)}));
+}
+function r19CatalogForFlow(source){
+  const bizId=String(source.bizId||source.flowId||source.id),groups=nexDatasets.groups();
+  const sourceGroupId=String(source.groupId||''),sourceGroupName=source.groupName||source.group?.name||'业务流程（演示分组）';
+  const group=groups.find(g=>sourceGroupId&&String(g.bizId||'')===sourceGroupId)||groups.find(g=>g.name===sourceGroupName)||{
+    id:sourceGroupId?'NEX-GR-B'+sourceGroupId:'R19-GROUP-'+r19Slug(source.groupKey||bizId),name:sourceGroupName,bizId:sourceGroupId,code:'r19_'+(sourceGroupId||bizId)};
+  const flow=nexDatasets.flows().find(f=>String(f.bizId||'')===bizId)||{id:'NEX-FL-B'+bizId,bizId,name:source.name,groupId:group.id,auditObject:'内容',auditMode:source.mode||source.auditMode||'',admins:['演练运营'],creator:'演练运营'};
+  flow.r19SourceComplete=source.complete!==false;
+  flow.r19SourceNote=source.complete===false?'任务清单待核对：当前访问上下文未能读取并核实完整任务清单；此处数量不能认定为生产任务数。':'已核对任务清单；配置为本地模拟。';
+  // Existing BIZ mapping wins, including user-changed group membership.
+  const actualGroup=groups.find(g=>String(g.id)===String(flow.groupId))||group;
+  const types=[...new Set(source.tasks.map(r19ContentType))];
+  const datasets=types.map((type,index)=>({id:'R19-DS-'+bizId+'-'+({图文:'GRAPHIC',视频:'VIDEO',综合:'MIXED'}[type]),
+    name:source.name+' · '+type+'送审（模拟）',flowId:String(flow.id),groupId:String(actualGroup.id),priority:index+1,admins:['演练运营'],
+    tags:['BIZ任务全量配置','本地模拟'],statsTagsEdited:true,type:'业务数据集',scenario:source.name,auditObject:'内容',method:'API',sourceKind:'业务系统',sourceId:'',
+    fields:r19Fields(),demoOnly:true,r19CatalogVersion:R19_CATALOG_VERSION,
+    record:{sourceRef:'mock.biz.'+bizId+'.'+({图文:'graphic',视频:'video',综合:'mixed'}[type]),bizData:{type:'业务数据',resubmit:'否',advanced:false}}}));
+  nexDatasets.installMockFlow({group:actualGroup,flow,datasets});
+  return {group:actualGroup,flow,datasets};
+}
+function r19BuildParent(source,definition,type,paused,children,library){
+  const bizId=String(source.bizId||source.flowId||source.id),{presetId,template}=r19Preset(source,type);
+  const machine=r19ExecutionPriorities(children.filter(t=>r19SourceStage(t)==='机审').map((t,i)=>r19MachineGroup(t,source,type,i,presetId,template.questions,library)));
+  const human=r19ExecutionPriorities(children.filter(t=>r19SourceStage(t)==='人审').map((t,i)=>r19HumanGroup(t,source,type,i)));
+  const machineEx=children.filter(t=>r19SourceStage(t)==='免机审').map((t,i)=>r19Exemption(t,source,type,i));
+  const humanEx=children.filter(t=>r19SourceStage(t)==='免人审').map((t,i)=>r19Exemption(t,source,type,i));
+  const members=r19Members(type,source),needsHuman=human.length||humanEx.length;
+  const flow={...defaultFlow(),nodes:needsHuman?['机审','标注']:['机审'],assignment:'条件分配',machineGroups:machine,
+    split:machine[0]?.conditions||[],splitJoin:machine[0]?.join||'AND',featureCalculationEnabled:!!machine.length,manualAnnotationEnabled:!!human.length,
+    annotationMode:bizId==='105317'&&type==='图文'&&!paused?'双人标注':'单人标注',members,annotator:members.labels.join('、'),qualityRate:0,shortCircuit:true,
+    agent:{enabled:false,bindings:[],failure:'继续人工标注'},
+    humanDistribution:{mode:'条件分配',groups:human,conditions:human[0]?.conditions||[],join:human[0]?.join||'AND'},
+    exemptions:{'机审':{enabled:!paused&&!!machineEx.length,tasks:machineEx},'标注':{enabled:!paused&&!!humanEx.length,tasks:humanEx}},
+    humanWork:{priority:'先送先审',sortField:'',order:'降序',recycle:5,preload:true,hold:false,holdMinutes:30,perPerson:20,perTask:100,aggregate:'关闭',quantity:3,display:'同一页面聚合',groupField:'',custom:false,priorityRules:[]}};
+  delete flow.exempt;delete flow.exemptGroups;
+  const kind={图文:'graphic',视频:'video',综合:'mixed'}[type],state=paused?'paused':'active';
+  const practiceKey='r19-biz-'+bizId+'-'+kind+'-'+state;
+  const id=String(Math.max(100024139,...tasks.map(t=>Number(t.id)).filter(Number.isFinite))+1);
+  return {id,practiceKey,r19CatalogVersion:R19_CATALOG_VERSION,r19SourceFlowId:bizId,r19ContentType:type,
+    name:bizId+' '+source.name+' · '+type+(paused?' · 暂停清单':'')+'（模拟配置）',created:source.capturedAt||source.verifiedAt||'2026-11-16 10:00:00',status:'已配置',taskPaused:paused,admin:'演练运营',
+    description:'逐条对照 BIZ '+bizId+' '+source.name+'的'+(paused?'暂停':'活跃')+'任务清单，共 '+children.length+' 条。来源任务 ID、名称、环节、原优先级及状态来自回读；机审/人审执行优先级已按 NEX 大值优先换算，保留源任务顺序；源值保存在每个子任务来源记录。分配条件、题目绑定、算子参数、人员和数据集为本地模拟配置，未导入生产配置。'+(type==='综合'?'源清单未明确素材类型，暂按综合素材演示。':'')+'可在任务流程中查看每个子任务或免审任务。',
+    groupId:String(definition.group.id),flowId:String(definition.flow.id),dataset:definition.flow.name+' · 流程数据集',dataSource:{type:'flow',id:String(definition.flow.id)},datasetBindings:[],
+    tags:['BIZ任务全量配置','本地模拟'],statsTagsEdited:true,templateVersion:3,sharedTemplate:template,nodeTemplates:{},bindings:[],flow,detailSamples:[],feedsMediaExampleVersion:1,
+    r19SourceTasks:children.map(t=>r19Provenance(source,t))};
+}
+function r19SeedInspectionSamples(task,source,children){
+  if(task.taskPaused)return;
+  const choices=[],stages=['机审','人审','免机审','免人审'];
+  for(const stage of stages){const candidate=children.find(child=>r19SourceStage(child)===stage);if(candidate)choices.push(candidate);}
+  if(choices.length===1){const other=children.find(child=>String(child.id)!==String(choices[0].id));if(other)choices.push(other);}
+  const type=task.r19ContentType,kind={图文:'GRAPHIC',视频:'VIDEO',综合:'MIXED'}[type],datasetId='R19-DS-'+task.r19SourceFlowId+'-'+kind;
+  const binding=taskDatasetBindings(task).find(b=>String(b.id)===datasetId);
+  if(!binding)return;
+  task.detailSamples=choices.slice(0,2).map((child,index)=>{
+    const stage=r19SourceStage(child),mediaIndex=(Number(child.id)+index)%3,material=feedsMediaFields(mediaIndex),media=feedsMediaRecord(mediaIndex),id='R19-CASE-'+task.r19SourceFlowId+'-'+child.id+'-'+(index+1);
+    const fields={...material,outer_id:id,source_dataset_id:datasetId,content_type:type==='综合'?'图文':type,has_item:'是',source_channel:'日常送审',resubmit:'否',black_shop:'否',item_count:1,
+      summary:'本地配置检查样本，对应 BIZ 子任务 '+child.id+'「'+child.name+'」。素材仅用于界面展示，分配字段为模拟值。',base_sku_name:'演示关联商品',demo_content_context:'本地模拟账号、商家及内容分层；不对应生产素材'};
+    for(const rule of r19Route(source,child,type)){if(rule.source==='送审字段')fields[rule.field]=rule.relation==='大于'?Number(rule.value)+1:rule.value;}
+    const human=stage==='人审',exemption=stage.startsWith('免'),node=human?'标注':'机审';
+    const output=exemption?r19Exemption(child,source,type,index).output:null;
+    const history=human?[{stage:'机审',result:'通过',caseResult:'通过',actor:'本地模拟机审',at:task.created}]:exemption?[{stage,result:output.result,caseResult:output.result,actor:'本地模拟免审',at:task.created}]:[];
+    const row={...media,id,instance:'SIM-'+id,dataset:binding.name,datasetId,flowId:task.flowId,poolDatasetId:datasetId,batchId:binding.batchId,dataInstanceId:viewDataID(binding),sourcePriority:binding.priority,
+      contentType:fields.content_type,title:material.title+' · '+child.name,accountName:material.account_name,sent:task.created,fields,
+      submissionSnapshot:{demo:true,at:task.created,fields:r19Clone(fields),results:{官方:{},业务:{}},operatorResults:{}},
+      history,finished:human?['机审']:exemption?task.flow.nodes.slice():[],stage:exemption?'完成':node,status:exemption?'已完成':human?'待标注':'待机审',
+      assignmentId:human?'R19-H-'+child.id:'',machineAssignmentId:stage==='机审'?'R19-M-'+child.id:'',scopeTaskName:task.name,scopeMatchedAt:task.created,
+      r19Inspection:true,r19BizTaskId:String(child.id),r19SourceStage:stage};
+    if(exemption){row.caseResult=output.result;row.resultOverride={result:output.result,reason:output.customReason,source:'本地模拟免审示例',at:task.created};}
+    return row;
+  });
+}
+function r19InstallConfiguredCatalog(){
+  let manifest={parents:{},flows:[]};try{const saved=JSON.parse(localStorage.getItem(R19_CATALOG_MARKER)||'null');if(saved?.parents)manifest=saved;}catch{}
+  if(!Array.isArray(r19LiveSources)||!r19LiveSources.length)return {installed:false,reason:'no-sources'};
+  const sourceKey=(source,type,paused)=>'r19-biz-'+String(source.bizId||source.flowId||source.id)+'-'+({图文:'graphic',视频:'video',综合:'mixed'}[type])+'-'+(paused?'paused':'active');
+  const alreadyKnown=r19LiveSources.every(source=>manifest.flows.includes(String(source.bizId||source.flowId||source.id))&&source.tasks.every(child=>(manifest.parents[sourceKey(source,r19ContentType(child),r19SourcePaused(child))]||[]).includes(String(child.id))));
+  if(alreadyKnown)return {installed:false,reason:'already-installed'};
+  const library=r19BuildOperators();
+  if(typeof library.resolve!=='function')throw Error('r19BuildOperators must provide resolve(context)');
+  let featureAdded=0,operatorAdded=0;
+  for(const feature of library.features||[])if(!features.some(f=>String(f.id)===String(feature.id))){features.push(r19Clone(feature));featureAdded++;}
+  for(const operator of library.operators||[])if(!rows.some(op=>String(op.id)===String(operator.id))){rows.push(r19Clone(operator));operatorAdded++;}
+  // Store dependencies before storing tasks that reference them.
+  if(!writeLocal(FEATURE_KEY,features)||!persist())return {installed:false,reason:'rule-storage-failed'};
+  const added=[],catalog=[];
+  for(const source of r19LiveSources){
+    const definition=r19CatalogForFlow(source);catalog.push(definition);
+    const buckets=new Map();
+    for(const child of source.tasks){
+      const type=r19ContentType(child),paused=r19SourcePaused(child),key=type+'::'+paused;
+      if(!buckets.has(key))buckets.set(key,{type,paused,children:[]});
+      buckets.get(key).children.push(child);
+    }
+    for(const {type,paused,children} of buckets.values()){
+      const key=sourceKey(source,type,paused),known=manifest.parents[key]||[],newChildren=children.filter(child=>!known.includes(String(child.id)));
+      if(!newChildren.length)continue;
+      const existing=tasks.find(t=>t.practiceKey===key);
+      // A recorded parent that was deleted stays deleted. Existing groups are never replaced.
+      if(existing){
+        const {presetId}=r19Preset(source,type),questions=nodeQuestions(existing,'机审');
+        for(const child of newChildren){
+          const stage=r19SourceStage(child),index=(existing.r19SourceTasks||[]).length;
+          if(stage==='机审')(existing.flow.machineGroups||=[]).push(r19MachineGroup(child,source,type,index,presetId,questions,library));
+          else if(stage==='人审')auHumanDistributionModel(existing.flow).groups.push(r19HumanGroup(child,source,type,index));
+          else ensureExemptions(existing.flow)[stage==='免机审'?'机审':'标注'].tasks.push(r19Exemption(child,source,type,index));
+          (existing.r19SourceTasks||=[]).push(r19Provenance(source,child));
+        }
+      }else if(!Object.hasOwn(manifest.parents,key)){
+        const task=r19BuildParent(source,definition,type,paused,children,library);
+        tasks.push(task);task.datasetBindings=taskDatasetBindings(task);r19SeedInspectionSamples(task,source,children);added.push(task);
+      }
+      manifest.parents[key]=[...new Set([...known,...children.map(child=>String(child.id))])];
+    }
+    manifest.flows=[...new Set([...manifest.flows,String(source.bizId||source.flowId||source.id)])];
+  }
+  for(const task of added){rev3NormalizeAllocation(task.flow);rev8NormalizeMachine(task);ensureNodeTemplates(task);}
+  if(!writeLocal(TASK_KEY,tasks))return {installed:false,reason:'task-storage-failed'};
+  if(!r12StoreSourcePriorities())return {installed:false,reason:'priority-storage-failed'};
+  try{
+    const savedCatalog=JSON.parse(localStorage.getItem('nex-demo.dataset-catalog.v1')||'{}');
+    if(catalog.some(definition=>definition.datasets.some(dataset=>!savedCatalog.dsCatalog?.[dataset.id])))return {installed:false,reason:'catalog-storage-failed'};
+  }catch{return {installed:false,reason:'catalog-storage-failed'};}
+  syncTaskDatasetReferences();
+  try{localStorage.setItem(R19_CATALOG_MARKER,JSON.stringify(manifest));}catch{return {installed:false,reason:'marker-storage-failed'};}
+  return {installed:true,tasks:added.length,features:featureAdded,operators:operatorAdded,sourceTasks:r19LiveSources.reduce((n,f)=>n+f.tasks.length,0)};
+}
+
+
+r19InstallConfiguredCatalog();
+// END REV19 CONFIGURED CATALOG
 (builtinTemplates.unshift(graphicCommonTemplate),
   tasks.forEach(t => { if (t.id === "100024139" && t.name === "内容域组合特征机审") t.name = "组合特征机审"; }),
   rows.forEach(row => { if (row.description === "用于内容域产品方案演示的示例算子。") row.description = "用于产品方案演示的示例算子。"; }),
