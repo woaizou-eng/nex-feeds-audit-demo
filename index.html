@@ -4407,6 +4407,10 @@ function dsgFilters(ui,records) {
     (f.more?'<div class="dg6-filter-grid dg6-more">'+more+'</div>':'')+
     '<div class="dg6-filter-actions">'+btn('查询','dsg-search','',true)+link('重置','dsg-reset')+link(f.more?'收起筛选':'更多筛选','dsg-more')+'</div></section>';
 }
+function dsgPresetScope(record) {
+  if(String(record.bizId||'')==='115543')return {label:'本轮暂不预置',note:'广告素材审核 115543 本轮暂不预置；本轮 Demo 按已核对的其余 8 个流程提供任务配置。此范围调整不代表实际迁移计划变更。'};
+  return record.r19SourceComplete===false?{label:'任务清单待核对',note:record.r19SourceNote||'任务清单待核对'}:null;
+}
 function dsgList(ui) {
   const groups=dsGroups(),flows=dsFlows(),group=ui.tab==='group',kind=group?'分组':'流程',all=group?groups:flows,f=dsgFilterState(ui.tab);
   const records=all.filter(record=>dsgMatches(record,f,f.mine));
@@ -4416,7 +4420,7 @@ function dsgList(ui) {
     ['流程名称','NEX 流程 ID','BIZ 流程 ID','分组名称','审核对象','管理员','状态','作业方式','审核模式','共享数据集','任务数','操作'];
   const rows=records.map(record=>{
     if(group){const members=flows.filter(flow=>flow.groupId===record.id),count=dsgCount(members);return [link(record.name,'dsg-filter',record.id),esc(record.id),dsgId(record),dsgShown(record,'code'),esc(dsgObject(record)),dsgShown(record,'admin'),String(members.length),String(count.datasets),String(count.tasks),link('查看流程','dsg-filter',record.id)+link('编辑','dsg-edit-group',record.id)];}
-    return [link(record.name,'dsg-detail',record.id)+(record.r19SourceComplete===false?'<small>任务清单待核对</small>':''),esc(record.id),dsgId(record),esc(dsGroupName(record.groupId)),esc(dsgObject(record)),dsgShown(record,'admin'),dsgShown(record,'status'),dsgShown(record,'workMode'),dsgShown(record,'auditMode'),String(dsgData(record.id).length),String(getTasksForFlow(record.id).length),link('新建任务','dsg-create-task',record.id)+link('查看','dsg-detail',record.id)+link('编辑','dsg-edit-flow',record.id)];
+    return [link(record.name,'dsg-detail',record.id)+(dsgPresetScope(record)?'<small>'+esc(dsgPresetScope(record).label)+'</small>':''),esc(record.id),dsgId(record),esc(dsGroupName(record.groupId)),esc(dsgObject(record)),dsgShown(record,'admin'),dsgShown(record,'status'),dsgShown(record,'workMode'),dsgShown(record,'auditMode'),String(dsgData(record.id).length),String(getTasksForFlow(record.id).length),link('新建任务','dsg-create-task',record.id)+link('查看','dsg-detail',record.id)+link('编辑','dsg-edit-flow',record.id)];
   });
   return title+tabs([['group','分组列表'],['flow','流程列表']],ui.tab,'dsg-tab')+dsgFilters(ui,all)+actions+
     '<div class="dc-scroll">'+table(columns,rows,'dg-list dg6-list'+(group?'':' dg6-flows'))+'</div>'+(records.length?'':'<p class="dc-empty">暂无符合条件的'+kind+'。</p>')+
@@ -4437,7 +4441,7 @@ function dsgDetail(flow) {
   const datasets=dsgData(flow.id),tasks=getTasksForFlow(flow.id);
   const meta=[['所属分组',esc(dsGroupName(flow.groupId))],['审核对象',esc(dsgObject(flow))],['管理员',dsgShown(flow,'admin')],['状态',dsgShown(flow,'status')],['作业方式',dsgShown(flow,'workMode')],['审核模式',dsgShown(flow,'auditMode')]];
   return '<header class="dc-title"><h2>'+esc(flow.name)+'</h2><div class="f-actions">'+btn('新建任务','dsg-create-task',flow.id,true)+btn('编辑','dsg-edit-flow',flow.id)+btn('返回流程列表','dsg-back-flows')+'</div></header>'+
-    (flow.r19SourceComplete===false?'<p class="info">'+esc(flow.r19SourceNote||'任务清单待核对')+'</p>':'')+'<p class="dg-meta">NEX 流程 ID　'+esc(flow.id)+'　·　BIZ 流程 ID　'+dsgId(flow)+'</p><dl class="dg6-details">'+meta.map(([key,value])=>'<div><dt>'+key+'</dt><dd>'+value+'</dd></div>').join('')+'</dl>'+
+    (dsgPresetScope(flow)?'<p class="info">'+esc(dsgPresetScope(flow).note)+'</p>':'')+'<p class="dg-meta">NEX 流程 ID　'+esc(flow.id)+'　·　BIZ 流程 ID　'+dsgId(flow)+'</p><dl class="dg6-details">'+meta.map(([key,value])=>'<div><dt>'+key+'</dt><dd>'+value+'</dd></div>').join('')+'</dl>'+
     '<h3 class="dg-section">共享数据集（'+datasets.length+'）</h3>'+(datasets.length?'<div class="dc-scroll">'+table(['数据集名称','数据集 ID','导入方式'],datasets.map(item=>[link(item.name,'asset-detail',item.id),esc(item.id),esc(item.method||'—')]))+'</div>':'<p class="dc-empty">暂无挂靠此流程的数据集。</p>')+
     '<h3 class="dg-section">所属任务（'+tasks.length+'）</h3>'+(tasks.length?'<div class="dc-scroll">'+table(['任务名称','任务 ID'],tasks.map(item=>[esc(item.name),esc(item.id)]))+'</div>':'<p class="dc-empty">暂无归入此流程的任务。</p>');
 }
@@ -14123,7 +14127,7 @@ function templateCatalog(){
     return {id:template.id,template,name:examples[0]?.template||template.name,flows:proposed?['106597','111847']:ids,
       examples,source:proposed?'预设':ids.includes('105317')?'上线任务全量':'人审任务抽样'};
   });
-  rows.push({id:'pending-115543',name:'机审作业模板待核实',flows:['115543'],examples:[],source:'待核实'});
+  rows.push({id:'pending-115543',name:'广告素材审核（本轮暂不预置）',flows:['115543'],examples:[],source:'本轮跳过'});
   for(const template of templateLibrary){
     rows.push({id:template.id,template,name:template.name,flows:template.applicableFlows||[],examples:[],source:'本地保存'});
   }
@@ -14133,7 +14137,7 @@ function templateCatalog(){
 function catalogDetail(row,flowId){
   if(row.id==='pending-115543'){
     modal('广告素材审核 · 115543',
-      '<dl class="r4-defs"><dt>分组 ID</dt><dd>80013184</dd><dt>BIZ 审核模式</dt><dd>信息流广告审核-单AI审</dd><dt>迁移清单</dt><dd>2 个机审任务，0 个人审任务</dd><dt>作业模板</dt><dd>尚未核实这两个机审任务选用的模板名称。</dd></dl>');
+      '<dl class="r4-defs"><dt>分组 ID</dt><dd>80013184</dd><dt>BIZ 审核模式</dt><dd>信息流广告审核-单AI审</dd><dt>原 Roadmap 清单</dt><dd>2 个机审任务，0 个人审任务</dd><dt>本轮 Demo 范围</dt><dd>广告素材审核暂不预置，任务与模板不纳入本轮核对。</dd></dl>');
     return;
   }
   const records=row.examples.filter(x=>!flowId||x.flowId===flowId);
