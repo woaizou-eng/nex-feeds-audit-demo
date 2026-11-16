@@ -3774,6 +3774,56 @@ span.v6-new,
 .r21-task-empty{padding:56px 24px;border:1px solid #e5e8ee;border-radius:9px;background:#fff;text-align:center;color:#8b95a6}
 @media(max-width:900px){.r21-task-filter-footer{flex-wrap:wrap}.r21-view-toggle{margin-left:auto}.r21-task-group-head{padding:16px;gap:8px}.r21-group-id{max-width:32%}}
 </style>
+<style id="rev22-task-fields-style">
+.r22-task-ownership-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;width:100%}
+.r22-task-ownership-row .field{margin:0;min-width:0}
+.r22-task-ownership-row select{width:100%}
+#r22-task-ownership{grid-column:1/-1}
+#r8-task-tags{grid-column:1/-1}
+@media(max-width:760px){.r22-task-ownership-row{grid-template-columns:1fr;gap:16px}}
+</style>
+<style id="rev22-dataset-owner-style">.nex-datasets .r22-dataset-owner-fields{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px 15px;min-width:0}
+.nex-datasets .r22-dataset-tags{grid-column:1/-1}
+.nex-datasets .r22-dataset-owner-fields select:disabled{background:#f7f8fa;color:#8a93a3;cursor:not-allowed}
+@media(max-width:895px){.nex-datasets .r22-dataset-owner-fields{grid-template-columns:minmax(0,1fr)}}
+</style>
+<style id="rev22-task-hierarchy-style">
+.r22-task-name{display:flex;align-items:flex-start;gap:8px}
+.r22-task-name>div{min-width:0}
+.r22-task-toggle{flex:0 0 23px;width:23px;height:25px;border:0;background:transparent;color:#8c96a9;cursor:pointer;border-radius:4px;padding:4px;margin-top:1px}
+.r22-task-toggle:hover{background:#f0efff;color:#6557ff}
+.r22-task-toggle svg,.r22-node-toggle svg{width:14px;height:14px;stroke:currentColor;stroke-width:1.5;fill:none;transition:transform .15s ease}
+.r22-task-toggle[aria-expanded=true] svg,.r22-node-toggle[aria-expanded=true] svg{transform:rotate(90deg)}
+.r22-task-children[hidden],.r22-node-content[hidden]{display:none}
+.r21-task-table tr.r22-task-children>td{padding:0 18px 18px 45px;background:#fbfcff;border-top:0}
+.r22-task-tree{padding-top:12px}
+.r22-tree-caption{color:#9098a8;font-size:12px;padding:0 0 9px}
+.r22-node{border:1px solid #e6e9f1;border-radius:7px;background:#fff;margin-top:8px;overflow:hidden}
+.r22-node-head{display:flex;align-items:center;gap:16px;min-height:44px;background:#f8f9fc;padding-right:16px}
+.r22-node-toggle{display:flex;align-items:center;gap:9px;flex:1;align-self:stretch;border:0;background:transparent;text-align:left;padding:12px 14px;cursor:pointer;color:#8d96aa;font:inherit;font-size:12px}
+.r22-node-toggle strong{color:#3c4559;font-size:13px;font-weight:600}
+.r22-node-toggle span{margin-left:4px;color:#8b94a6}
+.r22-node-head>.action{flex-shrink:0;font-size:12px}
+.r22-child-table-wrap{overflow-x:auto}
+.r21-task-table .r22-child-table{table-layout:fixed;min-width:900px;width:100%;margin:0}
+.r21-task-table .r22-child-table th{font-size:12px;font-weight:500;color:#7b8599;background:#fff;padding:11px 14px;border-bottom:1px solid #edf0f5}
+.r21-task-table .r22-child-table td{font-size:12px;padding:12px 14px;vertical-align:top;border-bottom:1px solid #f0f2f6;color:#536078}
+.r21-task-table .r22-child-table th:nth-child(1){width:31%}
+.r21-task-table .r22-child-table th:nth-child(2){width:7%}
+.r21-task-table .r22-child-table th:nth-child(3){width:25%}
+.r21-task-table .r22-child-table th:nth-child(4){width:18%}
+.r21-task-table .r22-child-table th:nth-child(5){width:9%}
+.r21-task-table .r22-child-table th:nth-child(6){width:10%}
+.r22-child-name{display:flex;align-items:flex-start;gap:6px;line-height:1.6;color:#39465b}
+.r22-kind{display:inline-flex;white-space:nowrap;flex-shrink:0;font-size:10px;color:#7769dd;border:1px solid #e7e1ff;background:#faf8ff;line-height:16px;border-radius:3px;padding:0 4px;margin-top:1px}
+.r22-kind.exempt{color:#6c8390;border-color:#e1e9ec;background:#f5f8f9}
+.r22-child-table small{display:block;font-size:11px;color:#929cad;margin-top:4px;line-height:1.4}
+.r22-child-summary{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.6}
+.r22-child-status{white-space:nowrap;font-size:11px;color:#2c9e85;background:#eff9f5;border-radius:4px;padding:3px 6px;display:inline-block}
+.r22-child-status.paused{color:#9298a6;background:#f4f5f7}
+.r22-node-empty{padding:20px;color:#8c95a7;font-size:12px}
+.r22-task-toggle:focus-visible,.r22-node-toggle:focus-visible{outline:2px solid #8b80ff;outline-offset:-2px}
+</style>
 </head>
 <body>
   <header><div class="logo">NEX</div><button class="space" id="space"><em>✦</em> 官方测试空间 <span class="chevron">▼</span></button><nav class="topnav"><button class="active">管理中心</button><button>作业中心</button><button>HCM</button><button>AI Workshop</button><button>平台工坊</button></nav><div class="account"><button class="round" id="help" aria-label="Demo 使用说明">♧</button><button class="round" id="export" title="导出算子配置" aria-label="导出算子配置">▣</button><span class="avatar">管</span><button class="accountname" id="account">业务空间管理员 <span class="chevron">▼</span></button></div></header>
@@ -4139,7 +4189,7 @@ function dsCommit(form){
   if(sourceId&&!dsPreset(sourceId))return '关联的 BIZ 来源不在已核对的清单内。';
   const tagFlows=dsFlows().filter(f=>(form.tags||[]).includes('流程：'+f.name+(f.bizId?'（BIZ '+f.bizId+'）':'')));
   const model={name,statsTagsEdited:true,sourceOnly:!!form.sourceOnly,priority:r10Finite(form.priority)?Number(form.priority):old?.priority??1,admins:[...(form.admins||form.admin||[])],tags:[...new Set(form.tags||[])].filter(t=>!['业务数据','订正数据'].includes(t)),project:form.project||'',
-    auditObject:form.auditObject||old?.auditObject||'内容',type:form.type,method:form.method,scenario:form.scenario||'',flowId:form.flowId||'',sourceKind:form.sourceKind||form.apiSource||'',
+    auditObject:form.auditObject||old?.auditObject||'内容',type:form.type,method:form.method,scenario:form.scenario||'',flowId:form.flowId||'',groupId:dsFlows().find(f=>String(f.id)===String(form.flowId))?.groupId||'',sourceKind:form.sourceKind||form.apiSource||'',
     sourceId,fields:(form.fields||[]).map(f=>({name:f.name,description:f.description||'',type:f.type,indexed:!!f.indexed,primary:!!f.primary})),
     record:assetSafeDetails(form)};
   const catalog={...(s.dsCatalog||{}),[id]:model};
@@ -4627,6 +4677,37 @@ function dsfPicker(a,key,title,choices){
   return '<div class="dsf-select-line">'+dsfAct(caption,'pop',key)+(key==='admins'?'<small>共 '+selected.length+' 人</small>':dsfLink('新建标签','pop','tag-new'))+'</div>'+
     (a.pop===key?'<div class="dsf-pop-list">'+options.map((v,i)=>dsfTick(key+':'+encodeURIComponent(v),selected.includes(v),v)).join('')+'</div>':'');
 }
+// Dataset ownership uses explicit fields; tags carry only optional classifications.
+function r22DatasetOwnerLocked(a){
+  return !!(a.allowUnassignedFlow||a.editId&&r12DatasetFlowLocked(a.editId)||session?.flowId);
+}
+function r22DatasetOwnerFields(a){
+  if(a.live)return '';
+  const flows=dsFlows(),groups=dsGroups(),selected=flows.find(f=>String(f.id)===String(a.flowId));
+  if(selected)a.groupId=String(selected.groupId||'');
+  if(a.groupId===undefined)a.groupId='';
+  const locked=r22DatasetOwnerLocked(a),required=!a.sourceOnly&&!a.allowUnassignedFlow;
+  const select=(key,label,values,value,disabled=false)=>dsfSelect(key,value,values,label).replace('<select ','<select '+(disabled?'disabled ':''));
+  const options=flows.filter(f=>String(f.groupId)===String(a.groupId));
+  const hint=a.allowUnassignedFlow?'保存后回到上一层关联流程。':a.editId&&locked?'数据集已关联任务，分组和流程保持不变。':session?.flowId?'沿用当前任务选择的流程。':'';
+  return '<div class="r22-dataset-owner-fields">'+dsfRow('所属分组',select('groupId','所属分组',[['',a.allowUnassignedFlow?'在上一层关联':'请选择分组'],...groups.map(g=>[String(g.id),g.name+(g.bizId?'（'+g.bizId+'）':'')])],a.groupId,locked),required?'*':'')+
+    dsfRow('所属流程',select('flowId','所属流程',[['',a.allowUnassignedFlow?'在上一层关联':a.groupId?'请选择流程':'请先选择分组'],...options.map(f=>[String(f.id),f.name+(f.bizId?'（'+f.bizId+'）':'')])],a.flowId,locked||!a.groupId)+(hint?'<small class="nt10-help">'+esc(hint)+'</small>':''),required?'*':'')+'</div>';
+}
+function r22DatasetOwnerChange(a,key,value){
+  if(!['groupId','flowId'].includes(key))return false;
+  if(r22DatasetOwnerLocked(a))return true;
+  if(key==='groupId'){
+    a.groupId=dsGroups().some(g=>String(g.id)===String(value))?String(value):'';
+    const selected=dsFlows().find(f=>String(f.id)===String(a.flowId));
+    if(!selected||String(selected.groupId)!==a.groupId)a.flowId='';
+  }else{
+    const selected=dsFlows().find(f=>String(f.id)===String(value)&&String(f.groupId)===String(a.groupId));
+    a.flowId=selected?String(selected.id):'';
+    if(selected){a.groupId=String(selected.groupId);a.auditObject=selected.auditObject||'内容';}
+  }
+  return true;
+}
+
 function dsfBase(a){
   const tagInput=a.pop==='tag-new'?'<div class="dsf-inline">'+dsfInput('tagName',a.tagName,'标签名称','标签名称','maxlength="40"')+
     dsfSelect('tagColor',tagKey(a.tagColor),Object.keys(sourceTagPalette),'标签颜色')+'<small>使用场景：数据集 / 任务</small>'+dsfAct('保存标签','tag-add')+dsfLink('取消','pop','')+'</div>':'';
@@ -4635,7 +4716,8 @@ function dsfBase(a){
   return (a.allowUnassignedFlow?'<p class="info">先保存普通数据集，再回到上一层关联流程。</p>':'')+'<div class="dsf-base">'+dsfRow('数据集名称',dsfInput('name',a.name,'数据集名称','请输入','maxlength="80"'),'*')+
     dsfRow('管理员',dsfPicker(a,'admins','管理员',['当前用户','推荐运营','推荐产品']),'*')+
     (!a.live&&!a.composeSources?dsfRow('优先级','<input class="f-in" type="number" step="any" data-dsf="priority" aria-label="数据集优先级" value="'+esc(r10Finite(a.priority)?a.priority:'')+'" placeholder="请输入优先级"><small>数字越大越优先；关联任务统一使用，不在任务中重复配置。</small>'+(a.editId?r12PriorityConflictHTML(a.editId,a.editId):''),'*'):'')+
-    dsfRow('标签',window.nexTagPicker.control('dataset',a.tags||[],a.live?null:{id:a.flowId,required:!a.sourceOnly&&!a.allowUnassignedFlow,deferred:!!a.allowUnassignedFlow})+'<small class="nt10-help">'+(!a.live?'业务流程单选，其他标签可多选。':'选填，按类型选择。')+'</small>',!a.live&&!a.sourceOnly&&!a.allowUnassignedFlow?'*':'')+
+    r22DatasetOwnerFields(a)+
+    dsfRow('标签',window.nexTagPicker.control('dataset',r16PlainTags(a.tags||[]))+'<small class="nt10-help">选填，可按类型多选或新建标签。</small>').replace('class="dsf-row"','class="dsf-row r22-dataset-tags"')+
     dsfRow('关联项目','<div class="dsf-inline">'+dsfSelect('project',a.project,[['','请选择'],...new Set([...(s.dsProjects||[]),...(a.project?[a.project]:[])])],'关联项目')+dsfLink('新建项目','pop','project-new')+'</div>'+projectInput)+
     '</div>'+dsfRow('数据集类型',dsfChoose('type',a.type,'数据集类型',DS_FORM_TYPES),'*');
 }
@@ -4794,7 +4876,8 @@ async function dsfParseFile(a){
 function dsfError(a){
   if(!a.name.trim())return '请填写数据集名称。';
   if(!a.admins.length)return '请选择管理员。';
-  if(!a.live&&!a.sourceOnly&&!a.allowUnassignedFlow&&!dsFlows().some(f=>String(f.id)===String(a.flowId)))return '请选择所属流程。';
+  if(!a.live&&!a.sourceOnly&&!a.allowUnassignedFlow&&!dsGroups().some(g=>String(g.id)===String(a.groupId)))return '请选择所属分组。';
+  if(!a.live&&!a.sourceOnly&&!a.allowUnassignedFlow&&!dsFlows().some(f=>String(f.id)===String(a.flowId)&&String(f.groupId)===String(a.groupId)))return '请选择所属流程。';
   if(!a.live&&!a.composeSources&&!r10Finite(a.priority))return '请填写数据集优先级。';
   if(a.live)return '当前为现网对照。请返回迁移方案后保存本地数据集。';
 
@@ -4871,7 +4954,7 @@ function dsFormAction(action,id=''){
       a.error=dsfError(a);if(a.error)break;
       const isRecommended=a.type==='业务数据集'&&a.scenario==='信息流推荐';
       const record={...(a.method==='API'?{bizData:{advanced:false,type:a.bizData.type||'业务数据',resubmit:a.bizData.resubmit||''}}:{}),advanced:{...(a.advanced.ext?{ext:true,extGroups:a.advanced.extGroups}:{}),...(a.advanced.circle?{circle:true,circleGroups:a.advanced.circleGroups}:{})},...(a.method==='ODPS'?{odps:{...a.odps}}:{}),...(a.method==='本地上传'?{upload:{...a.upload}}:{}),...(isRecommended&&a.method==='API'&&a.sourceRef?{sourceRef:a.sourceRef.trim()}:{})};
-      a.error=dsCommit({origin:a.origin,editId:a.editId,name:a.name.trim(),admins:[...a.admins],tags:[...a.tags],project:a.project,
+      a.error=dsCommit({origin:a.origin,editId:a.editId,name:a.name.trim(),admins:[...a.admins],tags:r16PlainTags(a.tags||[]),project:a.project,auditObject:a.auditObject,
         sourceOnly:!!a.sourceOnly,priority:a.priority,type:a.type,method:a.method,flowId:a.flowId,scenario:a.scenario,fields:a.fields.map(f=>({name:f.name.trim(),type:a.method==='关联已有送审源'?f.type:f.indexed?f.type:'对象',description:f.description,indexed:f.indexed,primary:f.primary})),
         sourceKind:a.method==='API'&&a.type==='业务数据集'?a.sourceKind:'',sourceId:a.method==='API'&&a.type==='业务数据集'?a.sourceId:'',record})||'';
       if(!a.error){if(a.method==='关联已有送审源')r9CommitLinkedDataset(s.temp.lastDs,a);else if(!r12CommitSourcePriorities(s.temp.lastDs,[{id:s.temp.lastDs,priority:a.priority}])){a.error='优先级未能保存，请重试。';break;}dsLeaveForm(a.origin);}break;
@@ -4883,6 +4966,7 @@ function dsFormAction(action,id=''){
 function dsFormChange(key,value){
   const a=s.temp.dsForm;if(!a)return false;
   a.error='';
+  if(r22DatasetOwnerChange(a,key,value))return true;
   if(key==='priority'){a.priority=value===''?'':Number(value);return true;}
   if(key.startsWith('source-priority:')){const member=(a.sourceMembers||[]).find(m=>String(m.id)===key.slice(16));if(member)member.priority=value===''?'':Number(value);return true;}
   if(key==='sourceSearch'){a.sourceSearch=value;return true;}
@@ -5263,7 +5347,7 @@ function dsSaveFlowDataset(input){
       for(const data of defs.datasets){if(!s.dsCatalog[data.id])s.dsCatalog[data.id]=structuredClone(data);}
       persist();
     }
-  window.nexDatasets=Object.freeze({installMockFlow:dsInstallMockFlow,saveFlowDataset:dsSaveFlowDataset,tagCatalog,editFormTags:anchor=>{const form=s.temp.dsForm;if(form)window.nexTagPicker.open(anchor,{selected:form.tags||[],flowBinding:form.live?null:{id:form.flowId,required:!form.sourceOnly&&!form.allowUnassignedFlow,deferred:!!form.allowUnassignedFlow,locked:!!(form.allowUnassignedFlow||form.editId&&r12DatasetFlowLocked(form.editId))},onSave:(labels,id)=>{form.tags=labels;if(!form.live){form.flowId=id||'';const selectedFlow=dsFlows().find(f=>String(f.id)===String(form.flowId));if(selectedFlow)form.auditObject=selectedFlow.auditObject||'内容';}form.pop='';render();}});},mount,unmount,sources:()=>structuredClone(rawResources()),createSource,refresh:render,showCatalog:()=>{s.page='catalog';render();},addDemoResource:(id,data)=>{if(!s.dsCatalog[id]){s.dsCatalog[id]=structuredClone(data);persist();}return publicAsset(id);},list:()=>structuredClone(resources()),groups:()=>structuredClone(dsGroups()),flows:()=>structuredClone(dsFlows()),pick:choose,create,syncTasks});
+  window.nexDatasets=Object.freeze({installMockFlow:dsInstallMockFlow,saveFlowDataset:dsSaveFlowDataset,tagCatalog,editFormTags:anchor=>{const form=s.temp.dsForm;if(form)window.nexTagPicker.open(anchor,{selected:r16PlainTags(form.tags||[]),plainOnly:true,onSave:labels=>{form.tags=labels;form.pop='';render();}});},mount,unmount,sources:()=>structuredClone(rawResources()),createSource,refresh:render,showCatalog:()=>{s.page='catalog';render();},addDemoResource:(id,data)=>{if(!s.dsCatalog[id]){s.dsCatalog[id]=structuredClone(data);persist();}return publicAsset(id);},list:()=>structuredClone(resources()),groups:()=>structuredClone(dsGroups()),flows:()=>structuredClone(dsFlows()),pick:choose,create,syncTasks});
 })();
 
   </script>
@@ -9774,13 +9858,88 @@ function r21TaskGrouping(records){
   const ordered=[...groups.filter(group=>used.has(String(group.id))),...(used.has(ungrouped.id)?[ungrouped]:[])];
   return {groups:ordered,groupFor};
 }
+// Expand actual saved task nodes and their condition allocations in either list view.
+const r22TaskTreeState={tasks:new Set(),nodes:new Set()};
+function r22NodeLabel(node){return node==='标注'?'人审':node;}
+function r22NodeItems(task,node){
+  const flow=task.flow||{},out=[];
+  const add=(kind,list,enabled=true)=>list.forEach((config,index)=>out.push({kind,config,index,enabled}));
+  if(node==='免审')add('免审',flow.standaloneExemption?.tasks||[],flow.standaloneExemption?.enabled!==false);
+  else if(node==='机审'){
+    add('免机审',flow.exemptions?.['机审']?.tasks||[],flow.exemptions?.['机审']?.enabled!==false);
+    add('机审',flow.machineGroups||[],flow.featureCalculationEnabled!==false);
+  }else if(node==='标注'){
+    add('免人审',flow.exemptions?.['标注']?.tasks||[],flow.exemptions?.['标注']?.enabled!==false);
+    add('人审',flow.humanDistribution?.mode==='条件分配'?(flow.humanDistribution?.groups||[]):[],flow.manualAnnotationEnabled!==false);
+  }
+  return out;
+}
+function r22NodeItemPaused(task,node,item){return !!(task.taskPaused||!item.enabled||item.config.enabled===false||task.assignmentPaused?.[node+'::'+item.config.id]);}
+function r22ConditionSummary(task,config,exempt){
+  const catalog=[...window.nexDatasets.list(),...window.nexDatasets.sources()],fields=taskDatasetBindings(task).flatMap(binding=>catalog.find(dataset=>String(dataset.id)===String(binding.id))?.fields||[]);
+  const fieldName=id=>fields.find(field=>String(field.name)===String(id))?.description||metadata.find(field=>String(field.field)===String(id))?.description||id;
+  const sets=exempt?(config.groups||[]):(config.sets||[{rules:config.conditions||[],join:config.join||'AND'}]);
+  return sets.map(set=>(set.rules||[]).map(rule=>{
+    const name=rule.label||(rule.source==='内容规则项'?auRouteFeature(String(rule.field||rule.featureId))?.name:rule.source==='算子'?auOperators().find(operator=>String(operator.id)===String(rule.field))?.name:fieldName(rule.field));
+    return [name||rule.field,rule.output,rule.relation,rule.value??rule.values?.join('、')].filter(value=>value!==undefined&&value!==null&&value!=='').join(' ');
+  }).join(set.join==='OR'?' 或 ':' 且 ')).filter(Boolean).join(' ／ ')||'—';
+}
+function r22TaskNodeChildren(task,node,items){
+  const template=effectiveTemplate(task,node),label=r22NodeLabel(node);
+  if(!items.length){
+    const message=node==='质检'?'按任务配置抽检，当前抽检比例 '+(task.flow.qualityRate??0)+'%。':node==='标注'&&task.flow.humanDistribution?.mode==='全量分配'?'当前为全量分配，未单独拆分人审子任务。':'暂未配置子任务。';
+    return '<div class="r22-node-empty">'+esc(message)+'</div>';
+  }
+  return '<div class="r22-child-table-wrap"><table class="r22-child-table"><thead><tr><th>子任务 / 来源 ID</th><th>优先级</th><th>分配条件</th><th>模板 / 结果</th><th>状态</th><th>操作</th></tr></thead><tbody>'+items.map(item=>{
+    const c=item.config,exempt=item.kind.includes('免'),ids=[...new Set([...(c.sourceTaskIds||[]),c.bizTaskId,c.source?.taskId].filter(Boolean).map(String))];
+    const conditions=r22ConditionSummary(task,c,exempt);
+    const display=exempt?(c.output?.result||'待配置'):(template?.name||template?.title||'未选择模板');
+    const paused=r22NodeItemPaused(task,node,item);
+    return '<tr><td><div class="r22-child-name"><span class="r22-kind '+(exempt?'exempt':'')+'">'+esc(item.kind)+'</span><span>'+esc(c.name||'未命名子任务')+'</span></div><small>'+(ids.length?'BIZ '+esc(ids.join(' / ')):esc(c.id||'—'))+'</small></td><td>'+esc(c.priority??'—')+'</td><td><span class="r22-child-summary" title="'+esc(conditions)+'">'+esc(conditions)+'</span></td><td><span class="r22-child-summary" title="'+esc(display)+'">'+esc(display)+'</span>'+(item.kind==='机审'?'<small>'+String(c.bindings?.length||0)+' 项题目 / 算子引用</small>':'')+'</td><td><span class="r22-child-status '+(paused?'paused':'')+'">'+(paused?'已停用':'已启用')+'</span></td><td><button type="button" class="action" data-r22-child="'+esc(task.id)+'" data-node="'+esc(node)+'" data-kind="'+esc(!item.enabled&&['机审','人审'].includes(item.kind)?'':item.kind)+'" data-index="'+item.index+'">'+(!item.enabled&&['机审','人审'].includes(item.kind)?'节点配置':'查看配置')+'</button></td></tr>';
+  }).join('')+'</tbody></table></div>';
+}
+function r22TaskHierarchy(task){
+  const nodes=task.flow?.nodes||[];
+  return '<div class="r22-task-tree"><div class="r22-tree-caption">'+(nodes.includes('免审')?'独立免审 · 命中后结束':'任务节点')+'</div>'+nodes.map(node=>{
+    const items=r22NodeItems(task,node),key=String(task.id)+'::'+node,open=r22TaskTreeState.nodes.has(key),active=items.filter(item=>!r22NodeItemPaused(task,node,item)).length;
+    return '<section class="r22-node"><div class="r22-node-head"><button type="button" class="r22-node-toggle" data-r22-node="'+esc(key)+'" aria-expanded="'+open+'"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5"/></svg><strong>'+esc(r22NodeLabel(node))+'节点</strong><span>'+items.length+' 个子任务'+(items.length?' · '+active+' 个启用':'')+'</span></button><button type="button" class="action" data-r22-config-node="'+esc(task.id)+'" data-node="'+esc(node)+'">节点配置</button></div><div class="r22-node-content"'+(open?'':' hidden')+'>'+r22TaskNodeChildren(task,node,items)+'</div></section>';
+  }).join('')+(!nodes.length?'<div class="r22-node-empty">尚未配置审核节点</div>':'')+'</div>';
+}
+function r22OpenNodeConfiguration(id,node,kind,index){
+  const task=tasks.find(t=>String(t.id)===String(id));if(!task)return;
+  taskEditor(task,3);nodeTab=node;renderTaskFlow();
+  if(!kind)return;
+  if(kind==='机审')document.querySelector('#split-rules [data-r8-config="'+index+'"]')?.click();
+  else if(kind==='人审')document.querySelector('#human-distribution [data-edit="'+index+'"]')?.click();
+  else{
+    const list=node==='免审'?r21StandaloneConfig(taskDraft.flow).tasks:ensureExemptions(taskDraft.flow)[node].tasks;
+    if(list[index]){exemptionDraft=structuredClone(list[index]);openExemptionEditor();}
+  }
+}
+function r22BindTaskHierarchy(){
+  document.querySelectorAll('[data-r22-task-toggle]').forEach(button=>button.onclick=()=>{
+    const id=button.dataset.r22TaskToggle,open=button.getAttribute('aria-expanded')!=='true';
+    if(open)r22TaskTreeState.tasks.add(id);else r22TaskTreeState.tasks.delete(id);
+    button.setAttribute('aria-expanded',String(open));button.title=open?'收起节点和子任务':'展开节点和子任务';button.setAttribute('aria-label',button.getAttribute('aria-label').replace(/^(展开|收起)/,open?'收起':'展开'));
+    const row=button.closest('tr').nextElementSibling;row.hidden=!open;
+  });
+  document.querySelectorAll('[data-r22-node]').forEach(button=>button.onclick=()=>{
+    const key=button.dataset.r22Node,open=button.getAttribute('aria-expanded')!=='true';
+    if(open)r22TaskTreeState.nodes.add(key);else r22TaskTreeState.nodes.delete(key);
+    button.setAttribute('aria-expanded',String(open));button.closest('.r22-node').querySelector('.r22-node-content').hidden=!open;
+  });
+  document.querySelectorAll('[data-r22-config-node]').forEach(button=>button.onclick=()=>r22OpenNodeConfiguration(button.dataset.r22ConfigNode,button.dataset.node));
+  document.querySelectorAll('[data-r22-child]').forEach(button=>button.onclick=()=>r22OpenNodeConfiguration(button.dataset.r22Child,button.dataset.node,button.dataset.kind,Number(button.dataset.index)));
+}
 function r21TaskRows(records){
   return records.map(t=>{
-    const id=esc(t.id),btn=(act,label)=>'<button class="action" data-task="'+act+'" data-id="'+id+'">'+label+'</button>';
-    return '<tr><td>'+btn('detail',esc(t.name))+'<small>'+id+'</small></td><td>'+esc(vwFlow(t)||'—')+'</td><td>'+vwProgress(t.detailSamples||[])+'</td><td><span class="status-pill '+(vwStatus(t)==='进行中'?'':'paused')+'">'+esc(vwStatus(t))+'</span></td><td>'+esc(vwAdmin(t))+'</td><td>'+esc(t.created||'—')+'</td>'+
-      '<td class="vw-actions">'+btn('edit','编辑')+'<button class="action" data-vw-pause="'+id+'">'+(t.taskPaused?'启动':'暂停')+'</button>'+btn('copy','复制')+btn('console','控制台')+btn('flow','任务流程')+btn('delete','删除')+'</td></tr>';
+    const id=esc(t.id),btn=(act,label)=>'<button class="action" data-task="'+act+'" data-id="'+id+'">'+label+'</button>',open=r22TaskTreeState.tasks.has(String(t.id));
+    return '<tr class="r22-task-parent"><td><div class="r22-task-name"><button type="button" class="r22-task-toggle" data-r22-task-toggle="'+id+'" aria-expanded="'+open+'" aria-label="'+(open?'收起':'展开')+' '+esc(t.name)+' 的节点和子任务" title="'+(open?'收起':'展开')+'节点和子任务"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5"/></svg></button><div>'+btn('detail',esc(t.name))+'<small>'+id+'</small></div></div></td><td>'+esc(vwFlow(t)||'—')+'</td><td>'+vwProgress(t.detailSamples||[])+'</td><td><span class="status-pill '+(vwStatus(t)==='进行中'?'':'paused')+'">'+esc(vwStatus(t))+'</span></td><td>'+esc(vwAdmin(t))+'</td><td>'+esc(t.created||'—')+'</td>'+
+      '<td class="vw-actions">'+btn('edit','编辑')+'<button class="action" data-vw-pause="'+id+'">'+(t.taskPaused?'启动':'暂停')+'</button>'+btn('copy','复制')+btn('console','控制台')+btn('flow','任务流程')+btn('delete','删除')+'</td></tr>'+
+      '<tr class="r22-task-children"'+(open?'':' hidden')+'><td colspan="7">'+r22TaskHierarchy(t)+'</td></tr>';
   }).join('');
 }
+
 function r21TaskTable(records){
   const heads=['任务信息','任务流程','总进度','状态','管理员','创建时间','操作'];
   return '<div class="tablewrap vw-table r21-task-table"><table><thead><tr>'+heads.map(k=>'<th>'+k+'</th>').join('')+'</tr></thead><tbody>'+(r21TaskRows(records)||'<tr><td colspan="7" class="empty">暂无匹配任务</td></tr>')+'</tbody></table></div>';
@@ -9828,6 +9987,7 @@ function vwRenderTasks(){
   $('#r12-flow-create').onclick=r12OpenFlowStart;
   $('#vw-fast').onclick=()=>openCatalogPicker('quick',createTaskFromCatalog);
   document.querySelectorAll('[data-vw-pause]').forEach(b=>b.onclick=()=>{const t=tasks.find(t=>String(t.id)===b.dataset.vwPause);if(t){t.taskPaused=!t.taskPaused;writeLocal(TASK_KEY,tasks);renderTasks();}});
+  r22BindTaskHierarchy();
 }
 // rev21 task groups end
 
@@ -11285,7 +11445,7 @@ function r21SourceHTML(config){
 function r21TaskModePicker(){
   const host=document.createElement('div'),flow=taskDraft.flow;
   host.className='task-row';host.id='r21-task-mode';
-  host.innerHTML='<label>任务流程 <b>*</b></label><div class="task-controls"><label><input type="radio" name="r21-task-mode" value="regular" '+(!r21IsStandalone(taskDraft)?'checked':'')+'> 常规审核</label><label><input type="radio" name="r21-task-mode" value="exemption" '+(r21IsStandalone(taskDraft)?'checked':'')+'> 免审</label></div>';
+  host.innerHTML='<label>审核方式 <b>*</b></label><div class="task-controls"><label><input type="radio" name="r21-task-mode" value="regular" '+(!r21IsStandalone(taskDraft)?'checked':'')+'> 常规审核</label><label><input type="radio" name="r21-task-mode" value="exemption" '+(r21IsStandalone(taskDraft)?'checked':'')+'> 独立免审</label></div>';
   $('#task-step-content').prepend(host);
   const templateField=$('#r4-pick-template')?.closest('label.field');if(templateField){templateField.hidden=r21IsStandalone(taskDraft);templateField.style.display=r21IsStandalone(taskDraft)?'none':'';}
   host.querySelectorAll('input').forEach(input=>input.onchange=()=>{
@@ -11612,7 +11772,7 @@ function renderTaskWizard() {
           ? (taskStep=r21IsStandalone(taskDraft)?3:taskStep+1, renderTaskWizard())
           : saveTask();
     }),
-    1 === taskStep && (renderTaskBasics(),r21TaskModePicker()),
+    1 === taskStep && renderTaskBasics(),
     2 === taskStep && renderTaskTemplate(),
     3 === taskStep && renderTaskFlow());
 }
@@ -11668,7 +11828,33 @@ function taskDatasetScope(flowId) {
   return {eligible,historical,canKeep:id=>eligible.has(String(id))||historical(id)};
 }
 
-function renderTaskScope() { r8RenderTaskTags(); }
+// Task ownership is explicit; free tags carry classification only.
+const r22TaskOwnershipNotes=new WeakMap();
+function r22RenderTaskOwnership(){
+  const host=document.getElementById('r22-task-ownership');if(!host)return;
+  const task=taskDraft,groups=nexDatasets.groups(),flows=nexDatasets.flows(),flow=r12Flow(task.flowId),locked=!!task.detailSamples?.length;
+  if(flow)task.groupId=String(flow.groupId);
+  const groupId=String(task.groupId||''),available=flows.filter(f=>String(f.groupId)===groupId);
+  const options=(items,id,empty)=>'<option value="">'+empty+'</option>'+items.map(item=>'<option value="'+esc(item.id)+'" '+(String(item.id)===String(id)?'selected':'')+'>'+esc(item.name+(item.bizId?' · BIZ '+item.bizId:''))+'</option>').join('');
+  host.innerHTML='<div class="r22-task-ownership-row"><label class="field"><span>所属分组 <b class="required">*</b></span><select id="r22-task-group" aria-label="所属分组" '+(locked?'disabled':'')+'>'+options(groups,groupId,'请选择所属分组')+'</select></label><label class="field"><span>所属流程 <b class="required">*</b></span><select id="r22-task-flow" aria-label="所属流程" '+(locked||!groupId?'disabled':'')+'>'+options(available,task.flowId,groupId?'请选择所属流程':'请先选择所属分组')+'</select></label></div>'+
+    (locked?'<small class="nt10-help">已有任务数据，所属分组和流程保持不变。</small>':r22TaskOwnershipNotes.get(task)?'<small class="nt10-help" role="status">'+esc(r22TaskOwnershipNotes.get(task))+'</small>':'');
+  function resetSource(message){
+    const selected=!!task.dataSource||!!task.datasetBindings?.length;
+    r12ClearSource(task);task.datasetOverrides={};r15SourceUi.delete(task);
+    r22TaskOwnershipNotes.set(task,selected?message:'');
+  }
+  host.querySelector('#r22-task-group').onchange=e=>{
+    if(locked||e.target.value===groupId)return;
+    resetSource('已清空原流程和数据集，请重新选择。');task.groupId=e.target.value;task.flowId='';renderTaskBasics();
+  };
+  host.querySelector('#r22-task-flow').onchange=e=>{
+    if(locked||String(e.target.value)===String(task.flowId||''))return;
+    const selected=available.find(f=>String(f.id)===e.target.value);
+    resetSource('已切换所属流程，请重新选择该流程内的数据集。');task.flowId=selected?String(selected.id):'';task.groupId=selected?String(selected.groupId):groupId;renderTaskBasics();
+  };
+}
+
+function renderTaskScope() { r22RenderTaskOwnership();r8RenderTaskTags(); }
 
 function renderTaskDatasets() { r8RenderTaskSource(); }
 
@@ -11677,6 +11863,7 @@ function renderTaskBasics() {
     `<label class="field"><span>${label} <b class="required">*</b></span><input data-task-field="${key}" value="${esc(taskDraft[key])}" placeholder="请输入${label}"></label>`;
   $("#task-step-content").innerHTML = `<div class="wizard-basics">
     ${textField("name", "任务名称")}
+    <div class="field" id="r22-task-ownership"></div>
     <div class="field" id="r8-task-tags"></div>
     <div class="field task-datasets" id="task-dataset-field"></div>
     <label class="field"><span>任务模板</span>${reviewTemplateSelect(taskDraft.sharedTemplate)}</label>
@@ -11688,6 +11875,7 @@ function renderTaskBasics() {
   renderTaskScope();
   renderTaskDatasets();
   bindReviewTemplateSelect();
+  r21TaskModePicker();
 }
 function radios(e, t, a) {
   return t
@@ -14767,10 +14955,10 @@ window.nexTagPicker=(()=>{
     return '<button type="button" class="nt10-control" data-nt10-open="'+esc(scope)+'" role="combobox" aria-haspopup="dialog" aria-expanded="false" aria-label="选择标签"><span class="nt10-control-value">'+owner+(items.length?items.map(item=>'<span class="nt10-value" title="'+esc(item.name)+'">'+esc(item.title)+'</span>').join('')+(chosen.length>2?'<span class="nt10-more">+'+(chosen.length-2)+'</span>':''):!binding?'<span class="nt10-placeholder">请选择标签，可多选</span>':'')+'</span><span class="nt10-caret">⌄</span></button>';
   }
   function close(restore=true){if(!active)return;const {anchor,panel,onOutside,onKey,onResize}=active;document.removeEventListener('pointerdown',onOutside,true);document.removeEventListener('keydown',onKey,true);window.removeEventListener('resize',onResize);panel.remove();anchor.setAttribute('aria-expanded','false');active=null;if(restore&&anchor.isConnected)anchor.focus();}
-  function open(anchor,{selected=[],onSave,flowBinding=null}={}){
+  function open(anchor,{selected=[],onSave,flowBinding=null,plainOnly=false}={}){
     if(active?.anchor===anchor){close();return;}close(false);
     const bound=!!flowBinding,flows=nexDatasets.flows(),groups=nexDatasets.groups();
-    const state={selected:new Set(bound?r16PlainTags(selected):selected.filter(t=>!['业务数据','订正数据'].includes(t))),flowId:String(flowBinding?.id||''),flowGroup:'',category:flowBinding?.deferred?'other':bound?'flow':'all',query:'',mode:'browse',newName:'',newCategory:'other',newColor:'purple',error:''};
+    const state={selected:new Set(bound||plainOnly?r16PlainTags(selected):selected.filter(t=>!['业务数据','订正数据'].includes(t))),flowId:String(flowBinding?.id||''),flowGroup:'',category:flowBinding?.deferred?'other':bound?'flow':'all',query:'',mode:'browse',newName:'',newCategory:'other',newColor:'purple',error:''};
     const panel=document.createElement('div');panel.className='nt10-dropdown nt16-dropdown';panel.setAttribute('role','dialog');panel.setAttribute('aria-label','分类选择标签');
     for(const type of ['input','change','click'])panel.addEventListener(type,e=>e.stopPropagation());
     (anchor.closest('dialog')||document.body).append(panel);anchor.setAttribute('aria-expanded','true');
@@ -14778,7 +14966,7 @@ window.nexTagPicker=(()=>{
     const onOutside=e=>{if(!panel.contains(e.target)&&!anchor.contains(e.target))close(false);};
     const onKey=e=>{if(e.key==='Escape'){e.preventDefault();e.stopImmediatePropagation();close();}};
     active={anchor,panel,onOutside,onKey,onResize:fit};document.addEventListener('pointerdown',onOutside,true);document.addEventListener('keydown',onKey,true);window.addEventListener('resize',fit);
-    function plainOptions(){return r9TagOptions([...state.selected]).filter(t=>!bound||r16PlainTags([t.name]).length).map(t=>bound&&['flow','group'].includes(t.kind)?{...t,kind:'other'}:t);}
+    function plainOptions(){return r9TagOptions([...state.selected]).filter(t=>!(bound||plainOnly)||r16PlainTags([t.name]).length).map(t=>(bound||plainOnly)&&['flow','group'].includes(t.kind)?{...t,kind:'other'}:t);}
     function count(){const el=panel.querySelector('.nt10-count');if(el)el.textContent=(bound?(state.flowId?'已选 1 个流程':'未选择流程')+' · ':'')+'已选 '+state.selected.size+' 个标签';}
     function resultList(){
       const q=state.query.trim().toLowerCase().replace(/\s+/g,''),match=x=>!q||x.join('').toLowerCase().replace(/\s+/g,'').includes(q);
@@ -14798,10 +14986,10 @@ window.nexTagPicker=(()=>{
       body.querySelector('[data-nt16-all-groups]')?.addEventListener('click',()=>{state.flowGroup='';resultList();});
     }
     function draw(){
-      const palette=nexDatasets.tagCatalog.palette(),createCategories=bound?categories.filter(([k])=>!['flow','group'].includes(k)):categories;
+      const palette=nexDatasets.tagCatalog.palette(),createCategories=bound||plainOnly?categories.filter(([k])=>!['flow','group'].includes(k)):categories;
       panel.innerHTML='<header><strong>'+(state.mode==='new'?'新建标签':'选择标签')+'</strong><button type="button" class="action" data-nt10-mode="'+(state.mode==='new'?'browse':'new')+'">'+(state.mode==='new'?'返回选择':'＋ 新建标签')+'</button></header>'+(state.mode==='new'?
         '<div class="nt10-create"><label>标签类型<select id="nt10-create-category">'+createCategories.map(([k,n])=>'<option value="'+k+'" '+(state.newCategory===k?'selected':'')+'>'+n+'</option>').join('')+'</select></label><label>标签名称<input id="nt10-create-name" maxlength="40" placeholder="请输入标签名称" value="'+esc(state.newName)+'"></label><div class="nt10-colors"><span>标签颜色</span>'+Object.entries(palette).map(([k,v])=>'<button type="button" data-nt10-color="'+esc(k)+'" class="'+(state.newColor===k?'active':'')+'" style="--nt10-color:'+esc(v)+'" aria-label="'+esc(k)+'" aria-pressed="'+(state.newColor===k)+'"></button>').join('')+'</div>'+(bound?'<small>分组和流程在「分组&流程」中维护。</small>':'')+'<p id="nt10-create-error" role="alert">'+esc(state.error)+'</p></div><footer><span>创建后可在任务、数据集中复用</span><button type="button" class="btn" id="nt10-create-save">创建并选中</button></footer>':
-        '<div class="nt10-search"><input type="search" aria-label="搜索标签" placeholder="搜索标签、流程、所属分组或 BIZ ID" value="'+esc(state.query)+'"></div><nav aria-label="标签类型">'+[['all','全部'],...categories].map(([k,n])=>'<button type="button" data-nt10-kind="'+k+'" aria-pressed="'+(state.category===k)+'">'+n+'</button>').join('')+'</nav>'+(bound?'<p class="nt16-binding-hint">'+(flowBinding.deferred?'所属流程在上一步选择，此处仅选择其他标签。':flowBinding.locked?'已有数据，所属流程保持不变；其他标签可修改。':'业务流程单选，所属分组随流程关联；其他标签可多选。')+'</p>':'')+'<div class="nt10-list"></div><p class="nt10-selection-error" role="alert"></p><footer><span class="nt10-count"></span><button type="button" class="action" id="nt10-clear">清空标签</button><span class="nt10-spacer"></span><button type="button" class="btn secondary" id="nt10-cancel">取消</button><button type="button" class="btn" id="nt10-apply">确定</button></footer>');
+        '<div class="nt10-search"><input type="search" aria-label="搜索标签" placeholder="'+(plainOnly?'搜索标签名称':'搜索标签、流程、所属分组或 BIZ ID')+'" value="'+esc(state.query)+'"></div><nav aria-label="标签类型">'+[['all','全部'],...(plainOnly?categories.filter(([k])=>!['group','flow'].includes(k)):categories)].map(([k,n])=>'<button type="button" data-nt10-kind="'+k+'" aria-pressed="'+(state.category===k)+'">'+n+'</button>').join('')+'</nav>'+(bound?'<p class="nt16-binding-hint">'+(flowBinding.deferred?'所属流程在上一步选择，此处仅选择其他标签。':flowBinding.locked?'已有数据，所属流程保持不变；其他标签可修改。':'业务流程单选，所属分组随流程关联；其他标签可多选。')+'</p>':'')+'<div class="nt10-list"></div><p class="nt10-selection-error" role="alert"></p><footer><span class="nt10-count"></span><button type="button" class="action" id="nt10-clear">清空标签</button><span class="nt10-spacer"></span><button type="button" class="btn secondary" id="nt10-cancel">取消</button><button type="button" class="btn" id="nt10-apply">确定</button></footer>');
       panel.querySelector('[data-nt10-mode]').onclick=()=>{state.mode=state.mode==='new'?'browse':'new';if(state.mode==='new')state.newCategory=createCategories.some(([k])=>k===state.category)?state.category:'other';state.error='';draw();if(state.mode==='new')panel.querySelector('#nt10-create-name').focus();};
       if(state.mode==='new'){
         panel.querySelector('#nt10-create-name').oninput=e=>state.newName=e.target.value;panel.querySelector('#nt10-create-category').onchange=e=>state.newCategory=e.target.value;
@@ -14815,10 +15003,11 @@ window.nexTagPicker=(()=>{
       }fit();
     }draw();panel.querySelector('input[type=search]')?.focus();
   }
-  document.addEventListener('click',e=>{const anchor=e.target.closest('[data-nt10-open]');if(!anchor)return;e.preventDefault();e.stopImmediatePropagation();if(anchor.dataset.nt10Open==='task')open(anchor,{selected:r8TaskTags(taskDraft),flowBinding:{id:taskDraft.flowId,required:true,locked:!!taskDraft.detailSamples?.length},onSave:(labels,id)=>{if(String(taskDraft.flowId||'')!==id)r12SetFlow(taskDraft,id);r8SaveTaskTags(taskDraft,labels);renderTaskBasics();}});else nexDatasets.editFormTags(anchor);},true);
+  document.addEventListener('click',e=>{const anchor=e.target.closest('[data-nt10-open]');if(!anchor)return;e.preventDefault();e.stopImmediatePropagation();if(anchor.dataset.nt10Open==='task')open(anchor,{selected:r16PlainTags(taskDraft.tags||[]),plainOnly:true,onSave:labels=>{r8SaveTaskTags(taskDraft,labels);renderTaskBasics();}});else nexDatasets.editFormTags(anchor);},true);
   return {control,open,close};
 })();
-function r8RenderTaskTags(){const host=document.getElementById('r8-task-tags');if(!host)return;const flow=r12Flow(taskDraft.flowId),group=flow&&nexDatasets.groups().find(g=>String(g.id)===String(flow.groupId));host.innerHTML='<span>标签 <b class="required">*</b></span>'+nexTagPicker.control('task',r8TaskTags(taskDraft),{id:taskDraft.flowId,required:true})+'<small class="nt10-help">'+(flow?'所属分组：'+esc(group?.name||'—')+' · ':'')+'业务流程单选，其他标签可多选。</small>';}
+function r8RenderTaskTags(){const host=document.getElementById('r8-task-tags');if(!host)return;host.innerHTML='<span>标签</span>'+nexTagPicker.control('task',r16PlainTags(taskDraft.tags||[]))+'<small class="nt10-help">可按类型选择多个标签。</small>';}
+
 
 function r9OpenTaskTags(){document.querySelector('[data-nt10-open=task]')?.click();}
 
@@ -14889,18 +15078,22 @@ const r15SourceUi=new WeakMap();
 function r15SourceState(task){if(!r15SourceUi.has(task))r15SourceUi.set(task,{mode:'existing',type:'',query:'',open:false,index:0,createKind:task.dataSource?.type==='flow'?'flow':'dataset'});return r15SourceUi.get(task);}
 function r15SourceChoices(task,state){
   const q=state.query.trim().toLowerCase(),flows=nexDatasets.flows(),items=[];
+  if(!r12Flow(task.flowId))return items;
   for(const ds of r12IndependentDatasets()){
     if(!ds.flowId||(task.flowId&&String(ds.flowId)!==String(task.flowId)))continue;
     const flow=flows.find(f=>String(f.id)===String(ds.flowId));
     items.push({kind:'dataset',id:String(ds.id),name:ds.name,type:ds.method||'普通数据集',meta:String(ds.id)+' · '+(flow?.name||'')});
   }
-  for(const flow of flows){const count=r12FlowDatasets(flow.id).length;if(count)items.push({kind:'flow',id:String(flow.id),name:flow.name+' · 流程数据集',type:'流程数据集',meta:(flow.bizId?'BIZ '+flow.bizId+' · ':'')+count+' 个数据集，随流程更新'});}
+  for(const flow of flows){if(String(flow.id)!==String(task.flowId))continue;const count=r12FlowDatasets(flow.id).length;if(count)items.push({kind:'flow',id:String(flow.id),name:flow.name+' · 流程数据集',type:'流程数据集',meta:(flow.bizId?'BIZ '+flow.bizId+' · ':'')+count+' 个数据集，随流程更新'});}
   return items.filter(d=>(!state.type||state.type===d.type)&&(!q||(d.name+' '+d.id+' '+d.meta).toLowerCase().includes(q)));
 }
 function r15SelectSource(task,item){
+  if(!r12Flow(task.flowId))return '请先选择所属分组和流程';
+  if(item.kind==='flow'&&String(item.id)!==String(task.flowId))return '请选择所属流程内的数据集';
   if(item.kind==='flow')return r13ApplyFlowDataset(task,item.id)?'':'流程数据集已失效';
   const ds=nexDatasets.list().find(d=>String(d.id)===item.id),flow=r12Flow(ds?.flowId);
   if(!flow)return '数据集尚未关联流程';
+  if(String(flow.id)!==String(task.flowId))return '请选择所属流程内的数据集';
   task.flowId=String(flow.id);task.groupId=String(flow.groupId);return r8SetTaskSource(task,{type:'dataset',id:item.id});
 }
 function r8RenderTaskSource(){
@@ -15869,7 +16062,9 @@ function r12TaskPoolRecords(task){return taskDatasetBindings(task).flatMap(b=>r1
 
 
 function r12SourceScopeError(task){
+  if(!nexDatasets.groups().some(g=>String(g.id)===String(task.groupId)))return '请先选择所属分组。';
   if(!r12Flow(task.flowId))return '请先选择所属流程。';
+  if(String(r12Flow(task.flowId).groupId)!==String(task.groupId))return '所属流程与分组不一致，请重新选择。';
   if(task.dataSource?.type==='flow'){if(String(task.dataSource.id)!==String(task.flowId))return '流程数据集与所属流程不一致，请重新选择。';}
   else{const dataset=window.nexDatasets.list().find(d=>String(d.id)===r9TaskDatasetId(task));if(!dataset||String(dataset.flowId)!==String(task.flowId))return '请选择当前流程内的数据集。';}
   return '';
