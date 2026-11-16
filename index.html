@@ -3824,6 +3824,13 @@ span.v6-new,
 .r22-node-empty{padding:20px;color:#8c95a7;font-size:12px}
 .r22-task-toggle:focus-visible,.r22-node-toggle:focus-visible{outline:2px solid #8b80ff;outline-offset:-2px}
 </style>
+<style id="rev23-exemption-type-style">
+.r23-exemption-type .task-row{margin-bottom:0}
+.r23-exemption-type .task-controls{gap:28px}
+.r23-exemption-type-help{font-size:12px;line-height:1.7;color:#8993a5;margin:13px 0 0 132px}
+.r23-exemption-empty{font-size:13px;color:#949bae}
+.r23-exemption-console-note{font-size:12px;line-height:1.7;color:#8993a5;margin:12px 0}
+</style>
 </head>
 <body>
   <header><div class="logo">NEX</div><button class="space" id="space"><em>✦</em> 官方测试空间 <span class="chevron">▼</span></button><nav class="topnav"><button class="active">管理中心</button><button>作业中心</button><button>HCM</button><button>AI Workshop</button><button>平台工坊</button></nav><div class="account"><button class="round" id="help" aria-label="Demo 使用说明">♧</button><button class="round" id="export" title="导出算子配置" aria-label="导出算子配置">▣</button><span class="avatar">管</span><button class="accountname" id="account">业务空间管理员 <span class="chevron">▼</span></button></div></header>
@@ -9764,7 +9771,7 @@ const taskViewState={q:'',status:'',admin:'',flow:'',from:'',to:'',mine:false};
 const dataViewState={q:'',job:'',priority:'',type:'',tag:'',task:'',state:'',mine:false};
 function vwAdmin(t){return t.admin||'当前用户';}
 function vwMine(t){return /当前用户|业务空间管理员|本地演练/.test(vwAdmin(t));}
-function vwFlow(t){return (t.flow?.nodes||[]).map(n=>n==='标注'?(t.flow.annotationMode||'单人标注'):n).join(' - ');}
+function vwFlow(t){if(r21IsStandalone(t))return r23ExemptionLabel(t);return (t.flow?.nodes||[]).map(n=>n==='标注'?(t.flow.annotationMode||'单人标注'):n).join(' - ');}
 function vwStatus(t){return t.taskPaused?'已暂停':t.status==='草稿'?'初始化':t.status==='已配置'?'进行中':t.status||'初始化';}
 function vwProgress(records){
   const complete=records.filter(r=>r.status==='已完成').length,total=records.length,pct=total?100*complete/total:0;
@@ -9860,11 +9867,11 @@ function r21TaskGrouping(records){
 }
 // Expand actual saved task nodes and their condition allocations in either list view.
 const r22TaskTreeState={tasks:new Set(),nodes:new Set()};
-function r22NodeLabel(node){return node==='标注'?'人审':node;}
+function r22NodeLabel(node,task){return node==='免审'?r23ExemptionLabel(task):node==='标注'?'人审':node;}
 function r22NodeItems(task,node){
   const flow=task.flow||{},out=[];
   const add=(kind,list,enabled=true)=>list.forEach((config,index)=>out.push({kind,config,index,enabled}));
-  if(node==='免审')add('免审',flow.standaloneExemption?.tasks||[],flow.standaloneExemption?.enabled!==false);
+  if(node==='免审')add(r23ExemptionLabel(task),flow.standaloneExemption?.tasks||[],flow.standaloneExemption?.enabled!==false);
   else if(node==='机审'){
     add('免机审',flow.exemptions?.['机审']?.tasks||[],flow.exemptions?.['机审']?.enabled!==false);
     add('机审',flow.machineGroups||[],flow.featureCalculationEnabled!==false);
@@ -9900,9 +9907,9 @@ function r22TaskNodeChildren(task,node,items){
 }
 function r22TaskHierarchy(task){
   const nodes=task.flow?.nodes||[];
-  return '<div class="r22-task-tree"><div class="r22-tree-caption">'+(nodes.includes('免审')?'独立免审 · 命中后结束':'任务节点')+'</div>'+nodes.map(node=>{
+  return '<div class="r22-task-tree"><div class="r22-tree-caption">'+(nodes.includes('免审')?r23ExemptionHelp(task):'任务节点')+'</div>'+nodes.map(node=>{
     const items=r22NodeItems(task,node),key=String(task.id)+'::'+node,open=r22TaskTreeState.nodes.has(key),active=items.filter(item=>!r22NodeItemPaused(task,node,item)).length;
-    return '<section class="r22-node"><div class="r22-node-head"><button type="button" class="r22-node-toggle" data-r22-node="'+esc(key)+'" aria-expanded="'+open+'"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5"/></svg><strong>'+esc(r22NodeLabel(node))+'节点</strong><span>'+items.length+' 个子任务'+(items.length?' · '+active+' 个启用':'')+'</span></button><button type="button" class="action" data-r22-config-node="'+esc(task.id)+'" data-node="'+esc(node)+'">节点配置</button></div><div class="r22-node-content"'+(open?'':' hidden')+'>'+r22TaskNodeChildren(task,node,items)+'</div></section>';
+    return '<section class="r22-node"><div class="r22-node-head"><button type="button" class="r22-node-toggle" data-r22-node="'+esc(key)+'" aria-expanded="'+open+'"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5"/></svg><strong>'+esc(r22NodeLabel(node,task))+'节点</strong><span>'+items.length+' 个子任务'+(items.length?' · '+active+' 个启用':'')+'</span></button><button type="button" class="action" data-r22-config-node="'+esc(task.id)+'" data-node="'+esc(node)+'">节点配置</button></div><div class="r22-node-content"'+(open?'':' hidden')+'>'+r22TaskNodeChildren(task,node,items)+'</div></section>';
   }).join('')+(!nodes.length?'<div class="r22-node-empty">尚未配置审核节点</div>':'')+'</div>';
 }
 function r22OpenNodeConfiguration(id,node,kind,index){
@@ -10856,7 +10863,7 @@ function openTaskDetail(task, tab='数据列表') {
     return {completed, total:all.length};
   }
   function nodeName(node) {
-    return node === '标注' ? '标注（'+(task.flow.annotationMode||'单人标注')+'）' : node;
+    return node==='免审'?r23ExemptionLabel(task):node === '标注' ? '标注（'+(task.flow.annotationMode||'单人标注')+'）' : node;
   }
   function write() { return writeLocal(TASK_KEY,tasks); }
   function tags() {
@@ -10983,7 +10990,7 @@ function openTaskDetail(task, tab='数据列表') {
     $('#r16-batch').onclick=()=>r16BatchResult(task,found.filter(r=>state.selected.includes(r.id)),render);
     root.querySelectorAll('[data-r16-result]').forEach(b=>b.onclick=()=>r16BatchResult(task,samples().filter(r=>r.id===b.dataset.r16Result),render));
     $('#detail-columns').onclick=columnSettings;$('#detail-sample').onclick=addSample;
-    if(r21IsStandalone(task)){const button=document.createElement('button');button.className='btn secondary';button.id='r21-run-standalone';button.textContent='执行免审';button.disabled=!!task.taskPaused;$('#detail-sample').after(button);button.onclick=()=>r21RunStandaloneBatch(task,render);}
+    if(r21IsStandalone(task)){const button=document.createElement('button');button.className='btn secondary';button.id='r21-run-standalone';button.textContent='执行'+r23ExemptionLabel(task);button.disabled=!!task.taskPaused;$('#detail-sample').after(button);button.onclick=()=>r21RunStandaloneBatch(task,render);}
     $('#vw-reject').onclick=()=>vwRejectCases(task,found,true,render);
     root.querySelectorAll('[data-vw-edit]').forEach(b=>b.onclick=()=>vwCaseWork(task,samples().find(r=>r.id===b.dataset.vwEdit),true,render));
     root.querySelectorAll('[data-vw-release]').forEach(b=>b.onclick=()=>{const row=samples().find(r=>r.id===b.dataset.vwRelease);if(!row?.claimant)return;confirmLocal('释放作业','将该数据放回任务池？',()=>{row.claimant='';row.status='待'+row.stage;write();render();});});
@@ -11422,8 +11429,36 @@ function r21IsStandalone(taskOrFlow){
   const flow=taskOrFlow?.flow||taskOrFlow;
   return flow?.nodes?.length===1&&flow.nodes[0]==='免审';
 }
+// A standalone node has one exemption type; historical result snapshots are separate.
+function r23ExemptionType(taskOrFlow){
+  const flow=taskOrFlow?.flow||taskOrFlow;
+  return ['machine','human','total'].includes(flow?.standaloneExemption?.type)?flow.standaloneExemption.type:'';
+}
+function r23StandaloneType(taskOrFlow){return r23ExemptionType(taskOrFlow);}
+function r23TypeLabel(type){return ({machine:'免机审',human:'免人审',total:'全部免审'})[type]||'免审';}
+function r23ExemptionLabel(taskOrFlow){return ({machine:'免机审',human:'免人审',total:'全部免审'})[r23ExemptionType(taskOrFlow)]||'免审';}
+function r23ExemptionHelp(taskOrFlow){
+  return r23ExemptionType(taskOrFlow)?'结果处理：命中后写入最终审核结果，结束当前任务。':'请选择免审范围，再配置分配条件和结果。';
+}
+function r23ExemptionMachine(kind=nodeTab){return kind==='机审'||kind==='免审'&&r23ExemptionType(taskDraft)==='machine';}
+function r23InstallExemptionTypes(){
+  let changed=false;
+  for(const task of tasks){
+    const config=task.flow?.standaloneExemption;if(!config||Object.hasOwn(config,'type'))continue;
+    config.type=r21CatalogPreset(task)&&String(task.r19SourceFlowId)==='106236'?'machine':'total';changed=true;
+  }
+  if(changed)writeLocal(TASK_KEY,tasks);
+}
+function r23RenderExemptionType(){
+  const flow=taskDraft.flow,config=r21StandaloneConfig(flow),type=r23ExemptionType(flow);
+  $('#node-config').innerHTML='<section class="panel r23-exemption-type"><div class="panel-body"><div class="task-row"><label>免审范围 <b class="required">*</b></label><div class="task-controls">'+[['machine','免机审'],['human','免人审'],['total','全部免审']].map(([value,label])=>'<label><input type="radio" name="r23-exemption-type" value="'+value+'" '+(type===value?'checked':'')+'> '+label+'</label>').join('')+'</div></div><p class="r23-exemption-type-help">'+esc(r23ExemptionHelp(flow))+'</p></div></section><section class="panel" id="exemption-section"></section>';
+  document.querySelectorAll('[name="r23-exemption-type"]').forEach(input=>input.onchange=()=>{config.type=input.value;renderTaskWizard();});
+  if(type)renderExemptionTasks();
+  else $('#exemption-section').innerHTML='<div class="panel-body r23-exemption-empty">选择免审范围后配置条件分配。</div>';
+}
+
 function r21StandaloneConfig(flow){
-  const config=flow.standaloneExemption??={enabled:true,tasks:[]};
+  const config=flow.standaloneExemption??={enabled:true,type:"",tasks:[]};
   config.tasks??=[];
   return config;
 }
@@ -11431,6 +11466,7 @@ function r21ExemptionConfig(flow,kind=nodeTab){
   return kind==='免审'?r21StandaloneConfig(flow):ensureExemptions(flow)[kind];
 }
 function r21ValidateStandalone(task){
+  if(!r23ExemptionType(task))return "请选择免审范围";
   if(task.flow.nodes.length!==1)return '免审不能与机审、标注或质检组合，请只选择免审节点';
   if(exemptionDraft)return '请先保存或取消正在编辑的免审任务';
   const configs=r21StandaloneConfig(task.flow).tasks.filter(c=>c.enabled!==false);
@@ -11456,8 +11492,7 @@ function r21TaskModePicker(){
 }
 function r21RenderStandaloneNode(){
   const config=r21StandaloneConfig(taskDraft.flow);config.enabled=true;
-  $('#node-config').innerHTML='<section class="panel" id="exemption-section"></section>';
-  renderExemptionTasks();
+  r23RenderExemptionType();
 }
 function r21StandaloneResult(record){
   return record?.finished?.includes('免审')&&['通过','不通过'].includes(record.standaloneResult?.result)?record.standaloneResult:null;
@@ -11503,12 +11538,12 @@ function r21RunStandaloneBatch(task,refresh){
 }
 function r21RenderStandaloneConsole(root,task,tabs,refresh){
   const config=r21StandaloneConfig(task.flow),data=taskDatasetBindings(task),rows=task.detailSamples||[];
-  root.innerHTML=tabs+'<form class="toolbar detail-filter" id="r21-ex-filter"><label class="filter">任务 ID<input name="id" placeholder="请输入任务 ID"></label><label class="filter">任务名称<input name="name" placeholder="请输入任务名称"></label><label class="filter">任务状态<select name="status"><option value="">全部</option><option>进行中</option><option>已暂停</option></select></label><label class="filter">数据 ID<select name="data"><option value="">全部数据</option>'+data.map(b=>'<option value="'+esc(b.id)+'">'+esc(b.name)+' · '+esc(b.id)+'</option>').join('')+'</select></label><button class="btn">查询</button><button type="reset" class="reset">重置筛选</button></form><div class="detail-listbar"><button class="btn" id="r21-console-run" '+(task.taskPaused?'disabled':'')+'>执行免审</button><button class="btn secondary" id="r21-console-config">配置免审</button></div><div id="r21-ex-console-rows"></div>';
+  root.innerHTML=tabs+'<p class="r23-exemption-console-note">'+esc(r23ExemptionHelp(task))+'</p><form class="toolbar detail-filter" id="r21-ex-filter"><label class="filter">任务 ID<input name="id" placeholder="请输入任务 ID"></label><label class="filter">任务名称<input name="name" placeholder="请输入任务名称"></label><label class="filter">任务状态<select name="status"><option value="">全部</option><option>进行中</option><option>已暂停</option></select></label><label class="filter">数据 ID<select name="data"><option value="">全部数据</option>'+data.map(b=>'<option value="'+esc(b.id)+'">'+esc(b.name)+' · '+esc(b.id)+'</option>').join('')+'</select></label><button class="btn">查询</button><button type="reset" class="reset">重置筛选</button></form><div class="detail-listbar"><button class="btn" id="r21-console-run" '+(task.taskPaused?'disabled':'')+'>执行'+esc(r23ExemptionLabel(task))+'</button><button class="btn secondary" id="r21-console-config">配置'+esc(r23ExemptionLabel(task))+'</button></div><div id="r21-ex-console-rows"></div>';
   const form=root.querySelector('#r21-ex-filter');
   function draw(){
     const query=Object.fromEntries(new FormData(form));
     const configs=config.tasks.filter(c=>(!query.id||[c.id,...(c.sourceTaskIds||[]),c.bizTaskId||''].some(id=>String(id).includes(query.id)))&&(!query.name||c.name.includes(query.name))&&(!query.status||(task.taskPaused||c.enabled===false||task.assignmentPaused?.['免审::'+c.id]?'已暂停':'进行中')===query.status));
-    root.querySelector('#r21-ex-console-rows').innerHTML='<div class="tablewrap"><table class="detail-table"><thead><tr><th>任务分配名称 / ID</th><th>优先级</th><th>分配条件</th><th>免审结果</th><th>已完成</th><th>状态</th><th>操作</th></tr></thead><tbody>'+configs.map(c=>{
+    root.querySelector('#r21-ex-console-rows').innerHTML='<div class="tablewrap"><table class="detail-table"><thead><tr><th>任务分配名称 / ID</th><th>优先级</th><th>分配条件</th><th>'+esc(r23ExemptionLabel(task))+'结果</th><th>已完成</th><th>状态</th><th>操作</th></tr></thead><tbody>'+configs.map(c=>{
       const paused=task.taskPaused||c.enabled===false||task.assignmentPaused?.['免审::'+c.id],own=rows.filter(r=>String(r.standaloneAssignmentId)===String(c.id)&&(!query.data||String(r.datasetId)===query.data));
       return '<tr><td>'+esc(c.name)+'<small>'+esc(c.id)+'</small>'+r21SourceHTML(c)+'</td><td>'+esc(c.priority)+'</td><td>'+esc(auditDescribeGroup({sets:c.groups||[]}))+'</td><td>'+esc(c.output?.result||'待配置')+'</td><td>'+own.filter(r=>r21StandaloneResult(r)).length+'</td><td>'+ (paused?'已暂停':'进行中')+'</td><td><button class="action" data-r21-ex-toggle="'+esc(c.id)+'" '+(task.taskPaused?'disabled':'')+'>'+(paused?'启动':'暂停')+'</button><button class="action" data-r21-ex-config="'+esc(c.id)+'">查看配置</button></td></tr>';
     }).join('')+(configs.length?'':'<tr><td colspan="7" class="empty">暂无匹配的免审分配</td></tr>')+'</tbody></table></div>';
@@ -11549,7 +11584,7 @@ function ensureExemptions(e) {
   return (delete e.exempt, delete e.exemptGroups, e.exemptions);
 }
 function exemptionLabel() {
-  return nodeTab === "免审" ? "免审" : "机审" === nodeTab ? "免机审" : "免人审";
+  return nodeTab === "免审" ? r23ExemptionLabel(taskDraft) : "机审" === nodeTab ? "免机审" : "免人审";
 }
 function nodeConfigTabs() {
   return `<section class="panel" id="exemption-section"></section><section class="panel"><div class="panel-head"><span class="stage-step">2</span>特征计算配置 ${switchButton("feature-calculation-enabled",r16FeatureEnabled(taskDraft.flow),"特征计算配置")}</div><div class="panel-body">`;
@@ -11570,9 +11605,9 @@ function openExemptionEditor() {
 function exemptionOutput(e,kind=nodeTab){
   const result=auditHumanResult(e);
   if(!result)return null;
-  return ["标注","免审"].includes(kind)?result:{result:result.result,reasonIds:result.reasonIds};
+  return !r23ExemptionMachine(kind)?result:{result:result.result,reasonIds:result.reasonIds};
 }
-function validateExemptionOutput(e,kind=nodeTab){return exemptionOutput(e,kind)?"":"请选择"+(kind==="免审"?"免审":kind==="标注"?"免人审":"免机审")+"结果";}
+function validateExemptionOutput(e,kind=nodeTab){return exemptionOutput(e,kind)?"":"请选择"+(kind==="免审"?r23ExemptionLabel(taskDraft):kind==="标注"?"免人审":"免机审")+"结果";}
 function validateExemptionTask(e,kind=nodeTab) {
   return e.name.trim()
     ? !Number.isInteger(+e.priority) || +e.priority < 1
@@ -11592,7 +11627,7 @@ function renderExemptionTasks() {
     t = exemptionLabel();
   if (
     (($("#exemption-section").innerHTML =
-      `<div class="panel-head"><span class="stage-step">1</span>${t}配置 ${nodeTab==="免审"?"":switchButton("node-exempt-switch", e.enabled, t)}</div><div class="panel-body"><div class="muted" style="font-size:12px">${e.enabled ? (nodeTab === "免审" ? "按优先级匹配条件，写入免审结果后直接完成，不进入机审、标注或质检。" : "机审" === nodeTab ? "命中后写入免机审结果，仅跳过特征计算，继续判断免人审。" : "在 Agent 辅助标注之前判断；命中后写入免人审结果，同时跳过 Agent 和人工标注。") : "开启后可配置免审任务，已有配置保留。"}</div>${e.enabled ? '<div id="exemption-workspace"></div>' : ""}</div>`),
+      `<div class="panel-head"><span class="stage-step">1</span>${t}配置 ${nodeTab==="免审"?"":switchButton("node-exempt-switch", e.enabled, t)}</div><div class="panel-body"><div class="muted" style="font-size:12px">${e.enabled ? (nodeTab === "免审" ? "" : "机审" === nodeTab ? "命中后写入免机审结果，仅跳过特征计算，继续判断免人审。" : "在 Agent 辅助标注之前判断；命中后写入免人审结果，同时跳过 Agent 和人工标注。") : "开启后可配置免审任务，已有配置保留。"}</div>${e.enabled ? '<div id="exemption-workspace"></div>' : ""}</div>`),
     ($("#node-exempt-switch") && ($("#node-exempt-switch").onclick = () => {
       ((e.enabled = !e.enabled), renderExemptionTasks());
     })),
@@ -12213,7 +12248,7 @@ function auditHumanResult(e) {
   return ["通过","不通过"].includes(o.result)?{result:o.result,reasonIds:[...o.reasonIds],customReason:o.customReason||""}:null;
 }
 function auditHumanOutputHTML(e) {
-  const o=auHumanOutput(e),machine=nodeTab==="机审",prefix=nodeTab==="免审"?"免审":machine?"免机审":"免人审",cat=o.result==="通过"?"审核通过原因":machine?"机审拒绝原因":"审核拒绝原因";
+  const o=auHumanOutput(e),machine=r23ExemptionMachine(),prefix=exemptionLabel(),cat=o.result==="通过"?"审核通过原因":machine?"机审拒绝原因":"审核拒绝原因";
   const choices=(window.reviewTaxonomy?.reasons()||[]).filter(r=>(!r.object||r.object==='内容')&&(r.category===cat||r.category==="审核理由"));
   return '<h3 style="font-size:14px">免审结果写入</h3>'+
     auTaskRow(prefix+'结果 <b>*</b>','<select class="small-select" id="au-ex-result"><option value="">请选择</option>'+options(["通过","不通过"],o.result)+'</select>')+
@@ -12223,7 +12258,7 @@ function auditHumanOutputHTML(e) {
 function bindAuditHumanOutput(e) {
   const o=auHumanOutput(e);
   $("#au-ex-result").onchange=ev=>{
-    const next=ev.target.value,cat=next==="通过"?"审核通过原因":nodeTab==="机审"?"机审拒绝原因":"审核拒绝原因";
+    const next=ev.target.value,cat=next==="通过"?"审核通过原因":r23ExemptionMachine()?"机审拒绝原因":"审核拒绝原因";
     o.result=next;
     o.reasonIds=o.reasonIds.filter(id=>{const r=auFindReason(id);return !r||r.category===cat||r.category==="审核理由";});
     renderExemptionEditor();
@@ -15924,6 +15959,7 @@ function r21CompactConfiguredCatalog(){
 
 r19InstallConfiguredCatalog();
 r21CompactConfiguredCatalog();
+r23InstallExemptionTypes();
 // END REV21 SIXTEEN PARENTS
 // END REV19 CONFIGURED CATALOG
 (builtinTemplates.unshift(graphicCommonTemplate),
