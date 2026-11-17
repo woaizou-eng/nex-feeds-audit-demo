@@ -4022,6 +4022,11 @@ span.v6-new,
 .r31-approver-chip{display:inline-flex;align-items:center;padding:3px 10px;border-radius:4px;background:#eeebff;color:#5f50ba;font-size:13px;line-height:22px}
 .r31-approver-line small{font-size:12px;color:#8892a7}
 </style>
+<style id="rev32-approval-badge-style">
+#sidebar [data-nav="审批管理"]{position:relative;gap:9px;padding-right:8px}
+#sidebar .r32-approval-badge{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;min-width:18px;height:18px;padding:0 5px;margin-left:auto;box-sizing:border-box;border-radius:10px;background:#ef4444;color:#fff;font-size:11px;font-weight:600;line-height:18px;font-variant-numeric:tabular-nums}
+.collapsed #sidebar .r32-approval-badge{position:absolute;top:0;right:0;min-width:16px;height:16px;padding:0 4px;font-size:9px;line-height:16px;box-shadow:0 0 0 1px #fff}
+</style>
 </head>
 <body>
   <header><div class="logo">NEX</div><button class="space" id="space"><em>✦</em> 官方测试空间 <span class="chevron">▼</span></button><nav class="topnav"><button class="active">管理中心</button><button>作业中心</button><button>HCM</button><button>AI Workshop</button><button>平台工坊</button></nav><div class="account"><button class="round" id="help" aria-label="Demo 使用说明">♧</button><button class="round" id="export" title="导出算子配置" aria-label="导出算子配置">▣</button><span class="avatar">管</span><button class="accountname" id="account">业务空间管理员 <span class="chevron">▼</span></button></div></header>
@@ -5750,12 +5755,23 @@ function toast(e) {
       (($("#toast").className = ""), ($("#toast").textContent = ""));
     }, 3e3)));
 }
+function r32ApprovalBadgeHTML(){
+  const count=systemAdminDemo.pendingApprovalCount();
+  return count?'<span class="r32-approval-badge" data-approval-count="'+count+'" title="'+count+' 条待我处理的审批" aria-label="'+count+' 条待处理审批">'+(count>99?'99+':count)+'</span>':'';
+}
+function r32RefreshApprovalBadge(){
+  const menu=document.querySelector('#sidebar [data-nav="审批管理"]');
+  if(!menu)return;
+  const old=menu.querySelector('.r32-approval-badge'),html=r32ApprovalBadgeHTML();
+  if(old){if(html)old.outerHTML=html;else old.remove();}
+  else if(html)menu.insertAdjacentHTML('beforeend',html);
+}
 function renderNavGroups(navGroups) {
   let nextIcon = 0;
   return navGroups.map(([title, items, firstIcon = nextIcon]) => {
     nextIcon = firstIcon + items.length;
     const buttons = items.map((name, index) =>
-      `<button class="navitem ${name === current ? "active" : ""}" data-nav="${name}" title="${name}">${icon(firstIcon + index)}<span class="navtext">${name}</span>${name==='机审算力配置'?'<small class="r8-new">NEW</small>':''}</button>`
+      `<button class="navitem ${name === current ? "active" : ""}" data-nav="${name}" title="${name}">${icon(firstIcon + index)}<span class="navtext">${name}</span>${name==='机审算力配置'?'<small class="r8-new">NEW</small>':''}${name==='审批管理'?r32ApprovalBadgeHTML():''}</button>`
     ).join("");
     return `<div class="navgroup"><div class="groupname">${title}</div>${buttons}</div>`;
   }).join("");
@@ -7567,7 +7583,7 @@ const systemAdminDemo = (() => {
   }
   let store, page='',view='',bizTab='基础信息',approvalTab='全部审批单',approvalType='角色',query={},activeHandler=()=>{},listPage=1;
   const all=(sel,root=document)=>[...root.querySelectorAll(sel)];
-  const root=()=>document.querySelector('#main'), data=readSystemStore, save=()=>writeLocal(key,[data()]);
+  const root=()=>document.querySelector('#main'), data=readSystemStore, save=()=>{const saved=writeLocal(key,[data()]);if(saved)r32RefreshApprovalBadge();return saved;};
   const val=(id,host=document)=>host.querySelector('#'+id)?.value?.trim()||'';
   const bind=(id,fn,host=document)=>{const b=host.querySelector('#'+id);if(b)b.onclick=fn;};
   const opts=(pairs,value='',prompt='请选择')=>(prompt?'<option value="">'+esc(prompt)+'</option>':'')+pairs.map(p=>{const [id,label]=Array.isArray(p)?p:[p,p];return `<option value="${esc(id)}" ${value===id?'selected':''}>${esc(label)}</option>`;}).join('');
@@ -7846,10 +7862,11 @@ const approvalCols={
     }bind('sya-approve',()=>decide(true),pane);bind('sya-reject',()=>decide(false),pane);
   }
 
+  function pendingApprovalCount(){return data().approvals.filter(a=>a.status==='进行中'&&r31ApprovalHas(a,me)).length;}
   function enqueueOperatorApproval(item){data().approvals.unshift(item);if(save())return true;data().approvals.shift();return false;}
   function operatorApprovals(){return data().approvals.filter(a=>a.operatorChange);}
   function openOperatorApprovals(id){page='审批管理';view='';approvalType='算子变更';approvalTab='全部审批单';query={};listPage=1;renderApprovals();const item=id&&data().approvals.find(a=>a.id===id);if(item)approvalDetail(item);}
-  return {open,pages,enqueueOperatorApproval,operatorApprovals,openOperatorApprovals};
+  return {open,pages,enqueueOperatorApproval,operatorApprovals,openOperatorApprovals,pendingApprovalCount};
 })();
 
 const datasetResourceViews = {
