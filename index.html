@@ -4008,6 +4008,14 @@ span.v6-new,
 @media(max-width:850px){.r29-biz .r25-review-body,.r29-biz .r25-review-body.r29-preferential-video{display:grid;grid-template-columns:minmax(190px,38fr) minmax(330px,62fr);overflow:auto;align-items:start}.r29-biz .r25-review-body.r29-preferential-graphic{grid-template-columns:minmax(190px,38fr) minmax(330px,62fr)}.r29-biz .r29-middle-material{grid-column:1}.r29-biz .r25-review-main{grid-column:2;grid-row:1/span 2}.r29-biz .r25-material,.r29-biz .r29-middle-material,.r29-biz .r25-review-main{overflow:visible}.r29-biz .r25-review-footer{flex-wrap:wrap}.r29-biz .r29-footer-context{max-width:100%}.r29-biz .r25-review-top{gap:8px;padding:10px}.r29-biz .r25-review-top>div{gap:7px}.r29-biz .r25-review-top strong{max-width:30vw}.r29-biz .r25-review-top small{display:none}}
 @media(max-width:600px){.r29-biz .r25-review-body,.r29-biz .r25-review-body.r29-preferential-graphic,.r29-biz .r25-review-body.r29-preferential-video{display:block;overflow:auto}.r29-biz .r25-material,.r29-biz .r29-middle-material,.r29-biz .r25-review-main{margin-bottom:8px}.r29-biz .r25-immersive-video{max-height:450px}.r29-biz .r25-review-footer>.r29-footer-actions{flex-wrap:wrap;flex-shrink:1}.r29-biz .r29-footer-result{gap:8px}.r29-biz .r25-review-top .action{font-size:11px}.r29-header-result{display:none}}
 </style>
+<style id="rev30-case-owner-style">
+.r30-case-owner{display:inline-flex;align-items:center;gap:8px;max-width:100%;font-size:12px;line-height:20px;color:#8190a8;white-space:nowrap}
+.r30-case-owner b{font-weight:500;color:#5d57c7;background:#f2f0ff;border-radius:4px;padding:0 6px;font-size:12px}
+.r26-biz-content>.r30-case-owner{margin:5px 0 1px}
+.r25-immersive.r29-biz .r29-reference-heading{justify-content:flex-start;gap:12px;flex-wrap:wrap}
+.r25-immersive.r29-biz .r29-reference-heading>button{margin-left:auto}
+.d25-table td>.r30-case-owner>span{display:none}
+</style>
 </head>
 <body>
   <header><div class="logo">NEX</div><button class="space" id="space"><em>✦</em> 官方测试空间 <span class="chevron">▼</span></button><nav class="topnav"><button class="active">管理中心</button><button>作业中心</button><button>HCM</button><button>AI Workshop</button><button>平台工坊</button></nav><div class="account"><button class="round" id="help" aria-label="Demo 使用说明">♧</button><button class="round" id="export" title="导出算子配置" aria-label="导出算子配置">▣</button><span class="avatar">管</span><button class="accountname" id="account">业务空间管理员 <span class="chevron">▼</span></button></div></header>
@@ -10319,7 +10327,7 @@ function persistTaskDatasets(task, bindings, flow) {
 
 // Per-task drill-down. Only samples explicitly added in this local demo enter the progress counts.
 const detailTabs = ['数据列表', '控制台', '数据分析', '设置'];
-const detailColumns={contentId:'内容 ID',publishedAt:'发布时间',auditedAt:'审核时间',auditResult:'审核结果',dataOrigin:'数据来源',id:'数据ID',account:'账号名',title:'标题',video:'视频',gallery:'图片组图',stage:'当前阶段',status:'当前状态',sent:'送审时间',annotator:'标注人',annotationAt:'标注完成时间',inspector:'质检人',inspectionAt:'质检完成时间',claimant:'当前领取人',instance:'实例ID'};
+const detailColumns={contentId:'内容 ID',publishedAt:'发布时间',auditedAt:'审核时间',auditResult:'审核结果',caseOwner:'case归属',dataOrigin:'数据来源',id:'数据ID',account:'账号名',title:'标题',video:'视频',gallery:'图片组图',stage:'当前阶段',status:'当前状态',sent:'送审时间',annotator:'标注人',annotationAt:'标注完成时间',inspector:'质检人',inspectionAt:'质检完成时间',claimant:'当前领取人',instance:'实例ID'};
 function renderTaskConsole(task) { openTaskDetail(task, '控制台'); }
 // Snapshot values belong to the submitted record. Catalogs only populate the selector.
 function demoSubmissionSnapshot(number,submitted,fields){
@@ -10496,6 +10504,7 @@ function r14MockFinalHTML(record,withResult=false){
   return (withResult?row('最终结果',final.result):'')+row('结果来源',final.source)+row('结果理由',final.reason)+row('结果生效时间',final.publishedAt);
 }
 function v5PublishedCaseResult(record){
+  if(record?.r30CaseFixture && ['质检','复核'].includes(record.stage) && record.status!=='已完成')return '';
   if(r21StandaloneResult(record)&&!record.resultOverride?.result)return record.standaloneResult.result;
   if(record?.resultOverride?.result)return record.resultOverride.result;
   if(record?.mockScenario==='feeds-quality-v1')return r14MockFinal(record)?.result||'';
@@ -10505,6 +10514,7 @@ function v5PublishedCaseResult(record){
   return typeof result==='string'?result:'';
 }
 function v5CaseResultExport(record){
+  if(record?.r30CaseFixture && ['质检','复核'].includes(record.stage) && record.status!=='已完成')return '未生效';
   if(r21StandaloneResult(record)&&!record.resultOverride?.result)return record.standaloneResult.result;
   if(record?.resultOverride?.result)return record.resultOverride.result;
   if(record?.mockScenario==='feeds-quality-v1')return r14MockFinal(record)?.result||'未生效';
@@ -10968,9 +10978,9 @@ function r14MountMock(task,refresh){
 // BIZ 105317 list fields verified on 2026-11-12; values below are local demo data only.
 let r16ConditionTask=null;
 const R16_BIZ_FILTERS=[
- ['contentId','内容id'],['contentType','内容类型'],['channel','发布渠道'],['subchannel','发布子渠道'],['itemId','商品id'],['userId','用户id'],['itemType','挂品类型'],['itemInPool','关联商品是否在池'],['title','标题'],['categoryId','信息流一级类目ID'],['leafCategoryId','信息流叶子类目ID'],['humanReason','人审理由'],['machineReason','机审不通过理由'],['sent','送审时间','date'],['publishedAt','发布时间','date'],['auditedAt','审核时间','date'],['createdAt','创建时间','date'],['preferred','择优结果'],['videoGrade','视频择优等级'],['coverGrade','封面图择优等级'],['algorithmGrade','择优算法打标等级'],['auditStatus','审核状态'],['secondStatus','逛逛二审状态'],['materialStatus','素材状态'],['datasetId','数据集ID'],['bcType','BC Type'],['icTags','ic_tag_list'],['whitePool','feeds_item_in_white_pool'],['negativeFeedback','二审舆情负反馈'],['reviewer','审核人'],['taskId','任务id'],['visitedTaskIds','执行到的审核任务id集合'],['dataOrigin','数据来源']
+ ['contentId','内容id'],['contentType','内容类型'],['channel','发布渠道'],['subchannel','发布子渠道'],['itemId','商品id'],['userId','用户id'],['itemType','挂品类型'],['itemInPool','关联商品是否在池'],['title','标题'],['categoryId','信息流一级类目ID'],['leafCategoryId','信息流叶子类目ID'],['humanReason','人审理由'],['machineReason','机审不通过理由'],['sent','送审时间','date'],['publishedAt','发布时间','date'],['auditedAt','审核时间','date'],['createdAt','创建时间','date'],['preferred','择优结果'],['videoGrade','视频择优等级'],['coverGrade','封面图择优等级'],['algorithmGrade','择优算法打标等级'],['auditStatus','审核状态'],['secondStatus','逛逛二审状态'],['materialStatus','素材状态'],['datasetId','数据集ID'],['bcType','BC Type'],['icTags','ic_tag_list'],['whitePool','feeds_item_in_white_pool'],['negativeFeedback','二审舆情负反馈'],['reviewer','审核人'],['taskId','任务id'],['visitedTaskIds','执行到的审核任务id集合'],['caseOwner','case归属'],['dataOrigin','数据来源']
 ];
-const R16_FRONT_COLUMNS=['video','gallery','title','contentId','publishedAt','account','auditedAt','auditResult','dataOrigin'];
+const R16_FRONT_COLUMNS=['video','gallery','title','contentId','publishedAt','account','auditedAt','auditResult','caseOwner','dataOrigin'];
 const R16_STATUSES=['待派单','已取消','待审核','审核通过','审核拒绝'];
 function r16EnrichMock(task){
  if(!r14IsMock(task))return;
@@ -10981,6 +10991,14 @@ function r16EnrichMock(task){
   for(const [k,v]of Object.entries(mock)){if(f[k]===undefined)f[k]=v;if(row.submissionSnapshot?.fields&&row.submissionSnapshot.fields[k]===undefined)row.submissionSnapshot.fields[k]=v;}
   row.dataOrigin=f.data_origin;
  }
+}
+function r30CaseOwner(row){
+  const f=r16RecordFields(row),values=[row.caseOwner,f.case_owner];
+  return values.map(v=>String(v??'').trim()).find(v=>['3.0','4.0'].includes(v))||'待确认';
+}
+function r30CaseOwnerHTML(row){
+  const value=r30CaseOwner(row);
+  return '<span class="r30-case-owner" data-r30-case-owner="'+esc(value)+'"><span>case归属</span><b>'+esc(value)+'</b></span>';
 }
 function r16RecordFields(row){return {...(row.submissionSnapshot?.fields||{}),...(row.payload||{}),...(row.fields||{})};}
 function r16FinalResult(row){return row.resultOverride?.result||v5PublishedCaseResult(row)||'';}
@@ -11026,6 +11044,7 @@ function r16FieldValue(task,row,key){
   case 'reviewer':return (row.pairVotes?.map(v=>v.actor).join('、'))||lastHuman?.actor||'';
   case 'taskId':return String(task.id);
   case 'visitedTaskIds':return [...new Set([row.machineAssignmentId,row.assignmentId].filter(v=>v&&v!=='全量'))].join('、');
+  case 'caseOwner':return r30CaseOwner(row);
   case 'dataOrigin':return ['2.0','3.0','4.0'].includes(String(row.dataOrigin||f.data_origin))?String(row.dataOrigin||f.data_origin):'待确认';
   default:return '';
  }
@@ -11108,7 +11127,7 @@ function r25TaskRecords(task,found,state,keys,cell){
     return '<article class="r25-record-card r26-biz-card" data-r25-card="'+esc(r.id)+'"><label class="r26-biz-select">'+pick(r)+'</label><div class="r25-card-media r26-biz-media">'+
       (hasVideo?'<div data-r25-media-pane="video">'+viewMediaCell(task,r,'video')+'</div>':'')+'<div data-r25-media-pane="gallery" '+(hasVideo?'hidden':'')+'>'+viewMediaCell(task,r,'gallery')+'</div></div>'+
       '<div class="r26-biz-content">'+(hasVideo?'<div class="r25-card-media-tabs r26-biz-media-tabs"><button type="button" class="active" data-r25-medium="video">视频</button><button type="button" data-r25-medium="gallery">图片</button></div>':'<div class="r26-biz-media-space"></div>')+
-      '<h3 class="r26-biz-title" title="'+esc(title)+'">'+esc(title)+'</h3><div class="r26-biz-identity"><span title="'+esc(id)+'">'+esc(id)+'</span><time>'+esc(r16FieldValue(task,r,'publishedAt')||'—')+'</time></div><div class="r26-biz-account"><span class="r26-avatar">'+esc(account.slice(0,1))+'</span><span>'+esc(account)+'</span></div><div class="r26-biz-audit"><span class="r26-dot '+kind+'"></span><div>'+(reviewer?'<span>'+esc(reviewer)+' 审核</span>':'')+'<time>'+esc(time||'—')+'</time></div><span class="r26-result '+kind+'">'+esc(result||r.status||'待审核')+'</span></div><div class="r26-biz-actions"><button class="action" data-detail-record="'+esc(r.id)+'">查看详情</button><button class="action" data-r16-result="'+esc(r.id)+'" '+(['通过','不通过'].includes(result)?'':'disabled')+'>修改结果</button></div></div></article>';
+      '<h3 class="r26-biz-title" title="'+esc(title)+'">'+esc(title)+'</h3><div class="r26-biz-identity"><span title="'+esc(id)+'">'+esc(id)+'</span><time>'+esc(r16FieldValue(task,r,'publishedAt')||'—')+'</time></div><div class="r26-biz-account"><span class="r26-avatar">'+esc(account.slice(0,1))+'</span><span>'+esc(account)+'</span></div>'+r30CaseOwnerHTML(r)+'<div class="r26-biz-audit"><span class="r26-dot '+kind+'"></span><div>'+(reviewer?'<span>'+esc(reviewer)+' 审核</span>':'')+'<time>'+esc(time||'—')+'</time></div><span class="r26-result '+kind+'">'+esc(result||r.status||'待审核')+'</span></div><div class="r26-biz-actions"><button class="action" data-detail-record="'+esc(r.id)+'">查看详情</button><button class="action" data-r16-result="'+esc(r.id)+'" '+(['通过','不通过'].includes(result)?'':'disabled')+'>修改结果</button></div></div></article>';
   }).join('')+(!found.length?'<div class="empty">暂无符合条件的数据</div>':'')+'</div>';
 }
 function r25BindRecordCards(root,state,rerender){
@@ -11150,13 +11169,13 @@ function r29MaterialsHTML(row,media,preferential){
 }
 function r29ReferencesHTML(task,row,opts,preferential){
   const f=r16RecordFields(row),account=viewCaseIdentity(row,'account'),get=(...names)=>r29Value(f,names),category=(prefix)=>[1,2,3].map((n,i)=>'<p><span>'+['一级','二级','三级'][i]+'类目名称：</span><b>'+esc(get(prefix+n+'_name',prefix+n,...(prefix==='category'?['cate'+n+'_name']:[])))+'</b></p>').join('');
-  return '<section class="r29-reference"><div class="r29-reference-heading"><strong>参考信息</strong><button class="action" type="button" id="r29-reference-toggle" aria-expanded="true">收起⌃</button></div><div id="r29-reference-body"><div class="r29-reference-grid">'+
+  return '<section class="r29-reference"><div class="r29-reference-heading"><strong>参考信息</strong>'+r30CaseOwnerHTML(row)+'<button class="action" type="button" id="r29-reference-toggle" aria-expanded="true">收起⌃</button></div><div id="r29-reference-body"><div class="r29-reference-grid">'+
     '<section><h3>用户信息</h3><div class="r29-user-info"><span class="r29-user-avatar">'+esc(account.slice(0,1))+'</span><div><p><span>用户昵称：</span><b>'+esc(account)+'</b></p><p><span>账号名称：</span><b>'+esc(get('account_name','user_name'))+'</b></p><p><span>用户身份：</span><b>'+esc(get('user_identity','user_type'))+'</b></p><p><span>用户ID：</span><b>'+esc(get('user_id','uid'))+'</b></p></div></div></section>'+
     '<section><h3>店铺信息</h3><p><span>店铺名称：</span><b>'+esc(get('shop_name','seller_name'))+'</b></p></section><section><h3>已有类目</h3>'+category('category')+'</section><section><h3>前台类目</h3>'+category('front_category')+'</section></div>'+
     (preferential?'<div class="r29-reference-extra"><p><span>摘要：</span><b>'+esc(get('summary','description'))+'</b></p><p><span>发布渠道：</span><b>'+esc(get('publish_channel','source_channel'))+'</b><span>发布子渠道：</span><b>'+esc(get('publish_subchannel'))+'</b></p></div>':'')+'</div></section>';
 }
 function r29RecordMetaHTML(task,row,fields){
-  const refs=[['内容 ID',r16FieldValue(task,row,'contentId')],['送审记录',row.submissionId||row.id],['数据集 ID',row.datasetId],['数据来源',r16FieldValue(task,row,'dataOrigin')],['送审时间',row.sent],['发布时间',r16FieldValue(task,row,'publishedAt')],['发布渠道',r16FieldValue(task,row,'channel')],['发布子渠道',r16FieldValue(task,row,'subchannel')]];
+  const refs=[['内容 ID',r16FieldValue(task,row,'contentId')],['case归属',r30CaseOwner(row)],['送审记录',row.submissionId||row.id],['数据集 ID',row.datasetId],['数据来源',r16FieldValue(task,row,'dataOrigin')],['送审时间',row.sent],['发布时间',r16FieldValue(task,row,'publishedAt')],['发布渠道',r16FieldValue(task,row,'channel')],['发布子渠道',r16FieldValue(task,row,'subchannel')]];
   return '<details class="r29-record-meta"><summary>送审信息</summary><dl>'+refs.map(([k,v])=>'<div><dt>'+esc(k)+'</dt><dd>'+esc(v||'—')+'</dd></div>').join('')+'</dl><details><summary>全部送审字段</summary><pre>'+esc(JSON.stringify(fields,null,2))+'</pre></details></details>';
 }
 
@@ -11310,7 +11329,7 @@ function openTaskDetail(task, tab='数据列表') {
   const localDate=()=>new Date().toLocaleString('sv-SE');
   function columns() {
     const initial=[...R16_FRONT_COLUMNS,'stage','status','sent','annotator','annotationAt','inspector','inspectionAt','claimant','instance'];
-    const selected=(task.r16ColumnsUpdated?(task.detailColumns||initial):initial).map(key=>key==='cover'?'gallery':key);
+    const selected=[...(task.r16ColumnsUpdated?(task.detailColumns||initial):initial),...(!task.r30CaseOwnerColumnConfigured?['caseOwner']:[])].map(key=>key==='cover'?'gallery':key);
     return [...new Set([...R16_FRONT_COLUMNS.filter(k=>selected.includes(k)||k==='contentId'),...selected.filter(k=>!R16_FRONT_COLUMNS.includes(k))])];
   }
   function cell(row,key) {
@@ -11348,8 +11367,8 @@ function openTaskDetail(task, tab='数据列表') {
     const keys=columns();
     const filterControl=([key,label,type])=>{
       if(type==='date')return '<div class="filter r16-date-filter"><span>'+esc(label)+'</span><div><input type="date" name="'+key+'From" aria-label="'+label+'开始" value="'+esc(state.filters[key+'From']||'')+'"><span>至</span><input type="date" name="'+key+'To" aria-label="'+label+'结束" value="'+esc(state.filters[key+'To']||'')+'"></div></div>';
-      const values=key==='dataOrigin'?['2.0','3.0','4.0','待确认']:[...new Set(samples().map(r=>r16FieldValue(task,r,key)).filter(Boolean))];
-      return '<label class="filter">'+esc(label)+(key==='dataOrigin'?'<select name="'+key+'"><option value="">全部</option>'+options(values,state.filters[key]||'')+'</select>':'<input name="'+key+'" value="'+esc(state.filters[key]||'')+'" list="r16-options-'+key+'" placeholder="'+(['contentId','itemId','userId','categoryId','leafCategoryId','datasetId','taskId','visitedTaskIds'].includes(key)?'输入 ID，多个用逗号分隔':'选择或输入关键词')+'"><datalist id="r16-options-'+key+'">'+values.slice(0,100).map(v=>'<option value="'+esc(v)+'"></option>').join('')+'</datalist>')+'</label>';
+      const values=key==='caseOwner'?['3.0','4.0','待确认']:key==='dataOrigin'?['2.0','3.0','4.0','待确认']:[...new Set(samples().map(r=>r16FieldValue(task,r,key)).filter(Boolean))];
+      return '<label class="filter">'+esc(label)+(['dataOrigin','caseOwner'].includes(key)?'<select name="'+key+'"><option value="">全部</option>'+options(values,state.filters[key]||'')+'</select>':'<input name="'+key+'" value="'+esc(state.filters[key]||'')+'" list="r16-options-'+key+'" placeholder="'+(['contentId','itemId','userId','categoryId','leafCategoryId','datasetId','taskId','visitedTaskIds'].includes(key)?'输入 ID，多个用逗号分隔':'选择或输入关键词')+'"><datalist id="r16-options-'+key+'">'+values.slice(0,100).map(v=>'<option value="'+esc(v)+'"></option>').join('')+'</datalist>')+'</label>';
     };
     root.innerHTML='<form class="r16-filters" id="detail-filter"><div class="r16-filter-grid">'+R16_BIZ_FILTERS.filter((f,i)=>state.more||filterKeys.includes(f[0])).map(filterControl).join('')+'</div><div class="r16-filter-actions"><button class="btn">搜索</button><button type="button" id="detail-reset" class="btn secondary">重置</button><button type="button" id="r16-more" class="action">'+(state.more?'收起筛选':'更多筛选')+'</button><button type="button" id="detail-filter-fields" class="action">添加筛选项</button></div></form>'+
      (state.conditions.length?'<div class="r16-filter-summary">'+esc(auditDescribeGroup({sets:state.conditions}))+' <button class="action" id="r16-clear-rules">清除</button><small>按送审时结果筛选，缺少结果不匹配。</small></div>':'')+
@@ -11620,7 +11639,7 @@ function openTaskDetail(task, tab='数据列表') {
       Object.entries(detailColumns).map(([key,name])=>'<label><input type="checkbox" name="fields" value="'+key+'" '+(checked.includes(key)?'checked':'')+
         (key==='contentId'?' disabled':'')+'> '+name+'</label>').join('')+'</div></form>',
       '<button class="btn secondary" data-close>取消</button><button class="btn" form="detail-fields">保存设置</button>');
-    $('#detail-fields').onsubmit=e=>{e.preventDefault();task.r16ColumnsUpdated=true;task.mediaColumnsUpdated=true;task.identityColumnsUpdated=true;task.detailColumns=['contentId',...new FormData(e.target).getAll('fields')];const saved=write();close();render();if(saved)toast('已保存列表字段');};
+    $('#detail-fields').onsubmit=e=>{e.preventDefault();task.r16ColumnsUpdated=true;task.r30CaseOwnerColumnConfigured=true;task.mediaColumnsUpdated=true;task.identityColumnsUpdated=true;task.detailColumns=['contentId',...new FormData(e.target).getAll('fields')];const saved=write();close();render();if(saved)toast('已保存列表字段');};
   }
   function exportResults() { openTaskResultExport(task); }
   render();
@@ -16565,6 +16584,159 @@ function r21CompactConfiguredCatalog(){
   localStorage.setItem(R21_COMPACT_MARKER,JSON.stringify({at:new Date().toISOString(),parents:targets.map(task=>task.id),sourceTasks:[...new Set(targets.flatMap(task=>task.r19SourceTasks.map(source=>source.flowId+':'+source.taskId)))].length}));
 }
 
+// Synthetic cases only. One installation per original preset task; never rewrite saved reviews.
+const R30_CASE_SAMPLE_MARKER='nex-preset-case-samples-v1';
+function r30SeedOwnerKey(row){return String(row.datasetId||row.poolDatasetId||'')+'::'+String(row.submissionId||row.id||'');}
+function r30SeedOwner(row){
+  const values=[row.caseOwner,row.fields?.case_owner,row.submissionSnapshot?.fields?.case_owner];
+  return values.find(v=>['3.0','4.0'].includes(String(v)))||([...r30SeedOwnerKey(row)].reduce((n,c)=>(n*31+c.charCodeAt(0))>>>0,0)%2?'3.0':'4.0');
+}
+function r30FillSeedOwner(row,owner=r30SeedOwner(row)){
+  let changed=false;row.fields||={};row.submissionSnapshot||={demo:true,at:row.sent,fields:{},results:{官方:{},业务:{}},operatorResults:{}};row.submissionSnapshot.fields||={};
+  for(const [object,key]of [[row,'caseOwner'],[row.fields,'case_owner'],[row.submissionSnapshot.fields,'case_owner']])if(object[key]===undefined||object[key]===null||object[key]===''){object[key]=owner;changed=true;}
+  return changed;
+}
+// Fill only absent display metadata in the original system-authored inspection cases.
+// Existing field values, routing inputs, answers and review history stay untouched.
+const R30_SEED_DETAIL_FIELDS=['short_title','user_id','user_identity','shop_name','item_id','item_price','category1_name','category2_name','category3_name','front_category1_name','front_category2_name','front_category3_name','publish_channel','publish_subchannel','published_at'];
+function r30EnrichSeedDetails(task,row,index){
+  if(!row.r19Inspection)return false;
+  const current=r16RecordFields(row),key=row.mediaFixture||'',kind=key==='feeds-food'?0:key==='feeds-coffee'?1:key==='feeds-travel'?2:index%3;
+  const sample=[['家常料理日常（演示）','厨房好物演示店','家居百货','厨房用品','烹饪用具','美食日常','家常料理',69],['手冲咖啡日常（演示）','咖啡器具演示店','食品饮料','咖啡','咖啡器具','咖啡日常','冲泡记录',89],['周末海边记录（演示）','旅行好物演示店','运动户外','户外用品','旅行用品','周末旅行','海边记录',129]][kind];
+  const type=row.contentType||task.r19ContentType||'图文',id=String(row.submissionId||row.id),hasItem=String(current.has_item||'')!=='否';
+  const defaults={short_title:sample[0],user_id:'DEMO-USER-'+id,user_identity:index%2?'个人创作者（演示）':'商家创作者（演示）',category1_name:sample[2],category2_name:sample[3],category3_name:sample[4],front_category1_name:'生活方式',front_category2_name:sample[5],front_category3_name:sample[6],publish_channel:'信息流',publish_subchannel:type==='视频'?'短视频推荐':'图文推荐',published_at:row.sent||task.created};
+  if(hasItem)Object.assign(defaults,{shop_name:sample[1],item_id:'DEMO-ITEM-'+id,item_price:sample[7]});
+  let changed=false;row.fields||={};row.submissionSnapshot||={demo:true,at:row.sent,fields:{},results:{官方:{},业务:{}},operatorResults:{}};row.submissionSnapshot.fields||={};
+  for(const name of R30_SEED_DETAIL_FIELDS){
+    if(!hasItem&&['shop_name','item_id','item_price'].includes(name))continue;
+    const candidate=current[name]!==undefined&&current[name]!==null&&current[name]!==''?current[name]:defaults[name];
+    if(candidate===undefined||candidate===null||candidate==='')continue;
+    for(const fields of [row.fields,row.submissionSnapshot.fields])if(fields[name]===undefined||fields[name]===null||fields[name]===''){fields[name]=candidate;changed=true;}
+  }
+  return changed;
+}
+function r30SeedGroups(task,node){
+  const list=node==='免审'?(task.flow.standaloneExemption?.tasks||[]):node==='机审'?(task.flow.machineGroups||[]):(task.flow.humanDistribution?.groups||[]);
+  return list.filter(g=>g.enabled!==false&&!task.assignmentPaused?.[node+'::'+g.id]).sort((a,b)=>node==='免审'?Number(a.priority||0)-Number(b.priority||0):Number(b.priority||0)-Number(a.priority||0));
+}
+function r30SeedApplyRules(fields,config){
+  const set=(config?.sets||config?.groups||[{join:config?.join||'AND',rules:config?.conditions||[]}])[0];
+  for(const rule of set?.rules||[]){
+    if(rule.source&&rule.source!=='送审字段')continue;
+    const value=rule.value,relation=String(rule.relation||'等于');
+    if(relation==='大于')fields[rule.field]=Number(value)+1;
+    else if(relation==='大于等于')fields[rule.field]=Number(value);
+    else if(relation==='小于')fields[rule.field]=Number(value)-1;
+    else if(relation==='小于等于')fields[rule.field]=Number(value);
+    else if(/不等|不包含|不属于/.test(relation))fields[rule.field]='演示其他值';
+    else if(/为空/.test(relation))fields[rule.field]='';
+    else fields[rule.field]=Array.isArray(value)?value[0]:value;
+    if(set.join==='OR')break;
+  }
+}
+function r30SeedAnswers(task,row,result){
+  const answers={},details={},questions=nodeQuestions(task,'标注')||[],positive=['通过','S','A','B'].includes(result);
+  for(const q of questions){
+    const opts=r25QuestionOptions(q),labels=q.repeatLabels?.length?(q.name==='图片'?q.repeatLabels.slice(0,3):q.repeatLabels):[''];
+    let answer='';
+    if(/文本/.test(q.type))answer=positive?'画面与文案信息完整，按当前模板完成审核（演示）。':'画面或信息表达需要调整，按当前模板记录问题（演示）。';
+    else if(opts.includes('入选'))answer=positive?'入选':'不入选';
+    else if(opts.includes('通过'))answer=positive?'通过':(opts.includes('不通过')?'不通过':opts[0]);
+    else if(!positive)answer=opts.find(v=>/基础美观|清晰/.test(v))||opts[0]||'';
+    else if(q.required)answer=opts.find(v=>/正常|合格|无问题/.test(v))||opts[0]||'';
+    const instances=labels.map((label,index)=>({label,answer:positive||index===0?answer:'',sub:!positive&&index===0&&q.subOptions&&answer===q.subOptions.trigger?[q.subOptions.options[0]]:[],reason:q.customReason&&!positive&&index===0?'当前素材信息表达不完整（演示）':''}));
+    answers[q.id]=instances.length===1?instances[0].answer:instances.filter(v=>v.answer).map(v=>v.label+'：'+v.answer).join('；');
+    details[q.id]={sub:instances.length===1?instances[0].sub:[],reason:instances.length===1?instances[0].reason:'',instances};
+  }
+  return {answers,details};
+}
+function r30SeedSpecs(task){
+  if(r21IsStandalone(task))return [{kind:'ex-done'},{kind:'ex-pending'},{kind:'ex-done'},{kind:'ex-pending'}];
+  const nodes=task.flow.nodes||[],machine=nodes.includes('机审')&&r16FeatureEnabled(task.flow),human=nodes.some(n=>['标注','人审'].includes(n))&&r16HumanEnabled(task.flow),quality=human&&nodes.includes('质检')&&Number(task.flow.qualityRate)>0,prefer=v5CaseOptions(task).includes('S');
+  const specs=human?(prefer?['S','A','B','C','D'].map(result=>({kind:'human-done',result})):[{kind:'human-done',result:'通过'},{kind:'human-done',result:'不通过'}]):machine?[{kind:'machine-done',result:'通过'},{kind:'machine-done',result:'不通过'}]:[];
+  if(machine)specs.push({kind:'machine-pending'});
+  if(human)specs.push({kind:'human-pending'});
+  if(quality)specs.push({kind:'quality-pending',result:prefer?'A':'通过'},{kind:'quality-review',result:prefer?'C':'不通过'});
+  if(human&&task.flow.annotationMode==='双人标注')specs.push({kind:'pair-second',result:prefer?'A':'通过'},{kind:'pair-review',result:prefer?'C':'不通过'});
+  return specs.length?specs:[{kind:'unassigned'}];
+}
+function r30BuildSeedCase(task,index,spec){
+  const type=task.r19ContentType==='视频'?'视频':'图文',kind=type==='视频'?'VIDEO':'GRAPHIC',bindings=taskDatasetBindings(task).filter(b=>!b.packageArchived),binding=bindings.find(b=>String(b.id)==='R19-DS-'+task.r19SourceFlowId+'-'+kind)||bindings.find(b=>String(b.id).includes(kind));
+  if(!binding)return null;
+  let machine=r30SeedGroups(task,'机审')[index%Math.max(1,r30SeedGroups(task,'机审').length)],human=r30SeedGroups(task,'标注')[index%Math.max(1,r30SeedGroups(task,'标注').length)],exemption=r30SeedGroups(task,'免审')[index%Math.max(1,r30SeedGroups(task,'免审').length)];
+  const media=feedsMediaRecord(index%3),id='R30-CASE-'+task.id+'-'+String(index+1).padStart(2,'0'),at='2026-11-17 '+String(9+Math.floor(index/6)).padStart(2,'0')+':'+String(index%6*8).padStart(2,'0')+':00';
+  const variants=[['一锅彩蔬快手料理','今天的家常菜','厨房好物','家居百货','厨房用品','烹饪用具'],['手冲咖啡的日常记录','咖啡日常','咖啡器具','食品饮料','咖啡','咖啡器具'],['海边慢步与日落记录','周末旅行','旅行好物','运动户外','户外用品','旅行用品']][index%3];
+  const ordinal=Math.floor(index/3)+1,title=variants[0]+' · '+(type==='视频'?'短视频':'图文')+'第 '+ordinal+' 则（演示）',account=media.accountName.replace('（演示）','')+' '+ordinal+'号（演示）',owner=index%2?'3.0':'4.0';
+  const fields={...feedsMediaFields(index%3),outer_id:id,content_id:id,source_dataset_id:binding.id,content_type:type,title,short_title:variants[1],account_name:account,
+    case_owner:owner,data_origin:['4.0','2.0','3.0'][index%3],has_item:task.r19SourceFlowId==='111847'||task.r19SourceFlowId==='111630'?'否':'是',item_count:1,black_shop:'否',resubmit:'否',source_channel:'日常送审',risk_hint:'正常',campaign_type:'日常',quality_hint:'正常',
+    publish_channel:'信息流',publish_subchannel:type==='视频'?'短视频推荐':'图文推荐',published_at:at,created_at:at,user_id:'DEMO-USER-'+task.r19SourceFlowId+'-'+(index+1),user_identity:index%2?'个人创作者（演示）':'商家创作者（演示）',
+    item_id:'DEMO-ITEM-'+task.id+'-'+(index+1),item_type:'单品',item_in_pool:'是',shop_name:variants[2]+'演示店',base_sku_name:variants[2]+'（演示商品）',item_price:39+index*7,
+    category1_name:variants[3],category2_name:variants[4],category3_name:variants[5],front_category1_name:'生活方式',front_category2_name:variants[1],front_category3_name:type+'内容',category_id:String(1001+index%3),leaf_category_id:String(1101+index%3),
+    summary:'用于信息流迁移 Demo 的 '+type+'样本。账号、店铺、审核记录均为演示数据。',demo_content_context:'本地模拟账号、商家和内容，不对应生产素材',material_status:'有效',second_review_status:'未送二审',bc_type:index%2?'B':'C',ic_tag_list:['原创','日常分享'][index%2]};
+  r30SeedApplyRules(fields,machine);r30SeedApplyRules(fields,human);if(r21IsStandalone(task))r30SeedApplyRules(fields,exemption);
+  fields.content_type=type;fields.case_owner=owner;
+  const routeRecord={fields,submissionSnapshot:{fields}};
+  if(machine&&r14MockMatch(routeRecord,machine)!==true)machine=r30SeedGroups(task,'机审').find(g=>r14MockMatch(routeRecord,g)===true);
+  if(human&&r14MockMatch(routeRecord,human)!==true)human=r30SeedGroups(task,'标注').find(g=>r14MockMatch(routeRecord,g)===true);
+  if(fields.has_item==='否'){delete fields.base_sku_name;delete fields.item_id;delete fields.item_price;fields.item_count=0;fields.shop_name='';fields.item_type='未挂品';fields.item_in_pool='否';}
+  const row={...media,id,submissionId:id,instance:'SIM-'+id,dataset:binding.name,datasetId:String(binding.id),poolDatasetId:String(binding.id),flowId:task.flowId,batchId:binding.batchId,dataInstanceId:viewDataID(binding),sourcePriority:binding.priority,
+    contentType:type,title,accountName:account,caseOwner:owner,dataOrigin:fields.data_origin,sent:at,fields,submissionSnapshot:{demo:true,at,fields:structuredClone(fields),results:{官方:{},业务:{}},operatorResults:{}},
+    history:[],finished:[],stage:'机审',status:'待机审',scopeTaskName:task.name,scopeMatchedAt:at,r30CaseFixture:true,r30Scenario:spec.kind,r19BizTaskId:String((spec.kind.startsWith('ex-')?exemption:spec.kind.startsWith('machine-')?machine:human)?.bizTaskId||''),r19SourceStage:spec.kind.startsWith('ex-')?'免审':spec.kind.startsWith('machine-')?'机审':'人审'};
+  if(machine)row.machineAssignmentId=machine.id;if(human)row.assignmentId=human.id;
+  const add=(stage,result,extra={})=>row.history.push({stage,result,actor:'演练运营',at,...extra});
+  const machineActive=(task.flow.nodes||[]).includes('机审')&&r16FeatureEnabled(task.flow);
+  const finishMachine=()=>{if(machineActive){row.finished.push('机审');row.mockMachineResult='通过';add('机审','通过',{caseResult:'通过',actor:'演示机审',assignmentId:machine?.id});}else if((task.flow.nodes||[]).includes('机审'))row.disabledStages=['机审'];};
+  const applyHuman=(result,complete=true)=>{const qa=r30SeedAnswers(task,row,result);row.caseResult=result;row.workAnswers=qa.answers;row.r25AnswerDetails=qa.details;if(complete)row.finished.push('标注');
+    const people=revMemberPool(human?.members||task.flow.members),actors=task.flow.annotationMode==='双人标注'?people.slice(0,2):people.slice(0,1);
+    const entries=(actors.length?actors:[{id:'DEMO-REVIEWER',name:'演练运营'}]).map(person=>({stage:'标注',question:'全部题目',actor:person.name,actorId:person.id,caseResult:result,result:Object.entries(qa.answers).filter(([,v])=>v).map(([,v])=>v).join('；')||result,answers:structuredClone(qa.answers),answerDetails:structuredClone(qa.details),assignmentId:human?.id,at}));
+    row.history.push(...entries);if(task.flow.annotationMode==='双人标注')row.pairVotes=structuredClone(entries);};
+  if(spec.kind.startsWith('ex-')){
+    row.stage='免审';row.status='待免审';delete row.machineAssignmentId;delete row.assignmentId;
+    if(exemption){row.standaloneAssignmentId=exemption.id;row.assignmentId=exemption.id;}
+    if(spec.kind==='ex-done'&&exemption&&['通过','不通过'].includes(exemption.output?.result)){
+      const output=exemption.output,result=output.result,reasons=(output.reasonIds||[]).map(key=>output.reasonLabels?.[key]||auFindReason(key)?.name||String(key));if(output.customReason)reasons.push(output.customReason);
+      row.standaloneResult={result,reason:reasons.join('；')||exemption.name,reasonIds:structuredClone(output.reasonIds||[]),customReason:output.customReason||'',source:'免审 · '+exemption.name,publishedAt:at,sourceTaskIds:structuredClone(exemption.sourceTaskIds||[exemption.bizTaskId].filter(Boolean))};
+      row.caseResult=result;row.finished=['免审'];row.stage='完成';row.status='已完成';add('免审',result,{caseResult:result,reason:row.standaloneResult.reason,assignmentId:exemption.id,actor:'演示免审'});
+    }
+  }else if(spec.kind==='machine-pending'){
+    row.stage='机审';row.status='待机审';
+  }else if(spec.kind==='machine-done'){
+    row.finished=['机审'];row.mockMachineResult=spec.result;row.resultOverride={result:spec.result,reason:'机审结果演示',source:'本地模拟机审',at};row.stage='完成';row.status='已完成';add('机审',spec.result,{caseResult:spec.result,actor:'演示机审'});
+  }else if(spec.kind==='unassigned'){
+    row.stage=(task.flow.nodes||[])[0]||'未分配';row.status='未分配';
+  }else{
+    finishMachine();row.stage='标注';row.status='待标注';
+    if(spec.kind==='human-done'||spec.kind.startsWith('quality-')){
+      applyHuman(spec.result);row.stage='完成';row.status='已完成';
+      if(spec.kind==='quality-pending'){row.stage='质检';row.status='待质检';}
+      if(spec.kind==='quality-review'){row.finished.push('质检');row.stage='复核';row.status='待复核';add('质检','不合格');row.mockPending='质检样例存在差异，请复核最终结论';}
+    }else if(spec.kind==='pair-second'||spec.kind==='pair-review'){
+      applyHuman(spec.result,false);row.pairVotes=(row.pairVotes||[]).slice(0,spec.kind==='pair-second'?1:2);row.history=row.history.filter(h=>h.stage!=='标注');
+      if(spec.kind==='pair-review'&&row.pairVotes.length>1){const second=row.pairVotes[1],other=spec.result==='通过'?'不通过':spec.result==='不通过'?'通过':'A',qa=r30SeedAnswers(task,row,other);second.caseResult=other;second.answers=qa.answers;second.answerDetails=qa.details;second.result='独立审核结论存在差异（演示）';}
+      row.history.push(...structuredClone(row.pairVotes));row.status=spec.kind==='pair-second'?'待第二人标注':'待核对';delete row.caseResult;delete row.workAnswers;delete row.r25AnswerDetails;
+    }
+  }
+  for(const ref of machine?.bindings||[]){const output=ref.result||'审核结果',result=ref.targetKind==='case'?(v5CaseOptions(task).includes('S')?'A':'通过'):'正常';if(v5ReferenceKind(ref)==='rule'){const scope=v5ReferenceScope(ref);(row.submissionSnapshot.results[scope]||={})[v5ReferenceId(ref)]=result;}else(row.submissionSnapshot.operatorResults[v5ReferenceId(ref)]||={})[output]=result;}
+  return row;
+}
+function r30InstallCaseSamples(){
+  let marker={tasks:{}};try{const saved=JSON.parse(localStorage.getItem(R30_CASE_SAMPLE_MARKER)||'null');if(saved?.tasks)marker=saved;}catch{}
+  let changed=false;const owners=new Map();
+  for(const task of tasks)for(const row of task.detailSamples||[]){const value=[row.caseOwner,row.fields?.case_owner,row.submissionSnapshot?.fields?.case_owner].find(v=>['3.0','4.0'].includes(String(v)));if(value)owners.set(r30SeedOwnerKey(row),value);}
+  for(const task of tasks){
+    if(!r21CatalogPreset(task)||task.r21CatalogVersion!=='eight-flows-sixteen-parents-v1')continue;
+    for(const [index,row] of (task.detailSamples||[]).entries())if(row.r19Inspection||row.r30CaseFixture){const key=r30SeedOwnerKey(row),owner=owners.get(key)||r30SeedOwner(row);owners.set(key,owner);changed=r30FillSeedOwner(row,owner)||changed;changed=r30EnrichSeedDetails(task,row,index)||changed;}
+    if(marker.tasks[String(task.id)])continue;
+    const rows=task.detailSamples||=[],specs=r30SeedSpecs(task),needed=Math.max(0,12-rows.length);
+    let added=0;for(let index=0;index<needed;index++){const row=r30BuildSeedCase(task,index,specs[index%specs.length]);if(row&&!rows.some(r=>r.id===row.id)){rows.push(row);added++;}}
+    task.detailSamples=rows;marker.tasks[String(task.id)]={added,installedAt:'2026-11-17'};changed=changed||added>0;
+  }
+  if(changed&&!writeLocal(TASK_KEY,tasks))return {installed:false};
+  try{localStorage.setItem(R30_CASE_SAMPLE_MARKER,JSON.stringify(marker));}catch{return {installed:false};}
+  return {installed:true,tasks:Object.keys(marker.tasks).length};
+}
+
+
 r19InstallConfiguredCatalog();
 r21CompactConfiguredCatalog();
 r23InstallExemptionTypes();
@@ -16583,6 +16755,7 @@ r25InstallApprovalExample();
   migrateFeedsMediaExamples(),
   tasks.forEach(task=>rev3NormalizeAllocation(task.flow)),
   tasks.forEach(ensureNodeTemplates),
+  r30InstallCaseSamples(),
   ($("#help").onclick = () =>
     modal(
       "Demo 使用说明",
@@ -16990,8 +17163,8 @@ function d25Fixtures(){
   const demoTask=(id,name)=>({...structuredClone(base),id,name,d25Mock:true,flowId:flow.id,groupId:group.id,r19SourceFlowId:'',practiceKey:'',mockScenario:'',taskPaused:false,
     dataSource:{type:'dataset',id:dataset.id},datasetBindings:[{id:dataset.id,name:dataset.name,priority:1,batchId:'DQ-'+id}],detailSamples:[]});
   const a=demoTask('DQ-TASK-001','图文初审（查询演示）'),b=demoTask('DQ-TASK-002','图文复核（查询演示）');
-  const make=(id,contentId,title,sent,index)=>{const media=feedsMediaRecord(index),fields={...feedsMediaFields(index),outer_id:contentId,content_id:contentId,content_type:'图文',account_name:'小禾的厨房（演示）',title,publish_channel:'信息流',publish_subchannel:'图文推荐',data_origin:'4.0'};
-    return {...media,id,submissionId:id,datasetId:dataset.id,dataset:dataset.name,poolDatasetId:dataset.id,flowId:flow.id,sent,fields,title,accountName:fields.account_name,contentType:'图文',d25Mock:true,
+  const make=(id,contentId,title,sent,index)=>{const media=feedsMediaRecord(index),fields={...feedsMediaFields(index),outer_id:contentId,content_id:contentId,content_type:'图文',account_name:'小禾的厨房（演示）',title,publish_channel:'信息流',publish_subchannel:'图文推荐',data_origin:'4.0',case_owner:'4.0'};
+    return {...media,id,submissionId:id,datasetId:dataset.id,dataset:dataset.name,poolDatasetId:dataset.id,flowId:flow.id,sent,fields,title,accountName:fields.account_name,contentType:'图文',d25Mock:true,caseOwner:'4.0',
       submissionSnapshot:{demo:true,at:sent,fields:{...fields},results:{官方:{},业务:{}},operatorResults:{}},history:[],finished:[],stage:'机审',status:'待机审'};};
   const first=make('DQ-SUB-001','DQ-CONTENT-001','番茄炒蛋：第一版配方','2026-11-16 09:00:00',0),
     resend=make('DQ-SUB-002','DQ-CONTENT-001','番茄炒蛋：补充用量后重新送审','2026-11-16 11:00:00',0),
@@ -17093,10 +17266,10 @@ function d25Card(item){
     '<div class="r26-biz-content"><h3 class="r26-biz-title" title="'+esc(title)+'">'+esc(title)+'</h3>'+
     '<div class="r26-biz-identity"><span title="内容 ID：'+esc(id)+'">ID：'+esc(id)+'</span><time title="发布时间：'+esc(published||'未记录')+'">'+esc(r26D25Timestamp(published,'发布时间未记录'))+'</time></div>'+
     '<div class="r26-biz-account"><span class="r26-avatar" aria-hidden="true">'+esc(account==='—'?'·':account.slice(0,1))+'</span><span title="'+esc(account)+'">'+esc(account)+'</span></div>'+
-    r26D25Audit(item)+'</div>'+
+    r30CaseOwnerHTML(row)+r26D25Audit(item)+'</div>'+
     '<footer class="r26-biz-actions"><button type="button" class="action" data-d25-detail="'+esc(item.key)+'">查看详情</button></footer></article>';
 }
-function d25Flat(items){return '<div class="tablewrap d25-table"><table><thead><tr>'+['内容','送审记录','数据集','送审时间','任务处理记录','操作'].map(x=>'<th>'+x+'</th>').join('')+'</tr></thead><tbody>'+items.map(item=>'<tr data-d25-flat="'+esc(item.key)+'"><td><strong>'+esc(viewCaseIdentity(item.row,'title'))+'</strong><small>'+esc(viewCaseIdentity(item.row,'account'))+'</small><small>内容 ID '+esc(d25ContentId(item.row))+'</small></td><td>'+esc(d25SubmissionLabel(item))+(item.demo?'<small class="d25-demo-tag">查询演示</small>':'')+'</td><td>'+esc(item.dataset.name)+'<small>'+esc(item.datasetId)+'</small></td><td>'+esc(item.row.sent||'未记录')+'</td><td>'+d25TaskResults(item)+'</td><td><button type="button" class="action" data-d25-detail="'+esc(item.key)+'">查看详情</button><button type="button" class="action" data-d25-history="'+esc(d25ContentId(item.row))+'">历次送审</button></td></tr>').join('')+'</tbody></table></div>';}
+function d25Flat(items){return '<div class="tablewrap d25-table"><table><thead><tr>'+['内容','case归属','送审记录','数据集','送审时间','任务处理记录','操作'].map(x=>'<th>'+x+'</th>').join('')+'</tr></thead><tbody>'+items.map(item=>'<tr data-d25-flat="'+esc(item.key)+'"><td><strong>'+esc(viewCaseIdentity(item.row,'title'))+'</strong><small>'+esc(viewCaseIdentity(item.row,'account'))+'</small><small>内容 ID '+esc(d25ContentId(item.row))+'</small></td><td>'+r30CaseOwnerHTML(item.row)+'</td><td>'+esc(d25SubmissionLabel(item))+(item.demo?'<small class="d25-demo-tag">查询演示</small>':'')+'</td><td>'+esc(item.dataset.name)+'<small>'+esc(item.datasetId)+'</small></td><td>'+esc(item.row.sent||'未记录')+'</td><td>'+d25TaskResults(item)+'</td><td><button type="button" class="action" data-d25-detail="'+esc(item.key)+'">查看详情</button><button type="button" class="action" data-d25-history="'+esc(d25ContentId(item.row))+'">历次送审</button></td></tr>').join('')+'</tbody></table></div>';}
 function d25WriteHash(){const p=new URLSearchParams();for(const k of ['group','flow','dataset','task','q','assignment'])if(d25State[k])p.set(k,d25State[k]);history.replaceState(null,'','#data-cases'+(p.size?'?'+p.toString():''));}
 function d25OpenData(scope={}){
   if(!document.getElementById('d25-page'))d25Return={current:typeof current==='string'?current:'送审数据集',hash:current==='任务管理'?(taskListMode==='data'?'#data-view':'#tasks'):current==='送审数据集'?'#datasets':location.hash||'#datasets'};
@@ -17108,6 +17281,7 @@ window.d25OpenData=d25OpenData;
 function d25FilterControl([key,label,type],items){
   const val=d25State.filters[key]||'',list=[...new Set(items.flatMap(item=>(item.visibleEntries.length?item.visibleEntries:[{task:{id:'',flow:{nodes:[]}},row:item.row}]).map(e=>r16FieldValue(e.task,e.row,key))).filter(Boolean))];
   if(type==='date')return '<label class="filter d25-date"><span title="'+esc(label)+'">'+esc(label)+'</span><div><input name="'+key+'From" type="date" value="'+esc(d25State.filters[key+'From']||'')+'"><span>至</span><input name="'+key+'To" type="date" value="'+esc(d25State.filters[key+'To']||'')+'"></div></label>';
+  if(key==='caseOwner')return '<label class="filter"><span title="'+esc(label)+'">'+esc(label)+'</span><select name="caseOwner"><option value="">全部</option>'+['3.0','4.0','待确认'].map(v=>'<option value="'+v+'" '+(val===v?'selected':'')+'>'+v+'</option>').join('')+'</select></label>';
   return '<label class="filter"><span title="'+esc(label)+'">'+esc(label)+'</span><input name="'+key+'" list="d25-values-'+key+'" value="'+esc(val)+'" placeholder="选择或输入关键词"><datalist id="d25-values-'+key+'">'+list.slice(0,100).map(v=>'<option value="'+esc(v)+'"></option>').join('')+'</datalist></label>';
 }
 function d25Render(){
