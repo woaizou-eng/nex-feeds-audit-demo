@@ -4024,7 +4024,7 @@ span.v6-new,
 </style>
 <style id="rev32-approval-badge-style">
 #sidebar [data-nav="审批管理"]{position:relative;gap:9px;padding-right:8px}
-#sidebar .r32-approval-badge{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;min-width:18px;height:18px;padding:0 5px;margin-left:auto;box-sizing:border-box;border-radius:10px;background:#ef4444;color:#fff;font-size:11px;font-weight:600;line-height:18px;font-variant-numeric:tabular-nums}
+#sidebar .r32-approval-badge{position:absolute;top:3px;right:8px;display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 4px;box-sizing:border-box;border-radius:10px;background:#ef4444;color:#fff;font-size:10px;font-weight:600;line-height:16px;font-variant-numeric:tabular-nums;box-shadow:0 0 0 1px #fff}
 .collapsed #sidebar .r32-approval-badge{position:absolute;top:0;right:0;min-width:16px;height:16px;padding:0 4px;font-size:9px;line-height:16px;box-shadow:0 0 0 1px #fff}
 </style>
 </head>
@@ -7572,6 +7572,18 @@ const systemAdminDemo = (() => {
       store.roles.forEach(r=>{if(!r.roleType)r.roleType=oldNames[r.id]===r.name?'历史演练':'自定义';});
       for(const role of seedRoleCatalog())if(!store.roles.some(r=>r.id===role.id))store.roles.push(role);
       store.bizRoleCatalog=1;writeLocal(key,[store]);
+    }
+    if(!store.approvalBadgePreset){
+      // Reduce untouched placeholder requests to one pending example; preserve user requests and decisions.
+      const defaults=seed().approvals;
+      const placeholder=a=>{
+        const original=defaults.find(x=>x.id===a.id);
+        return a.status==='进行中'&&original&&Object.keys(a).length===Object.keys(original).length&&Object.keys(original).every(k=>JSON.stringify(a[k])===JSON.stringify(original[k]));
+      };
+      let pending=store.approvals.filter(a=>!placeholder(a)&&a.status==='进行中'&&r31ApprovalHas(a,me)).length;
+      store.approvals=store.approvals.filter(a=>!placeholder(a)||pending++<1);
+      store.approvalBadgePreset=1;
+      writeLocal(key,[store]);
     }
     return store;
   }
