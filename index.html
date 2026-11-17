@@ -4024,8 +4024,11 @@ span.v6-new,
 </style>
 <style id="rev32-approval-badge-style">
 #sidebar [data-nav="审批管理"]{position:relative;gap:9px;padding-right:8px}
-#sidebar .r32-approval-badge{position:absolute;top:3px;right:8px;display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 4px;box-sizing:border-box;border-radius:10px;background:#ef4444;color:#fff;font-size:10px;font-weight:600;line-height:16px;font-variant-numeric:tabular-nums;box-shadow:0 0 0 1px #fff}
-.collapsed #sidebar .r32-approval-badge{position:absolute;top:0;right:0;min-width:16px;height:16px;padding:0 4px;font-size:9px;line-height:16px;box-shadow:0 0 0 1px #fff}
+#sidebar .r34-approval-label{position:relative;display:inline-flex}
+#sidebar .r32-approval-badge{position:absolute;top:-5px;left:calc(100% + 1px);right:auto;display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 4px;box-sizing:border-box;border-radius:10px;background:#ef4444;color:#fff;font-size:10px;font-weight:600;line-height:16px;font-variant-numeric:tabular-nums;box-shadow:0 0 0 1px #fff}
+.collapsed #sidebar .r34-approval-label{display:contents}
+.collapsed #sidebar .r32-approval-badge{position:absolute;top:0;right:0;left:auto;min-width:16px;height:16px;padding:0 4px;font-size:9px;line-height:16px;box-shadow:0 0 0 1px #fff}
+@media(max-width:760px){#sidebar .r34-approval-label{display:contents}#sidebar .r32-approval-badge{top:0;right:0;left:auto}}
 </style>
 </head>
 <body>
@@ -5764,14 +5767,14 @@ function r32RefreshApprovalBadge(){
   if(!menu)return;
   const old=menu.querySelector('.r32-approval-badge'),html=r32ApprovalBadgeHTML();
   if(old){if(html)old.outerHTML=html;else old.remove();}
-  else if(html)menu.insertAdjacentHTML('beforeend',html);
+  else if(html)menu.querySelector('.r34-approval-label').insertAdjacentHTML('beforeend',html);
 }
 function renderNavGroups(navGroups) {
   let nextIcon = 0;
   return navGroups.map(([title, items, firstIcon = nextIcon]) => {
     nextIcon = firstIcon + items.length;
     const buttons = items.map((name, index) =>
-      `<button class="navitem ${name === current ? "active" : ""}" data-nav="${name}" title="${name}">${icon(firstIcon + index)}<span class="navtext">${name}</span>${name==='机审算力配置'?'<small class="r8-new">NEW</small>':''}${name==='审批管理'?r32ApprovalBadgeHTML():''}</button>`
+      `<button class="navitem ${name === current ? "active" : ""}" data-nav="${name}" title="${name}">${icon(firstIcon + index)}${name==='审批管理'?'<span class="r34-approval-label"><span class="navtext">'+name+'</span>'+r32ApprovalBadgeHTML()+'</span>':'<span class="navtext">'+name+'</span>'}${name==='机审算力配置'?'<small class="r8-new">NEW</small>':''}</button>`
     ).join("");
     return `<div class="navgroup"><div class="groupname">${title}</div>${buttons}</div>`;
   }).join("");
