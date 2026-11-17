@@ -4016,6 +4016,12 @@ span.v6-new,
 .r25-immersive.r29-biz .r29-reference-heading>button{margin-left:auto}
 .d25-table td>.r30-case-owner>span{display:none}
 </style>
+<style id="rev31-approver-style">
+.r31-approver-line{align-items:center;margin:12px 0;padding:10px 12px;border:1px solid #e6e8f0;border-radius:6px;background:#fafaff}
+.r31-approver-line>div{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.r31-approver-chip{display:inline-flex;align-items:center;padding:3px 10px;border-radius:4px;background:#eeebff;color:#5f50ba;font-size:13px;line-height:22px}
+.r31-approver-line small{font-size:12px;color:#8892a7}
+</style>
 </head>
 <body>
   <header><div class="logo">NEX</div><button class="space" id="space"><em>✦</em> 官方测试空间 <span class="chevron">▼</span></button><nav class="topnav"><button class="active">管理中心</button><button>作业中心</button><button>HCM</button><button>AI Workshop</button><button>平台工坊</button></nav><div class="account"><button class="round" id="help" aria-label="Demo 使用说明">♧</button><button class="round" id="export" title="导出算子配置" aria-label="导出算子配置">▣</button><span class="avatar">管</span><button class="accountname" id="account">业务空间管理员 <span class="chevron">▼</span></button></div></header>
@@ -7469,6 +7475,53 @@ const migrationReports = (() => {
   return {render,names:reportNames,menuNames,isReport,deepLink};
 })();
 
+// Default recipients are snapshotted when an operator request is submitted.
+// Existing requests and the current single-action demo approval remain unchanged.
+function r31People(){
+  const nicknames={P001:['演练运营','演练·青禾'],P002:['图文审核员','演练·知夏'],P003:['视频审核员','演练·星河'],P004:['信息流质检员','演练·初晴'],P005:['择优审核员','演练·行舟'],P006:['轮班审核员','演练·木川']};
+  return (window.nexPeople?.members?.()||[]).map(p=>({...p,originalName:p.name,name:p.nickname||p.nickName||(nicknames[p.id]?.[0]===p.name?nicknames[p.id][1]:p.name)}));
+}
+function r31NameKey(name){return String(name||'').trim().split(/[（(]/)[0].trim();}
+function r31ResolvePerson(value,name=''){
+  if(value&&typeof value==='object'){name=value.name||value.nickname||value.nickName||name;value=value.id||value.userId||value.employeeId||name;}
+  const text=String(value??'').trim(),people=r31People();
+  const member=people.find(p=>String(p.id)===text)||people.find(p=>[p.name,p.originalName,p.nickname,p.nickName].filter(Boolean).some(n=>r31NameKey(n)===r31NameKey(text)))||people.find(p=>name&&[p.name,p.originalName,p.nickname,p.nickName].filter(Boolean).some(n=>r31NameKey(n)===r31NameKey(name)));
+  if(member)return {id:String(member.id),name:member.name};
+  return {id:text,name:String(name||text)};
+}
+function r31CurrentCreator(){const p=r31People().find(p=>p.id==='P001');return {id:'P001',name:p?.name||'演练·青禾'};}
+function r31Qiongxiang(){
+  const p=r31People().find(p=>[p.name,p.originalName,p.nickname,p.nickName].filter(Boolean).some(n=>r31NameKey(n)==='琼香'));
+  return p?{id:String(p.id),name:p.name,source:'固定审批人'}:{id:'DEMO-QIONGXIANG',name:'琼香',source:'固定审批人',demoIdentity:true};
+}
+function r31OperatorCreator(op){
+  const value=[op?.creatorId,op?.createdById,op?.creator,op?.createdBy].find(v=>v!==undefined&&v!==null&&String(v).trim()!=='');
+  if(value!==undefined)return {...r31ResolvePerson(value,op?.creatorName||op?.createdByName||''),source:'算子创建人'};
+  if(op&&(op.demoOnly||op.r25ApprovalExample||String(op.id).startsWith('MOCK-')))return {...r31CurrentCreator(),source:'算子创建人（演示）',demoIdentity:true};
+  return {id:'UNRESOLVED-CREATOR:'+String(op?.id||''),name:'算子创建人（待确认）',source:'创建人未记录',unresolved:true};
+}
+function r31OperatorApprovers(op){
+  const creator=r31OperatorCreator(op),fixed=r31Qiongxiang();
+  if(creator.id===fixed.id||r31NameKey(creator.name)==='琼香')return [{...(creator.id===creator.name?fixed:creator),source:creator.source+'、固定审批人'}];
+  return [creator,fixed];
+}
+function r31ApprovalApprovers(a){
+  const raw=Array.isArray(a?.approvers)&&a.approvers.length?a.approvers:a?.approver?[a.approver]:[];
+  const people=raw.map(p=>p&&typeof p==='object'?{...p,id:String(p.id),name:p.name||r31ResolvePerson(p.id).name}:r31ResolvePerson(p));
+  return people.filter((p,i)=>p.id&&people.findIndex(x=>x.id===p.id)===i);
+}
+function r31ApprovalHas(a,id){return r31ApprovalApprovers(a).some(p=>p.id===String(id));}
+function r31ApprovalNames(a){return r31ApprovalApprovers(a).map(p=>p.name).join('、')||'—';}
+function r31ApproverChoices(approvals=[]){
+  const candidates=[...r31People(),r31Qiongxiang(),...approvals.flatMap(r31ApprovalApprovers)];
+  return [...new Map(candidates.map(p=>[String(p.id),p])).values()].map(p=>[String(p.id),p.name]);
+}
+function r31ApproverLine(people,label='审批人'){
+  return '<div class="detailrow r31-approver-line"><span>'+esc(label)+'</span><div>'+people.map(p=>'<span class="r31-approver-chip" data-r31-approver="'+esc(p.id)+'" title="'+esc(p.source||'审批人')+'">'+esc(p.name)+'</span>').join('')+(people.some(p=>p.unresolved)?'<small>该历史算子未记录创建人</small>':'')+'</div></div>';
+}
+function r31ApproverPreview(op){return r31ApproverLine(r31OperatorApprovers(op),'默认审批人');}
+function r31ApprovalPeopleHTML(a){return r31ApproverLine(r31ApprovalApprovers(a));}
+
 const systemAdminDemo = (() => {
   const pages=['业务配置','角色管理','用户管理','用户组管理','审批管理'], me='P001', key='nex-system-admin-demo-v3';
   const mockNicknames={
@@ -7740,7 +7793,7 @@ function renderGroups(){
   }
 
 const approvalCols={
-    '算子变更':['算子名称','变更类型','影响任务数','申请人','申请日期','状态名称','操作'],
+    '算子变更':['算子名称','变更类型','影响任务数','申请人','审批人','申请日期','状态名称','操作'],
     '角色':['角色名称','所在业务空间','所在租户','申请人','申请理由','申请期限','最新审批人','状态名称','操作'],
     '业务空间':['业务空间名称','业务空间描述','头像','管理员','申请人','审批人','是否隐藏业务空间','状态名称','操作'],
     '项目审批':['业务线','子业务线','项目','子项目','应用场景','需求来源','需求类型','审核人效(CPD)','交付质量目标','用工层级','作业平台','申请人','审批人','状态名称','操作'],
@@ -7753,7 +7806,7 @@ const approvalCols={
     const b=data().biz, fields={
       '算子名称':a.name,'变更类型':a.operatorChange?.kind||'—','影响任务数':a.operatorChange?r25OperatorTaskCount(a.operatorChange.locations.filter(x=>a.operatorChange.kind==='取消关联'||!x.override)):'—',
       '角色名称':rname(a.role),'所在业务空间':b.name,'所在租户':'淘天租户','申请人':pname(a.applicant),'申请理由':a.reason,'申请期限':a.start+' 至 '+a.end,
-      '最新审批人':pname(a.approver),'当前审批人':pname(a.approver),'审批人':pname(a.approver),'状态名称':a.status,'业务空间名称':a.name,'业务空间描述':'信息流迁移演练','头像':'N','管理员':pname(a.applicant),'是否隐藏业务空间':'否',
+      '最新审批人':a.operatorChange?r31ApprovalNames(a):pname(a.approver),'当前审批人':a.operatorChange?r31ApprovalNames(a):pname(a.approver),'审批人':a.operatorChange?r31ApprovalNames(a):pname(a.approver),'状态名称':a.status,'业务空间名称':a.name,'业务空间描述':'信息流迁移演练','头像':'N','管理员':pname(a.applicant),'是否隐藏业务空间':'否',
       '业务线':'推荐','子业务线':'信息流','项目':'信息流迁移','子项目':a.name,'应用场景':'内容审核','需求来源':'推荐运营','需求类型':'审核','审核人效(CPD)':'240','交付质量目标':'98%','用工层级':'作业','作业平台':'NEX',
       '变更项目/子项目':a.name,'操作时间':a.date,'变更原因':a.reason,'项目变更流程':'业务审批','业务线/子业务线/项目':'推荐 / 信息流 / 信息流迁移','业务方的审批评论':a.comment||'—','审批单号':a.id,
       '项目详情名':a.name,'组件名称':a.name,'组件类型':'仪表盘组件','组件定位':'数据生产','申请日期':a.date
@@ -7761,10 +7814,10 @@ const approvalCols={
   }
   function renderApprovals(){
     const tabsA=['全部审批单','待我处理','我发起的','我已处理'],cols=approvalCols[approvalType],entries=data().approvals.filter(a=>a.type===approvalType&&
-      (approvalTab==='全部审批单'||approvalTab==='我发起的'&&a.applicant===me||a.approver===me&&(approvalTab==='待我处理'?a.status==='进行中':a.status!=='进行中'))&&
-      (!query.applicant||a.applicant===query.applicant)&&(!query.approver||a.approver===query.approver)&&(!query.start||a.date>=query.start)&&(!query.end||a.date<=query.end)&&(!query.role||query.role===a.role)&&match(a.name,query.name)&&(!query.flow||query.flow==='组件审批'));
+      (approvalTab==='全部审批单'||approvalTab==='我发起的'&&a.applicant===me||r31ApprovalHas(a,me)&&(approvalTab==='待我处理'?a.status==='进行中':a.status!=='进行中'))&&
+      (!query.applicant||a.applicant===query.applicant)&&(!query.approver||r31ApprovalHas(a,query.approver))&&(!query.start||a.date>=query.start)&&(!query.end||a.date<=query.end)&&(!query.role||query.role===a.role)&&match(a.name,query.name)&&(!query.flow||query.flow==='组件审批'));
     const extra=approvalType==='算子变更'?[['算子名称',queryBox('name','算子名称')]]:approvalType==='角色'?[['角色名称',querySel('role','角色名称',data().roles.map(r=>[r.id,r.name]))]]:approvalType==='项目审批'?[['子项目名称',queryBox('name','子项目名称')]]:approvalType==='组件'?[['审核流程',querySel('flow','审核流程',['组件审批'])],['组件名称',queryBox('name','组件名称')]]:[];
-    const filters=[...extra,['申请人',querySel('applicant','申请人',pchoices())],...(approvalType==='组件'?[]:[['审批人',querySel('approver','审批人',pchoices())]]),['申请日期',queryBox('start','开始日期','type="date"')+' 至 '+queryBox('end','结束日期','type="date"')]];
+    const filters=[...extra,['申请人',querySel('applicant','申请人',pchoices())],...(approvalType==='组件'?[]:[['审批人',querySel('approver','审批人',approvalType==='算子变更'?r31ApproverChoices(data().approvals.filter(a=>a.operatorChange)):pchoices())]]),['申请日期',queryBox('start','开始日期','type="date"')+' 至 '+queryBox('end','结束日期','type="date"')]];
     layout('审批管理',tabs(tabsA,approvalTab,'approval-scope')+tabs(approvalTypes,approvalType,'approval-type')+queryForm(filters)+listTable(cols,entries.map(a=>cols.map(c=>c==='操作'?action('inspect','查看详情',a.id):esc(approvalCell(a,c))))),(act,id)=>{
       if(act==='inspect'){approvalDetail(data().approvals.find(a=>a.id===id));return;}
       if(act==='approval-scope')approvalTab=id;else if(act==='approval-type')approvalType=id;query={};listPage=1;renderApprovals();
@@ -7782,7 +7835,7 @@ const approvalCols={
         a.status=ok?'已通过':'已驳回';a.comment=comment;a.processed=time();complete(ok?'审批已通过，配置已生效':'审批已驳回，原配置保持不变',true);
       };bind('r25-approve',()=>decide(true),pane);bind('r25-reject',()=>decide(false),pane);return;
     }
-    const canHandle=approvalTab==='待我处理'&&a.status==='进行中'&&a.approver===me;
+    const canHandle=approvalTab==='待我处理'&&a.status==='进行中'&&r31ApprovalHas(a,me);
     const content=approvalCols[a.type].filter(k=>k!=='操作').map(k=>field(k,esc(approvalCell(a,k)))).join('')+
       (a.comment?field('审批意见',esc(a.comment)):'')+(canHandle?field('审批意见','<textarea id="sya-decision" aria-label="审批意见" maxlength="300" placeholder="请输入审批意见"></textarea>')+bar([btn('sya-approve','通过'),btn('sya-reject','驳回',true)]):'');
     const pane=dialog('查看详情 · '+a.id,content,null,null,700);
@@ -8474,6 +8527,12 @@ function saveComposition() {
   } else
     ((a.id = String(Math.max(100469, ...rows.map((e) => Number(e.id)).filter(Number.isFinite)) + 1)),
       (a.created = new Date().toLocaleString("sv-SE")),
+      (a.creatorId = r31CurrentCreator().id),
+      (a.creatorName = r31CurrentCreator().name),
+      delete a.creator,
+      delete a.createdBy,
+      delete a.createdById,
+      delete a.createdByName,
       rows.unshift(a),
       (query = { id: "", name: "", source: "", admin: "" }),
       (page = 1));
@@ -12568,7 +12627,8 @@ function r25SubmitOperatorChange(change,reason){
   if(!String(reason||'').trim())return {error:'请填写申请原因'};
   const pending=r25OperatorPending(change.operatorId);
   if(pending)return {error:'该算子已有待审批申请 '+pending.id+'，请先处理该申请'};
-  const now=new Date().toLocaleString('sv-SE'),item={id:'OP-'+Date.now(),type:'算子变更',name:r25OperatorName(change.operatorId),applicant:'P001',approver:'P001',date:now.slice(0,10),created:now,status:'进行中',reason:String(reason).trim(),comment:'',operatorChange:structuredClone(change)};
+  const approvers=r31OperatorApprovers(rows.find(op=>String(op.id)===String(change.operatorId))||change.before);
+  const now=new Date().toLocaleString('sv-SE'),item={id:'OP-'+Date.now(),type:'算子变更',name:r25OperatorName(change.operatorId),applicant:'P001',approver:approvers[0]?.id||'',approvers:structuredClone(approvers),date:now.slice(0,10),created:now,status:'进行中',reason:String(reason).trim(),comment:'',operatorChange:structuredClone(change)};
   if(!systemAdminDemo.enqueueOperatorApproval(item))return {error:'审批申请未能保存，请重试'};
   return {item};
 }
@@ -12580,7 +12640,7 @@ function r25RequestOperatorEdit(next,kind='修改算子'){
   const shared=locations.filter(x=>!x.override),local=locations.filter(x=>x.override);
   const change={kind,operatorId:String(next.id),before:structuredClone(before),after:structuredClone(next),locations,sharedKeys:shared.map(x=>x.key)};
   const originalLayer=$('#layer').children.length;
-  wideModal('提交算子变更审批','<div class="r25-approval-summary"><strong>'+esc(before.name)+'</strong><span>'+shared.length+' 处共享引用 · '+r25OperatorTaskCount(shared)+' 个任务受影响</span></div><p class="au-note">审批通过后，共享引用使用新配置；待审期间沿用原配置。'+local.length+' 处本任务配置保持不变，历史送审结果不重算。</p><div class="r25-config-diff"><section><h4>当前生效</h4><pre>'+esc(r25OperatorSummary(before))+'</pre></section><section><h4>申请变更为</h4><pre>'+esc(r25OperatorSummary(next))+'</pre></section></div>'+r25LocationTable(locations)+'<label class="field"><span>申请原因 <b class="required">*</b></span><textarea id="r25-change-reason" maxlength="300" placeholder="说明本次变更原因"></textarea></label><p id="r25-change-error" class="error" role="alert"></p>','<button class="btn secondary" data-close>返回修改</button><button class="btn" id="r25-submit-change">提交审批</button>','r25-approval-drawer');
+  wideModal('提交算子变更审批','<div class="r25-approval-summary"><strong>'+esc(before.name)+'</strong><span>'+shared.length+' 处共享引用 · '+r25OperatorTaskCount(shared)+' 个任务受影响</span></div><p class="au-note">审批通过后，共享引用使用新配置；待审期间沿用原配置。'+local.length+' 处本任务配置保持不变，历史送审结果不重算。</p>'+r31ApproverPreview(before)+'<div class="r25-config-diff"><section><h4>当前生效</h4><pre>'+esc(r25OperatorSummary(before))+'</pre></section><section><h4>申请变更为</h4><pre>'+esc(r25OperatorSummary(next))+'</pre></section></div>'+r25LocationTable(locations)+'<label class="field"><span>申请原因 <b class="required">*</b></span><textarea id="r25-change-reason" maxlength="300" placeholder="说明本次变更原因"></textarea></label><p id="r25-change-error" class="error" role="alert"></p>','<button class="btn secondary" data-close>返回修改</button><button class="btn" id="r25-submit-change">提交审批</button>','r25-approval-drawer');
   $('#r25-submit-change').onclick=()=>{
     const result=r25SubmitOperatorChange(change,$('#r25-change-reason').value);
     if(result.error){$('#r25-change-error').textContent=result.error;return;}
@@ -12592,7 +12652,7 @@ function r25RequestDisconnect(id,initialKeys=[]){
   const locations=r25OperatorLocations(id),selected=new Set(initialKeys),pending=r25OperatorPending(id);
   if(pending){r25OpenApprovalInbox(pending.id);toast('请先处理该算子的待审批申请');return;}
   if(!locations.length){toast('暂无关联子任务');return;}
-  wideModal('取消算子关联','<div class="r25-approval-summary"><strong>'+esc(r25OperatorName(id))+'</strong><span>选择要取消的具体引用</span></div><p class="au-note">按任务、节点、子任务及题目精确取消。审批通过前保持原配置；其他引用和历史结果不变。分配条件中的引用需进入节点修改完整条件。</p>'+r25LocationTable(locations,{selectable:true,selected})+'<div id="r25-disconnect-count" class="r25-selected-count"></div><label class="field"><span>申请原因 <b class="required">*</b></span><textarea id="r25-change-reason" maxlength="300" placeholder="说明取消关联的原因"></textarea></label><p id="r25-change-error" class="error" role="alert"></p>','<button class="btn secondary" data-close>取消</button><button class="btn" id="r25-submit-change">提交审批</button>','r25-approval-drawer');
+  wideModal('取消算子关联','<div class="r25-approval-summary"><strong>'+esc(r25OperatorName(id))+'</strong><span>选择要取消的具体引用</span></div><p class="au-note">按任务、节点、子任务及题目精确取消。审批通过前保持原配置；其他引用和历史结果不变。分配条件中的引用需进入节点修改完整条件。</p>'+r31ApproverPreview(rows.find(op=>String(op.id)===String(id)))+r25LocationTable(locations,{selectable:true,selected})+'<div id="r25-disconnect-count" class="r25-selected-count"></div><label class="field"><span>申请原因 <b class="required">*</b></span><textarea id="r25-change-reason" maxlength="300" placeholder="说明取消关联的原因"></textarea></label><p id="r25-change-error" class="error" role="alert"></p>','<button class="btn secondary" data-close>取消</button><button class="btn" id="r25-submit-change">提交审批</button>','r25-approval-drawer');
   const update=()=>{const picked=locations.filter(x=>selected.has(x.key));$('#r25-disconnect-count').textContent='已选 '+picked.length+' 处引用，涉及 '+r25OperatorTaskCount(picked)+' 个任务';};
   document.querySelectorAll('[data-r25-location]').forEach(b=>b.onchange=()=>{const x=locations[Number(b.dataset.r25Location)];if(b.checked)selected.add(x.key);else selected.delete(x.key);update();});update();
   $('#r25-submit-change').onclick=()=>{
@@ -12642,7 +12702,7 @@ function r25ApplyOperatorApproval(approval){
 }
 function r25ApprovalContent(approval){
   const change=approval.operatorChange,locations=change.locations||[],shared=locations.filter(x=>!x.override);
-  return '<div class="r25-approval-summary"><strong>'+esc(change.kind)+' · '+esc(approval.name)+'</strong><span>'+esc(approval.status)+' · '+esc(approval.id)+'</span></div><p class="au-note">'+(change.kind==='取消关联'?'仅取消下列 '+locations.length+' 处选中引用，涉及 '+r25OperatorTaskCount(locations)+' 个任务。':'共享引用 '+shared.length+' 处，影响 '+r25OperatorTaskCount(shared)+' 个任务；本任务配置保持不变。')+' 待审期间原配置继续生效，历史结果不重算。</p>'+
+  return '<div class="r25-approval-summary"><strong>'+esc(change.kind)+' · '+esc(approval.name)+'</strong><span>'+esc(approval.status)+' · '+esc(approval.id)+'</span></div>'+r31ApprovalPeopleHTML(approval)+'<p class="au-note">'+(change.kind==='取消关联'?'仅取消下列 '+locations.length+' 处选中引用，涉及 '+r25OperatorTaskCount(locations)+' 个任务。':'共享引用 '+shared.length+' 处，影响 '+r25OperatorTaskCount(shared)+' 个任务；本任务配置保持不变。')+' 待审期间原配置继续生效，历史结果不重算。</p>'+
     (change.kind==='取消关联'?'<div class="r25-config-diff"><section><h4>当前生效</h4><p>保留选中的 '+locations.length+' 处算子引用</p></section><section><h4>申请变更为</h4><p>取消选中的 '+locations.length+' 处算子引用</p></section></div>':'<p class="r25-changed-fields">变更字段：'+esc(r25OperatorChangedFields(change.before,change.after))+'</p><div class="r25-config-diff"><section><h4>变更前</h4><pre>'+esc(r25OperatorSummary(change.before))+'</pre></section><section><h4>申请变更后</h4><pre>'+esc(r25OperatorSummary(change.after))+'</pre></section></div>')+
     r25LocationTable(locations)+'<div class="detailrow"><span>申请原因</span><div>'+esc(approval.reason)+'</div></div><div class="detailrow"><span>提交时间</span><div>'+esc(approval.created||approval.date)+'</div></div>'+(approval.appliedAt?'<div class="detailrow"><span>生效时间</span><div>'+esc(approval.appliedAt)+'</div></div>':'');
 }
