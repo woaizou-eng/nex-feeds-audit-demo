@@ -1493,6 +1493,42 @@ tbody tr:hover {
   color: #9ba2b6;
   margin-left: auto;
 }
+.inline-value-columns {
+  display: grid;
+  grid-template-columns: minmax(104px, 38%) minmax(0, 1fr);
+  min-height: 0;
+}
+.inline-value-column {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+.inline-value-column:first-child {
+  border-right: 1px solid #e7e9f2;
+  padding-right: 6px;
+  margin-right: 6px;
+}
+.inline-value-heading {
+  color: #646e82;
+  margin: 9px 5px 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.inline-value-groups {overflow: auto; min-height: 0;}
+.inline-value-groups button {
+  width: 100%;
+  padding: 8px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  border-radius: 5px;
+  text-align: left;
+  font-size: 12px;
+}
+.inline-value-groups button[aria-pressed="true"] {background: #efedff; color: #5144c9;}
+.inline-value-groups small {color: #697389; white-space: nowrap;}
 #inline-options {
   min-height: 40px;
   overflow: auto;
@@ -2669,6 +2705,56 @@ tbody tr:hover {
 .application-node-menu input {
   accent-color: #514bff;
 }
+.application-node-menu label > span small {
+  display: block;
+  color: #647087;
+}
+.template-area-heading {
+  color: #56647b;
+  margin: 0 0 9px;
+  font-size: 12px;
+}
+.builder-card [data-edit-block] {
+  color: inherit;
+  padding: 0;
+  text-align: left;
+  font: inherit;
+}
+.builder-card [data-edit-block]:focus-visible {
+  outline: 2px solid #6257ff;
+  outline-offset: 3px;
+}
+.builder-properties .property-tabs {
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.template-current-component {
+  border-left: 3px solid #695bec;
+  background: #f5f4ff;
+  border-radius: 4px;
+  color: #4c437a;
+  padding: 9px 11px;
+  margin: 0 0 16px;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.flow-template-source {
+  border: 1px solid #e5e8f2;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 10px 0 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+.flow-template-source small {
+  color: #627088;
+}
+.flow-template-source .action {
+  margin-left: auto;
+}
 .composition-form-row > .panel {
   background: none;
   border: 0;
@@ -3378,6 +3464,332 @@ body {
 
 </style><style>.tx-head,.tx-line,.tx-commands,.tx-picker-head{display:flex;align-items:center;gap:12px}.tx-head{justify-content:space-between;margin-bottom:18px}.tx-head h1{margin:0;font-size:20px}.tx-line{justify-content:space-between;flex-wrap:wrap}.tx-commands{flex-wrap:wrap}.tx-module .toolbar{display:flex;align-items:end;flex-wrap:wrap;margin:12px 0 18px;gap:12px}.tx-module .filter{width:150px}.tx-module .filter input,.tx-module .filter select{width:100%}.tx-module .tablewrap{overflow:auto}.tx-module table{min-width:760px}.tx-module th,.tx-module td{text-align:left;white-space:normal}.tx-module .tx-path{min-width:130px;max-width:360px}.tx-muted,.tx-count{font-size:13px;color:#626d84}.tx-count{margin:14px 0}.tx-layout{display:grid;grid-template-columns:minmax(280px,2fr) minmax(280px,3fr);gap:18px}.tx-pane{border:1px solid #e5e8f0;border-radius:8px;padding:16px;min-width:0}.tx-pane h2{font-size:16px;margin:0 0 14px}.tx-pane h3{font-size:14px;margin:20px 0 8px}.tx-tree{max-height:58vh;overflow:auto;margin-top:12px}.tx-node{display:flex;align-items:center;min-height:35px;border-radius:4px;gap:4px}.tx-node.active{background:#edf2ff}.tx-node button{border:0;background:transparent;color:inherit;text-align:left;cursor:pointer}.tx-node .tx-exp{width:23px;flex:0 0 23px;text-align:center;color:#6c7892}.tx-node .tx-select{flex:1;padding:7px 3px}.tx-node.active .tx-select{color:#3e59d7}.tx-chip{display:inline-flex;background:#f1f3fb;border:1px solid #e4e8f4;color:#465478;border-radius:4px;padding:2px 6px;font-size:12px;margin:1px 4px 2px 0}.tx-form{display:grid;gap:13px}.tx-form input,.tx-form textarea,.tx-form select,.tx-picker-head input,.tx-pane input[type=search]{width:100%;box-sizing:border-box}.tx-form textarea{min-height:62px}.tx-checks{max-height:230px;overflow:auto;border:1px solid #e3e7ee;border-radius:5px;padding:6px 9px}.tx-checks label{display:flex;align-items:flex-start;gap:9px;line-height:1.5;padding:5px 0;cursor:pointer}.tx-checks input[type=checkbox]{width:16px;flex:none;margin-top:3px}.tx-err{color:#ba3145;font-size:13px}.tx-required{color:#e15151}.tx-card{border-bottom:1px solid #e7eaf2;padding:8px 0}.tx-card:last-child{border-bottom:0}.tx-form fieldset{border:0;margin:0;padding:0;min-width:0}.tx-form legend{font-size:13px;margin-bottom:6px}.tx-pages{display:flex;justify-content:flex-end;gap:10px;margin-top:10px;align-items:center}.tx-module button:disabled{cursor:default;opacity:.48}.tx-pane .tx-actions{margin-top:18px}.tx-form input[type=search]{margin-bottom:8px}@media(max-width:850px){.tx-layout{grid-template-columns:1fr}.tx-tree{max-height:42vh}}
 .tx-question-tags{margin-top:14px;border-top:1px solid #e6eaf2;padding-top:10px}.tx-question-tags select{width:100%;max-width:400px}.tx-question-reasons{margin-top:8px}.tx-question-reasons p{margin:3px 0 0 22px;font-size:12px;color:#626d84}
+.option-editor{display:grid;gap:9px;margin:0 0 15px;min-width:0}
+.option-editor .field{margin:0}.option-editor label>span{font-weight:500}
+.option-editor .option-add-row{display:flex;align-items:center;gap:6px}.option-add-row input{flex:1;min-width:0}
+.option-editor .option-children{display:grid;gap:5px}.option-child{display:flex;align-items:center;justify-content:space-between;gap:5px;padding:4px 8px;background:#f5f3ff;border-radius:4px}
+.option-editor .option-path{display:block;font-size:12px;line-height:1.5;color:#595574;overflow-wrap:anywhere}
+.option-editor input{width:100%;min-width:0;box-sizing:border-box}
+.option-label-note,.option-editor [role=status]{font-size:12px;color:#595574;line-height:1.5}.option-editor [role=status]:empty{display:none}
+.task-content.template-step {
+  container: template-workspace / inline-size;
+}
+.template-builder {
+  grid-template-columns: clamp(110px, 10%, 155px) minmax(0, 1fr) clamp(335px, 32%, 475px);
+}
+.annotation-data {
+  container: annotation-editor / inline-size;
+  color: #34415a;
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  margin: 0 0 18px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.annotation-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 3px 8px;
+}
+.annotation-heading :is(h3, h4, strong) {
+  font-size: 15px;
+  margin: 0;
+}
+.annotation-heading > span,
+.annotation-status {
+  font-size: 12px;
+  color: #536078;
+}
+.annotation-status:empty {
+  display: none;
+}
+.annotation-tree-type,
+.annotation-tools {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.annotation-data :is(input:not([type=checkbox]), select) {
+  min-width: 0;
+  max-width: 100%;
+  background: #fff;
+  color: #34415a;
+  border: 1px solid #c8cfdf;
+  border-radius: 5px;
+  padding: 6px 8px;
+  min-height: 32px;
+  font: inherit;
+}
+.annotation-tree-type select,
+.annotation-tools input {
+  flex: 1 1 8rem;
+}
+.annotation-tools button,
+.annotation-expand,
+.annotation-sort-row button {
+  background: #fff;
+  color: #484294;
+  border: 1px solid #cdd1e4;
+  border-radius: 5px;
+  padding: 5px 9px;
+  min-height: 32px;
+  font: inherit;
+}
+.annotation-tools [data-search-annotation] {
+  color: #fff;
+  background: #544bd1;
+  border-color: #544bd1;
+}
+.annotation-data :is(button, select, input):focus-visible {
+  outline: 2px solid #514bff;
+  outline-offset: 1px;
+}
+.annotation-picker {
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr);
+  min-width: 0;
+  border: 1px solid #d9ddea;
+  border-radius: 7px;
+  background: #fff;
+}
+.annotation-directory,
+.annotation-selected {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.annotation-selected {
+  border-left: 1px solid #d9ddea;
+}
+.annotation-breadcrumb,
+.annotation-count {
+  padding: 7px 9px;
+  border-bottom: 1px solid #e4e7f0;
+  background: #f6f7fb;
+  color: #47546c;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.annotation-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px;
+  border-top-left-radius: 7px;
+}
+.annotation-breadcrumb button {
+  color: #4d449f;
+  padding: 2px 3px;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.annotation-count {
+  border-top-right-radius: 7px;
+  font-weight: 600;
+}
+.annotation-levels {
+  display: flex;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #bec4d6 transparent;
+}
+.annotation-levels .annotation-node-list {
+  flex: 0 0 min(100%, 10.5rem);
+  min-width: 0;
+}
+.annotation-levels .annotation-node-list:only-child {
+  flex-basis: 100%;
+}
+.annotation-levels .annotation-node-list + .annotation-node-list {
+  border-left: 1px solid #e1e4ef;
+}
+.annotation-node-list,
+.annotation-chips,
+.annotation-sort {
+  max-height: 16rem;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #bec4d6 transparent;
+  padding: 5px;
+}
+.annotation-node {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  min-height: 32px;
+  border-radius: 4px;
+  padding: 3px 5px;
+}
+.annotation-node:hover,
+.annotation-node:focus-within {
+  background: #f1f1fb;
+}
+.annotation-node.active,
+.annotation-node[aria-current=true] {
+  background: #eeedff;
+  color: #4436a9;
+}
+.annotation-node input[type=checkbox] {
+  flex: none;
+  margin: 0;
+  width: 15px;
+  height: 15px;
+  accent-color: #5c52d7;
+}
+.annotation-node-name {
+  flex: 1;
+  min-width: 0;
+  padding: 2px;
+  text-align: left;
+  overflow-wrap: anywhere;
+  color: inherit;
+  font: inherit;
+}
+.annotation-node button.annotation-node-name {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+.annotation-node-name > span[aria-hidden] {
+  color: #6a718a;
+  font-size: 17px;
+}
+.annotation-leaf {
+  width: 100%;
+  padding: 0;
+  text-align: left;
+  overflow-wrap: anywhere;
+  font: inherit;
+}
+.annotation-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  align-items: flex-start;
+  gap: 5px;
+  padding: 8px;
+}
+.annotation-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  padding: 2px 3px 2px 6px;
+  border: 1px solid #d3cff7;
+  border-radius: 4px;
+  background: #f6f4ff;
+  color: #5142a6;
+  font-size: 12px;
+}
+.annotation-chip > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.annotation-chip button {
+  flex: none;
+  min-width: 21px;
+  min-height: 23px;
+  padding: 0 3px;
+  border-radius: 3px;
+  color: #5142a6;
+  font: inherit;
+}
+.annotation-chip button:hover {
+  background: #e6e1fc;
+}
+.annotation-expand {
+  margin: auto 7px 7px;
+  align-self: flex-start;
+}
+.annotation-sort-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 0;
+  padding-inline-start: min(calc(var(--depth, 0) * 14px), 25%);
+  border-bottom: 1px solid #e7eaf2;
+}
+.annotation-sort-row [data-sort-open] {
+  min-width: 30px;
+  color: #5142a6;
+  padding: 3px 5px;
+}
+.annotation-sort-row > span {
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+.annotation-sort-row > span[aria-hidden] {
+  flex: 0 0 30px;
+  text-align: center;
+}
+.annotation-sort-row button:disabled {
+  color: #707889;
+  background: #f5f6fa;
+}
+.option-manual {
+  border-top: 1px solid #e3e6ef;
+  padding-top: 9px;
+  margin: 12px 0;
+  min-width: 0;
+}
+.annotation-drawer.drawer {
+  width: min(850px, 100vw);
+  max-width: 100vw;
+}
+.annotation-drawer .annotation-data {
+  font-size: 14px;
+}
+.annotation-drawer :is(.annotation-node-list, .annotation-chips, .annotation-sort) {
+  max-height: min(55dvh, 34rem);
+}
+@container template-workspace (max-width: 880px) {
+  .template-builder {
+    grid-template-columns: 90px minmax(0, 1fr) 315px;
+  }
+  .template-builder .node-canvas {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@container template-workspace (max-width: 640px) {
+  .template-builder {
+    grid-template-columns: minmax(78px, 22%) minmax(0, 1fr);
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+  .template-builder .builder-canvas,
+  .template-builder .builder-tools {
+    max-height: 50dvh;
+  }
+  .template-builder .builder-properties {
+    grid-column: 1 / -1;
+    border-left: 0;
+    border-top: 1px solid #d9ddea;
+  }
+}
+@container annotation-editor (max-width: 260px) {
+  .annotation-picker {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .annotation-selected {
+    border-left: 0;
+    border-top: 1px solid #d9ddea;
+  }
+  .annotation-chips,
+  .annotation-node-list {
+    max-height: 10rem;
+  }
+}
+.review-sub-options[hidden]{display:none}
 </style>
 <style>
 .ops-page{background:#fff;min-height:calc(100vh - 115px);padding:14px 22px;color:#202536;font:14px/1.55 system-ui,-apple-system,"PingFang SC",sans-serif}
@@ -3982,6 +4394,11 @@ span.v6-new,
 .r29-biz .r25-question-options input:checked+span,.r29-biz .r25-general-options input:checked+span{background:#eee9fd;border-color:#9a84eb;color:#6b52bb}
 .r29-biz .r25-question-options input:disabled:not(:checked)+span{color:#b9b7c1;background:#f0eff5}
 .r29-biz .r25-sub-options{display:flex;gap:8px;flex-wrap:wrap;padding:12px;margin-top:12px;border-radius:3px;background:#f8f8fc;font-size:12px}
+.r29-biz .r25-sub-options[hidden]{display:none}
+.option-tag .tree-choice-caption{display:inline-flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left}
+.option-tag .tree-choice-caption small{font-weight:400;font-size:.75rem;line-height:1.3;color:#57596d}
+.r25-recorded-labels{margin-top:10px;padding:10px 12px;border-left:3px solid #c5b9ee;background:#f6f4fb;color:#4e475e}
+.r25-recorded-labels ul{margin:5px 0 0;padding-left:1.2em}
 .r29-biz .r25-sub-options>span{width:100%;color:#9294a2;margin-bottom:0}
 .r29-biz .r25-sub-options label{position:relative;display:inline-flex;gap:0;cursor:pointer}
 .r29-biz .r25-sub-options input{position:absolute;opacity:0;width:1px;height:1px}
@@ -8236,7 +8653,7 @@ function renderConditions() {
       ? `<div class="condition-scroll"><div class="condition-grid condition-headers"><span>特征</span><span>逻辑关系</span><span>逻辑值</span><span>失败处理策略</span><span>操作</span></div><div class="condition-list"><span class="join-label">${"AND" === draft.join ? "且" : "或"}</span>${draft.conditions
           .map((t, a) => {
             const n = findFeature(t.featureId);
-            return `<div class="condition-grid condition-row" data-condition="${t.id}"><div class="feature-name"><span class="row-number">全${a + 1}</span><div class="feature-select-cell"><select class="small-select feature-select" data-select-feature="${t.id}" aria-label="全${a + 1} 选择特征" title="${esc(n?.name || "请选择特征")}" ${e ? "disabled" : ""}><option value="">请选择特征</option>${features.map((e) => `<option value="${esc(e.id)}" ${e.id === t.featureId ? "selected" : ""}>${esc(e.name)}</option>`).join("")}</select>${n ? `<span class="meta-key">${esc(n.field)}</span>` : ""}</div></div><select class="small-select" aria-label="全${a + 1} 逻辑关系" data-relation="${t.id}" ${e || !n ? "disabled" : ""}>${n ? options(n.relations, t.relation) : "<option>请选择</option>"}</select>${n ? (isNullRelation(t.relation) ? '<span class="muted" style="font-size:12px">无需配置值</span>' : "下拉选值" === n.valueMode ? `<div class="value-box" role="combobox" tabindex="${e ? "-1" : "0"}" aria-label="全${a + 1} 选择逻辑值" aria-expanded="false" aria-haspopup="listbox" data-pick-values="${t.id}">${t.values.map((a) => `<span class="chip">${esc(n.enums.find((e) => e.value === a)?.label || a)}${e ? "" : `<button aria-label="移除 ${esc(n.enums.find((e) => e.value === a)?.label || a)}" data-remove-value="${t.id}" data-value="${esc(a)}">×</button>`}</span>`).join("") || '<span class="muted">请选择</span>'}<span class="value-add">⌄</span></div>` : `<input class="condition-input" aria-label="全${a + 1} 逻辑值" data-input-values="${t.id}" value="${esc(t.values.join(","))}" placeholder="${"介于" === t.relation ? "起始时间,结束时间" : "请输入"}" ${e ? "disabled" : ""}>`) : '<input class="condition-input" disabled placeholder="请先选择特征">'}<select class="small-select" aria-label="全${a + 1} 失败处理策略" data-failure="${t.id}" ${e || !n ? "disabled" : ""}>${options(["维持机审", "通过", "不通过"], t.failure)}</select><div class="row-actions">${e ? "" : `<button data-copy-condition="${t.id}" title="复制条件" aria-label="复制全${a + 1}">⧉</button><button class="remove" data-delete-condition="${t.id}" title="删除条件" aria-label="删除全${a + 1}">×</button>`}</div></div>`;
+            return `<div class="condition-grid condition-row" data-condition="${t.id}"><div class="feature-name"><span class="row-number">全${a + 1}</span><div class="feature-select-cell"><select class="small-select feature-select" data-select-feature="${t.id}" aria-label="全${a + 1} 选择特征" title="${esc(n?.name || "请选择特征")}" ${e ? "disabled" : ""}><option value="">请选择特征</option>${features.map((e) => `<option value="${esc(e.id)}" ${e.id === t.featureId ? "selected" : ""}>${esc(e.name)}</option>`).join("")}</select>${n ? `<span class="meta-key">${esc(n.field)}</span>` : ""}</div></div><select class="small-select" aria-label="全${a + 1} 逻辑关系" data-relation="${t.id}" ${e || !n ? "disabled" : ""}>${n ? options(n.relations, t.relation) : "<option>请选择</option>"}</select>${n ? (isNullRelation(t.relation) ? '<span class="muted" style="font-size:12px">无需配置值</span>' : "下拉选值" === n.valueMode ? `<div class="value-box" role="combobox" tabindex="${e ? "-1" : "0"}" aria-label="全${a + 1} 选择逻辑值" aria-expanded="false" aria-haspopup="dialog" data-pick-values="${t.id}">${t.values.map((a) => `<span class="chip">${esc(n.enums.find((e) => e.value === a)?.label || a)}${e ? "" : `<button aria-label="移除 ${esc(n.enums.find((e) => e.value === a)?.label || a)}" data-remove-value="${t.id}" data-value="${esc(a)}">×</button>`}</span>`).join("") || '<span class="muted">请选择</span>'}<span class="value-add">⌄</span></div>` : `<input class="condition-input" aria-label="全${a + 1} 逻辑值" data-input-values="${t.id}" value="${esc(t.values.join(","))}" placeholder="${"介于" === t.relation ? "起始时间,结束时间" : "请输入"}" ${e ? "disabled" : ""}>`) : '<input class="condition-input" disabled placeholder="请先选择特征">'}<select class="small-select" aria-label="全${a + 1} 失败处理策略" data-failure="${t.id}" ${e || !n ? "disabled" : ""}>${options(["维持机审", "通过", "不通过"], t.failure)}</select><div class="row-actions">${e ? "" : `<button data-copy-condition="${t.id}" title="复制条件" aria-label="复制全${a + 1}">⧉</button><button class="remove" data-delete-condition="${t.id}" title="删除条件" aria-label="删除全${a + 1}">×</button>`}</div></div>`;
           })
           .join("")}</div></div>`
       : '<div class="empty-combo">暂无条件，点击下方「添加条件」开始配置。</div>'),
@@ -8339,77 +8756,129 @@ function closeInline() {
       .querySelectorAll("[data-pick-values]")
       .forEach((e) => e.setAttribute("aria-expanded", "false")));
 }
-function valuePicker(e) {
-  if ($("#inline-values")?.dataset.condition === e.id)
-    return void closeInline();
+// Resolve enum labels against the same BIZ taxonomy shown in 标签树. Only the
+// original enum value is saved in an operator condition.
+function operatorValueChoices(feature) {
+  const roots = {
+    F02: "标题", F03: "图片", F04: "图片", "local-video-quality": "视频",
+    "MOCK-R19-RULE-TITLE_QUALITY": "标题", "MOCK-R19-RULE-COVER_QUALITY": "图片", "MOCK-R19-RULE-BODY_QUALITY": "图片",
+    "封面图质量标签": "图片", "正文图质量标签": "图片", "标题质量标签": "标题", "视频质量标签": "视频",
+  };
+  const rootName = roots[feature.id] || roots[feature.name];
+  const categories = new Map();
+  if (rootName) {
+    const tree = reviewTaxonomy.trees().find(tree => tree.code === "quality_tag_tree" || tree.id === "57");
+    const nodes = tree?.nodes || [];
+    const root = nodes.find(node => !node.parentId && node.name === rootName);
+    if (root) {
+      const parents = new Map(nodes.filter(node => node.parentId === root.id).map(node => [node.id, node.name]));
+      for (const node of nodes) {
+        if (!parents.has(node.parentId)) continue;
+        const key = node.name.toLowerCase(), parent = parents.get(node.parentId);
+        categories.set(key, categories.has(key) && categories.get(key) !== parent ? "" : parent);
+      }
+    }
+  }
+  const aliases = {"封面牛皮癣": "封面图牛皮癣", "封面违禁词": "封面图违禁词", "正文违禁词": "图片违禁词"};
+  return (feature.enums || []).map(option => ({
+    value: String(option.value),
+    label: String(option.label),
+    category: option.group || categories.get(String(option.label).toLowerCase()) || categories.get(aliases[option.label]) || "",
+  }));
+}
+
+function valuePicker(condition, feature = findFeature(condition.featureId), refresh = renderConditions, multiple = true) {
+  if ($("#inline-values")?.dataset.condition === condition.id) return closeInline();
   closeInline();
-  const t = findFeature(e.featureId),
-    a = document.createElement("div");
-  function n() {
-    const t = $(`[data-pick-values="${e.id}"]`);
-    if (!t) return void closeInline();
-    t.setAttribute("aria-expanded", "true");
-    const n = t.getBoundingClientRect(),
-      i = Math.min(Math.max(n.width, 280), innerWidth - 24);
-    ((a.style.width = i + "px"),
-      (a.style.left =
-        Math.max(12, Math.min(n.left, innerWidth - i - 12)) + "px"));
-    const s = Math.min(340, innerHeight - 30);
-    ((a.style.maxHeight = s + "px"),
-      (a.style.top =
-        (innerHeight - n.bottom > Math.min(s, 220)
-          ? n.bottom + 5
-          : Math.max(12, n.top - Math.min(a.offsetHeight || s, s) - 5)) +
-        "px"));
+  if (!feature) return;
+  const choices = operatorValueChoices(feature);
+  const grouped = choices.some(item => item.category);
+  const groupOf = item => item.category || "未分组";
+  const selected = () => new Set(condition.values.map(String));
+  const initialSelection = selected();
+  let active = groupOf(choices.find(item => initialSelection.has(item.value)) || choices[0] || {});
+  const panel = document.createElement("div");
+  panel.id = "inline-values";
+  panel.className = "inline-values";
+  panel.dataset.condition = condition.id;
+  panel.setAttribute("role", "dialog");
+  panel.setAttribute("aria-label", feature.name + "逻辑值");
+  const searchHint = grouped ? "搜索分类、标签或逻辑值" : "搜索逻辑值";
+  const optionList = '<div id="inline-options" role="group" aria-label="逻辑值选项"></div>';
+  panel.innerHTML = '<input id="inline-value-search" aria-label="'+searchHint+'" placeholder="'+searchHint+'">'+
+    '<div class="inline-tools">'+(grouped && multiple ? '<button type="button" id="inline-group-all">全选本类</button>' : '')+
+    (multiple ? '<button type="button" id="inline-all">全选匹配项</button>' : '')+
+    '<button type="button" id="inline-clear">清空已选</button><span id="inline-count" aria-live="polite"></span></div>'+
+    (grouped ? '<div class="inline-value-columns"><div class="inline-value-column"><h4 class="inline-value-heading">一级分类</h4><div class="inline-value-groups" role="group" aria-label="一级分类"></div></div>'+
+      '<div class="inline-value-column"><h4 class="inline-value-heading">二级标签</h4>'+optionList+'</div></div>' : optionList);
+  document.body.append(panel);
+  const search = panel.querySelector("#inline-value-search"), list = panel.querySelector("#inline-options");
+  const groups = panel.querySelector(".inline-value-groups");
+  const anchor = () => document.querySelector('[data-pick-values="'+CSS.escape(condition.id)+'"]');
+  function position() {
+    const trigger = anchor();
+    if (!trigger) return closeInline();
+    trigger.setAttribute("aria-expanded", "true");
+    const rect = trigger.getBoundingClientRect();
+    const width = Math.min(Math.max(rect.width, grouped ? 440 : 280), innerWidth - 24);
+    const above = rect.top - 17, below = innerHeight - rect.bottom - 17;
+    const openBelow = below >= Math.min(370, above);
+    panel.style.width = width + "px";
+    panel.style.left = Math.max(12, Math.min(rect.left, innerWidth - width - 12)) + "px";
+    panel.style.maxHeight = Math.max(150, Math.min(370, openBelow ? below : above, innerHeight - 24)) + "px";
+    const height = panel.offsetHeight;
+    panel.style.top = Math.max(12, Math.min(innerHeight - height - 12, openBelow ? rect.bottom + 5 : rect.top - height - 5)) + "px";
   }
-  function i() {
-    const e = $("#inline-value-search").value.toLowerCase();
-    return t.enums.filter((t) =>
-      (t.label + " " + t.value).toLowerCase().includes(e),
-    );
+  const matches = () => {
+    const query = search.value.trim().toLowerCase();
+    return choices.filter(item => [item.label, item.value, groupOf(item)].some(text => text.toLowerCase().includes(query)));
+  };
+  function draw() {
+    const found = matches(), chosen = selected(), counts = new Map();
+    for (const item of found) {
+      const category = groupOf(item);
+      const count = counts.get(category) || {total: 0, selected: 0};
+      count.total++; if (chosen.has(item.value)) count.selected++;
+      counts.set(category, count);
+    }
+    if (!counts.has(active)) active = counts.keys().next().value;
+    if (groups) groups.innerHTML = [...counts].map(([category,count]) =>
+      '<button type="button" data-value-group="'+esc(category)+'" aria-pressed="'+(active===category)+'"><span>'+esc(category)+'</span><small>'+count.selected+' / '+count.total+'</small></button>').join("");
+    const visible = grouped ? found.filter(item => groupOf(item) === active) : found;
+    list.innerHTML = visible.map(item => '<label class="inline-option"><input type="'+(multiple?'checkbox':'radio')+'" name="inline-logic-value" value="'+esc(item.value)+'" '+(chosen.has(item.value) ? "checked" : "")+'><span>'+esc(item.label)+'</span><small>'+esc(item.value)+'</small></label>').join("") ||
+      '<div class="inline-empty">没有匹配项</div>';
+    panel.querySelector("#inline-count").textContent = "已选 " + chosen.size + " 项";
+    if (panel.querySelector("#inline-all")) panel.querySelector("#inline-all").disabled = !found.length;
+    if (panel.querySelector("#inline-group-all")) panel.querySelector("#inline-group-all").disabled = !visible.length;
+    position();
   }
-  function s() {
-    const t = i();
-    (($("#inline-options").innerHTML =
-      t
-        .map(
-          (t) =>
-            `<label class="inline-option"><input type="checkbox" value="${esc(t.value)}" ${e.values.includes(t.value) ? "checked" : ""}><span>${esc(t.label)}</span><small>${esc(t.value)}</small></label>`,
-        )
-        .join("") || '<div class="inline-empty">没有匹配项</div>'),
-      ($("#inline-count").textContent = "已选 " + e.values.length + " 项"),
-      document.querySelectorAll("#inline-options input").forEach(
-        (t) =>
-          (t.onchange = () => {
-            ((e.values = t.checked
-              ? [...new Set([...e.values, t.value])]
-              : e.values.filter((e) => e !== t.value)),
-              renderConditions(),
-              ($("#inline-count").textContent =
-                "已选 " + e.values.length + " 项"),
-              n());
-          }),
-      ),
-      n());
+  function change(values) {
+    condition.values = [...values];
+    refresh();
+    draw();
   }
-  ((a.id = "inline-values"),
-    (a.className = "inline-values"),
-    (a.dataset.condition = e.id),
-    (a.innerHTML =
-      '<input id="inline-value-search" placeholder="搜索逻辑值" aria-label="搜索逻辑值"><div class="inline-tools"><button id="inline-all">全选匹配项</button><button id="inline-clear">清空</button><span id="inline-count"></span></div><div id="inline-options" role="listbox" aria-label="逻辑值选项" aria-multiselectable="true"></div>'),
-    document.body.append(a),
-    (a.reposition = n),
-    ($("#inline-value-search").oninput = s),
-    ($("#inline-all").onclick = () => {
-      ((e.values = [...new Set([...e.values, ...i().map((e) => e.value)])]),
-        renderConditions(),
-        s());
-    }),
-    ($("#inline-clear").onclick = () => {
-      ((e.values = []), renderConditions(), s());
-    }),
-    s(),
-    $("#inline-value-search").focus());
+  function add(items) { change(new Set([...selected(), ...items.map(item => item.value)])); }
+  groups?.addEventListener("click", event => {
+    const button = event.target.closest("[data-value-group]");
+    if (!button) return;
+    active = button.dataset.valueGroup;
+    draw();
+    list.scrollTop = 0;
+    groups.querySelector('[aria-pressed="true"]')?.focus({preventScroll:true});
+  });
+  list.onchange = event => {
+    const input = event.target, chosen = multiple ? selected() : new Set();
+    if (input.checked) chosen.add(input.value); else chosen.delete(input.value);
+    change(chosen);
+    Array.from(list.querySelectorAll("input")).find(option => option.value === input.value)?.focus({preventScroll:true});
+  };
+  panel.querySelector("#inline-group-all")?.addEventListener("click", () => add(matches().filter(item => groupOf(item) === active)));
+  panel.querySelector("#inline-all")?.addEventListener("click", () => add(matches()));
+  panel.querySelector("#inline-clear").onclick = () => change([]);
+  search.oninput = () => { draw(); list.scrollTop = 0; };
+  panel.reposition = position;
+  draw();
+  search.focus();
 }
 function featurePicker(e = !1) {
   const t = new Set();
@@ -10375,7 +10844,12 @@ function vwCaseWork(task,row,editable,refresh){
     ...(!editable&&index>=0&&index<related.length-1?{onNext:()=>browse(index+1)}:{}),
     onSubmit:payload=>{
       const at=new Date().toLocaleString('sv-SE');
-      for(const q of nodeQuestions(task,'标注')||[]){if(String(row.workAnswers?.[q.id]||'')!==String(payload.answers[q.id]||''))(row.adjustments||=[]).push({stage:'标注修改',question:q.name,result:payload.answers[q.id]||'',actor:'本地演练',at});}
+      for(const q of nodeQuestions(task,'标注')||[]){
+        const result=payload.answers[q.id]||'',answerDetails=payload.answerDetails[q.id];
+        if(r25ResultText(row.workAnswers?.[q.id],row.r25AnswerDetails?.[q.id])!==r25ResultText(result,answerDetails)){
+          (row.adjustments||=[]).push({stage:'标注修改',question:q.name,result,answerDetails,actor:'本地演练',at});
+        }
+      }
       row.workAnswers={...(row.workAnswers||{}),...payload.answers};row.r25AnswerDetails={...(row.r25AnswerDetails||{}),...payload.answerDetails};writeLocal(TASK_KEY,tasks);close();refresh?.();toast('当前任务题目已修改');
     }});
 }
@@ -11228,8 +11702,62 @@ function r25BindRecordCards(root,state,rerender){
     card.querySelectorAll('[data-r25-medium]').forEach(button=>button.classList.toggle('active',button===b));
   });
 }
-function r25QuestionOptions(q){return (Array.isArray(q.options)?q.options:String(q.options||'').split(/[,，\n]/)).map(o=>typeof o==='object'?String(o.label||o.name||o.value||''):String(o)).filter(Boolean);}
+function questionManualOptions(q){return (Array.isArray(q.options)?q.options:String(q.options||'').split(/[,，\n]/)).map(o=>typeof o==='object'?String(o.label||o.name||o.value||''):String(o)).filter(Boolean);}
+function r25QuestionOptions(q){
+  const tree=questionTreeSelection(q);
+  return tree?tree.entries.map(treeChoicePath):questionManualOptions(q);
+}
 function r25AnswerDisplay(value){if(Array.isArray(value))return value.join('、');return value==null?'':String(value);}
+function r25ResultText(answer,detail){
+  const instances=detail?.instances||[];
+  if(!instances.some(item=>item.sub?.length))return answer||'';
+  return instances.filter(item=>item.answer).map(item=>{
+    const reasons=item.subSelections?.map(option=>option.parent+' / '+option.name)||item.sub||[];
+    return (item.label?item.label+'：':'')+item.answer+(reasons.length?'（'+reasons.join('、')+'）':'');
+  }).join('；');
+}
+function r25SelectedChild(saved,branch,child,q){
+  if(saved.subSelections)return saved.subSelections.some(selection=>{
+    if(child.nodeId!=null&&selection.nodeId!=null)return selection.parent===branch.parent&&selection.treeId===child.treeId&&selection.nodeId===child.nodeId;
+    return selection.parent===branch.parent&&selection.name===child.name;
+  });
+  return branch.parent===q.subOptions?.trigger&&(saved.sub||[]).includes(child.name);
+}
+function r25SavedTreeChoices(selection,saved,current,question){
+  if(saved.treeSelections)return saved.treeSelections.filter(entry=>entry.treeId===selection.treeId).map(entry=>entry.nodeId);
+  const ids=new Set(),tokens=current.split('、').filter(Boolean);
+  for(const token of tokens){
+    const byPath=selection.entries.filter(entry=>treeChoicePath(entry)===token);
+    const matches=byPath.length?byPath:selection.entries.filter(entry=>entry.name===token);
+    if(matches.length===1)ids.add(matches[0].nodeId);
+  }
+  for(const child of saved.subSelections||(saved.sub||[]).map(name=>({name,parent:question.subOptions?.trigger}))){
+    const matches=child.nodeId!=null?selection.entries.filter(entry=>entry.treeId===String(child.treeId)&&entry.nodeId===String(child.nodeId)):
+      selection.entries.filter(entry=>entry.name===child.name&&entry.ancestorNames.includes(child.parent));
+    if(matches.length===1)ids.add(matches[0].nodeId);
+  }
+  return [...ids];
+}
+function r25HistoricalLabels(tree,saved,current,question){
+  if(!['单选','多选'].includes(question.type))return '';
+  let missing=[];
+  if(saved.treeSelections){
+    missing=saved.treeSelections.filter(entry=>!tree?.entries.some(active=>
+      active.treeId===entry.treeId&&active.nodeId===entry.nodeId&&treeChoicePath(active)===treeChoicePath(entry)
+    )).map(treeChoicePath);
+  }else if(current){
+    const options=tree?tree.entries.map(treeChoicePath):questionManualOptions(question);
+    missing=current.split('、').filter(value=>!options.includes(value)&&(!tree||tree.entries.filter(entry=>entry.name===value).length!==1));
+    const branches=tree?[]:questionOptionBranches(question);
+    for(const child of saved.subSelections||(saved.sub||[]).map(name=>({parent:question.subOptions?.trigger,name}))){
+      const shown=tree?r25SavedTreeChoices(tree,{subSelections:[child]},'',question).length:
+        branches.some(branch=>branch.parent===child.parent&&branch.children.some(option=>option.name===child.name));
+      if(!shown)missing.push([child.parent,child.name].filter(Boolean).join(' / '));
+    }
+  }
+  if(!missing.length)return '';
+  return '<div class="r25-recorded-labels"><strong>提交时的标签</strong><ul>'+missing.map(path=>'<li>'+esc(path)+'</li>').join('')+'</ul></div>';
+}
 function r29Value(fields,names,fallback='—'){
   const value=names.map(k=>fields[k]).find(v=>v!==undefined&&v!==null&&v!=='');
   return value===undefined?fallback:Array.isArray(value)?value.join('、'):typeof value==='object'?JSON.stringify(value):String(value);
@@ -11276,25 +11804,34 @@ function r25OpenRecord(task,row,opts={}){
   const questions=opts.questions||nodeQuestions(task,quality?'质检':'标注')||[],media=viewRecordMedia(row),fields=r16RecordFields(row),pair=opts.pair;
   const prior=processing?{}:(row.workAnswers||{}),details=processing?{}:(row.r25AnswerDetails||{});
   const required=q=>!!q.required;
-  const repeatLabels=q=>q.repeatLabels?.length?(q.name==='图片'&&media.gallery.length?q.repeatLabels.slice(0,media.gallery.length):q.repeatLabels):[''];
+  const repeatsImages=q=>q.repeatLabels?.length&&(q.name==='图片'||q.repeatLabels[0]==='封面图');
+  const repeatLabels=q=>q.repeatLabels?.length?(repeatsImages(q)&&media.gallery.length?q.repeatLabels.slice(0,media.gallery.length):q.repeatLabels):[''];
   const questionHTML=questions.map((q,i)=>{
-    const values=r25QuestionOptions(q),stored=r25AnswerDisplay(prior[q.id]??(row.hidePriorAnswers?'':row.history?.findLast(h=>h.question===q.name)?.result||''));
-    const disabled=editable?'':'disabled',kind=/多选/.test(q.type)?'checkbox':'radio',labels=repeatLabels(q);
+    const tree=questionTreeSelection(q),values=r25QuestionOptions(q),stored=r25AnswerDisplay(prior[q.id]??(row.hidePriorAnswers?'':row.history?.findLast(h=>h.question===q.name)?.result||''));
+    const disabled=editable?'':'disabled',kind=/多选/.test(q.type)?'checkbox':'radio',labels=repeatLabels(q),branches=questionOptionBranches(q);
     const panes=labels.map((label,n)=>{
-      const saved=details[q.id]?.instances?.[n]||{},current=processing?'':saved.answer??(n===0?stored:''),savedSub=saved.sub||details[q.id]?.sub||[],reason=saved.reason??details[q.id]?.reason??'';
+      const saved=details[q.id]?.instances?.[n]||(n===0?details[q.id]:null)||{},current=r25AnswerDisplay(saved.answer??(n===0?stored:'')),reason=saved.reason??'';
       const key=i+'-'+n;
-      const choices=values.length?'<div class="r25-question-options">'+values.map(v=>'<label><input '+disabled+' type="'+kind+'" name="r25-q-'+key+'" value="'+esc(v)+'" '+((kind==='checkbox'?current.split('、').includes(v):v===current)?'checked':'')+'><span>'+esc(v)+'</span></label>').join('')+'</div>':'<'+(/文本/.test(q.type)?'textarea':'input')+' name="r25-q-'+key+'" aria-label="'+esc(q.name+' '+label)+'" '+(editable?'':'readonly')+(/文本/.test(q.type)?'>'+esc(current)+'</textarea>':' type="'+(/数字|数值/.test(q.type)?'number':'text')+'" value="'+esc(current)+'">');
+      const selectedParents=kind==='checkbox'?current.split('、'):[current];
+      const branchHTML=branches.map((branch,index)=>{
+        const active=selectedParents.includes(branch.parent);
+        return '<div class="r25-sub-options" role="group" aria-label="'+esc(branch.parent)+'的二级标签" data-r25-parent="'+esc(branch.parent)+'" '+(active?'':'hidden')+'><span>'+esc(branch.parent)+' · 二级标签</span>'+branch.children.map((child,childIndex)=>
+          '<label><input '+(editable&&active?'':'disabled')+' type="checkbox" name="r25-sub-'+key+'-'+index+'" value="'+childIndex+'" '+(active&&r25SelectedChild(saved,branch,child,q)?'checked':'')+'><span>'+esc(child.name)+'</span></label>'
+        ).join('')+'</div>';
+      }).join('');
+      const choices=tree?'<div class="r25-question-options">'+treeChoiceHTML(tree,{name:'r25-q-'+key,type:kind,disabled:!editable,checkedIds:r25SavedTreeChoices(tree,saved,current,q)})+'</div>':
+        values.length?'<div class="r25-question-options">'+values.map(v=>'<label><input '+disabled+' type="'+kind+'" name="r25-q-'+key+'" value="'+esc(v)+'" '+((kind==='checkbox'?current.split('、').includes(v):v===current)?'checked':'')+'><span>'+esc(v)+'</span></label>').join('')+'</div>':'<'+(/文本/.test(q.type)?'textarea':'input')+' name="r25-q-'+key+'" aria-label="'+esc(q.name+' '+label)+'" '+(editable?'':'readonly')+(/文本/.test(q.type)?'>'+esc(current)+'</textarea>':' type="'+(/数字|数值/.test(q.type)?'number':'text')+'" value="'+esc(current)+'">');
       return '<div data-r25-question-pane="'+n+'" '+(n?'hidden':'')+'>'+choices+
-        (q.subOptions?'<div class="r25-sub-options"><span>'+esc(q.subOptions.title||'审核理由')+'</span>'+q.subOptions.options.map(v=>'<label><input '+disabled+' type="checkbox" name="r25-sub-'+key+'" value="'+esc(v)+'" '+(savedSub.includes(v)?'checked':'')+'><span>'+esc(v)+'</span></label>').join('')+'</div>':'')+
+        branchHTML+(editable?'':r25HistoricalLabels(tree,saved,current,q))+
         (q.customReason?'<label class="r25-custom-reason"><span>自定义原因：</span><textarea name="r25-custom-'+key+'" '+(editable?'':'readonly')+' placeholder="补充审核理由">'+esc(reason)+'</textarea></label>':'')+'</div>';
     }).join('');
-    return '<section class="r25-question" data-r25-question="'+esc(q.id)+'"><h3>'+esc(q.name)+(required(q)?'<b class="required">*</b>':'')+'</h3>'+
+    return '<section class="r25-question" data-r25-question="'+esc(q.id)+'" '+(repeatsImages(q)?'data-r25-images':'')+'><h3>'+esc(q.name)+(required(q)?'<b class="required">*</b>':'')+'</h3>'+
       (labels[0]?'<nav class="r25-repeat-tabs">'+labels.map((label,n)=>'<button type="button" data-r25-question-tab="'+n+'" class="'+(n===0?'active':'')+'">'+esc(label)+'</button>').join('')+'</nav>':'')+panes+'</section>';
   }).join('');
   const caseOptions=v5CaseOptions(task),preferential=caseOptions.includes('S'),result=processing?'':v5PublishedCaseResult(row);
   const general=processing&&human?'<section class="r25-general r29-footer-result"><h3>'+(preferential?'通用评级':'通用结果')+'<b class="required">*</b></h3><div class="r25-general-options">'+caseOptions.map(v=>'<label><input type="radio" form="r25-review-form" name="r25-case-result" value="'+v+'"><span>'+v+'</span></label>').join('')+'</div></section>':'';
   const history=(row.history||[]).filter(h=>!pair||!['标注','人审'].includes(h.stage));
-  const logHTML='<ol class="r25-review-log">'+[...history,...(processing?[]:(row.adjustments||[]))].map(h=>'<li><time>'+esc(h.at||'')+'</time><strong>'+esc(h.stage||'')+' · '+esc(h.actor||'系统')+'</strong><p>'+esc([h.caseResult,h.question,h.result].filter(Boolean).join(' · '))+'</p></li>').join('')+'</ol>';
+  const logHTML='<ol class="r25-review-log">'+[...history,...(processing?[]:(row.adjustments||[]))].map(h=>'<li><time>'+esc(h.at||'')+'</time><strong>'+esc(h.stage||'')+' · '+esc(h.actor||'系统')+'</strong><p>'+esc([h.caseResult,h.question,r25ResultText(h.result,h.answerDetails)].filter(Boolean).join(' · '))+'</p></li>').join('')+'</ol>';
   const video=!!media.video&&row.contentType!=='图文',readonlyResult=opts.poolOnly?'未进入任务':result||'未生效';
   const body='<header class="r25-review-top"><div><span class="r25-review-mode">'+(preferential?'择优':'审核')+'</span><strong>'+esc(task.name)+'</strong><small>'+esc(task.id)+' · '+esc(opts.poolOnly?'未进入任务':row.stage||'未进入任务')+'</small>'+(!editable?'<span class="r29-header-result">'+esc(readonlyResult)+'</span>':'')+'</div><div><button class="action" data-r25-panel="questions">'+(editable?'审核题目':'审核结果')+'</button><button class="action" data-r25-panel="history">操作记录</button><button class="btn secondary" data-close>退出</button></div></header>'+
     (opts.relatedEntries?.length>1?'<div class="r26-related-task"><label for="r26-related-task">查看任务结果</label><select id="r26-related-task">'+opts.relatedEntries.map((e,i)=>'<option value="'+i+'" '+((opts.selectedEntry?opts.selectedEntry===e:String(e.task.id)===String(task.id)&&String(e.row.id)===String(row.id))?'selected':'')+'>'+esc(e.task.name)+' · '+esc(r16FinalResult(e.row)||e.row.status||'待处理')+'</option>').join('')+'</select><small>各任务结果分别保留</small></div>':'')+
@@ -11311,11 +11848,32 @@ function r25OpenRecord(task,row,opts={}){
   wideModal('审核详情',body,'','r25-immersive');
   const host=document.querySelector('.r25-immersive'),form=$('#r25-review-form');
   host.classList.add('r29-biz');
+  if(editable)form.addEventListener('change',event=>{
+    if(!event.target.closest('.r25-question-options'))return;
+    const pane=event.target.closest('[data-r25-question-pane]');
+    const selected=new Set([...pane.querySelectorAll('.r25-question-options input:checked')].map(input=>input.value));
+    pane.querySelectorAll('[data-r25-parent]').forEach(group=>{
+      group.hidden=!selected.has(group.dataset.r25Parent);
+      group.querySelectorAll('input').forEach(input=>{input.disabled=group.hidden;if(group.hidden)input.checked=false;});
+    });
+  });
   host.querySelectorAll('[data-r25-panel]').forEach(b=>b.onclick=()=>host.querySelectorAll('[data-r25-panel-body]').forEach(p=>p.hidden=p.dataset.r25PanelBody!==b.dataset.r25Panel));
-  host.querySelectorAll('[data-r25-picture]').forEach(b=>b.onclick=()=>{$('#r25-main-picture').src=media.gallery[Number(b.dataset.r25Picture)];host.querySelectorAll('[data-r25-picture]').forEach(x=>x.classList.toggle('active',x===b));});
+  function showInstance(section,index){
+    section.querySelectorAll('[data-r25-question-tab]').forEach(tab=>tab.classList.toggle('active',tab.dataset.r25QuestionTab===index));
+    section.querySelectorAll('[data-r25-question-pane]').forEach(pane=>pane.hidden=pane.dataset.r25QuestionPane!==index);
+  }
+  function showPicture(index){
+    if(!media.gallery[Number(index)])return;
+    const picture=host.querySelector('#r25-main-picture');if(picture)picture.src=media.gallery[Number(index)];
+    host.querySelectorAll('[data-r25-picture]').forEach(button=>button.classList.toggle('active',button.dataset.r25Picture===index));
+    host.querySelectorAll('[data-r25-images]').forEach(section=>{
+      if(section.querySelector('[data-r25-question-tab="'+index+'"]'))showInstance(section,index);
+    });
+  }
+  host.querySelectorAll('[data-r25-picture]').forEach(b=>b.onclick=()=>showPicture(b.dataset.r25Picture));
   host.querySelectorAll('[data-r25-question-tab]').forEach(b=>b.onclick=()=>{
-    const section=b.closest('[data-r25-question]');section.querySelectorAll('[data-r25-question-tab]').forEach(x=>x.classList.toggle('active',x===b));section.querySelectorAll('[data-r25-question-pane]').forEach(p=>p.hidden=p.dataset.r25QuestionPane!==b.dataset.r25QuestionTab);
-    if(section.querySelector('h3')?.textContent.includes('图片')&&media.gallery[Number(b.dataset.r25QuestionTab)]){const image=$('#r25-main-picture');if(image)image.src=media.gallery[Number(b.dataset.r25QuestionTab)];host.querySelectorAll('[data-r25-picture]').forEach(x=>x.classList.toggle('active',x.dataset.r25Picture===b.dataset.r25QuestionTab));}
+    const section=b.closest('[data-r25-question]'),index=b.dataset.r25QuestionTab;
+    showInstance(section,index);if(section.hasAttribute('data-r25-images'))showPicture(index);
   });
   const referenceButton=host.querySelector('#r29-reference-toggle');
   referenceButton.onclick=()=>{const content=host.querySelector('#r29-reference-body');content.hidden=!content.hidden;referenceButton.textContent=content.hidden?'展开⌄':'收起⌃';referenceButton.setAttribute('aria-expanded',String(!content.hidden));};
@@ -11342,12 +11900,22 @@ function r25OpenRecord(task,row,opts={}){
     if(pair&&!pair.pool.some(p=>String(p.id)===actor)){error.textContent='请选择本次独立标注的成员';return;}
     if(quality&&!fd.get('quality-result')){error.textContent='请选择质检结论';return;}
     for(const [i,q]of questions.entries()){
-      const instances=[];
+      const instances=[],tree=questionTreeSelection(q);
       for(const [n,label]of repeatLabels(q).entries()){
-        const key=i+'-'+n,chosen=fd.getAll('r25-q-'+key).map(v=>String(v).trim()).filter(Boolean),sub=fd.getAll('r25-sub-'+key).map(String),reason=String(fd.get('r25-custom-'+key)||'').trim();
-        if(required(q)&&!chosen.length){error.textContent='请完成「'+q.name+(label?' · '+label:'')+'」';return;}
-        if(sub.length&&q.subOptions?.trigger&&!chosen.includes(q.subOptions.trigger)){error.textContent='「'+q.name+'」选择详细理由前，请先选择「'+q.subOptions.trigger+'」';return;}
-        instances.push({label,answer:chosen.join('、'),sub,reason});
+        const key=i+'-'+n,chosen=fd.getAll('r25-q-'+key).map(v=>String(v).trim()).filter(Boolean),reason=String(fd.get('r25-custom-'+key)||'').trim();
+        const treeSelections=tree?.entries.filter(entry=>chosen.includes(entry.nodeId));
+        if(required(q)&&!(treeSelections||chosen).length){error.textContent='请完成「'+q.name+(label?' · '+label:'')+'」';return;}
+        if(tree){
+          instances.push({label,answer:treeSelections.map(treeChoicePath).join('、'),sub:[],reason,treeSelections});
+          continue;
+        }
+        const subSelections=questionOptionBranches(q).flatMap((branch,index)=>{
+          if(!chosen.includes(branch.parent))return [];
+          return fd.getAll('r25-sub-'+key+'-'+index).map(value=>({parent:branch.parent,...branch.children[Number(value)]}));
+        });
+        const instance={label,answer:chosen.join('、'),sub:subSelections.map(child=>child.name),reason};
+        if(subSelections.some(child=>child.nodeId!=null||child.parent!==q.subOptions?.trigger))instance.subSelections=subSelections;
+        instances.push(instance);
       }
       answers[q.id]=instances.length===1?instances[0].answer:instances.filter(v=>v.answer).map(v=>v.label+'：'+v.answer).join('；');
       answerDetails[q.id]=instances.length===1?{sub:instances[0].sub,reason:instances[0].reason,instances}:{sub:[],reason:'',instances};
@@ -11529,7 +12097,7 @@ function openTaskDetail(task, tab='数据列表') {
     const index=stages().indexOf(row.stage);if(index<0||row.status==='已完成')return;
     r25OpenRecord(task,row,{mode:'process',human,questions:active,pair,onSubmit:payload=>{
       const at=localDate(),completed=row.stage,actor=pair?pair.pool.find(p=>String(p.id)===payload.actor):null;
-      const summary=active.map(q=>q.name+'：'+(payload.answers[q.id]||'—')).join('；');
+      const summary=active.map(q=>q.name+'：'+(r25ResultText(payload.answers[q.id],payload.answerDetails[q.id])||'—')).join('；');
       const result=human?(summary||payload.caseResult):payload.result;
       if(pair){
         if(!actor||pair.votes.some(v=>String(v.actorId)===String(actor.id))){toast('请选择另一名可分配成员独立提交');return;}
@@ -11546,7 +12114,7 @@ function openTaskDetail(task, tab='数据列表') {
       }
       row.finished=[...new Set([...(row.finished||[]),completed])];
       if(!pair){
-        const entries=human&&active.length?active.map(q=>({stage:completed,result:payload.answers[q.id]||'',question:q.name,caseResult:payload.caseResult,actor:'本地演练',at})):[{stage:completed,result,...(human?{caseResult:payload.caseResult}:{}),actor:'本地演练',at}];
+        const entries=human&&active.length?active.map(q=>({stage:completed,result:payload.answers[q.id]||'',answerDetails:payload.answerDetails[q.id],question:q.name,caseResult:payload.caseResult,actor:'本地演练',at})):[{stage:completed,result,...(human?{caseResult:payload.caseResult}:{}),actor:'本地演练',at}];
         (row.history||=[]).push(...entries);
       }
       row.stage=stages()[index+1]||'完成';row.status=row.stage==='完成'?'已完成':'待'+row.stage;
@@ -12463,7 +13031,16 @@ function stageName(e) {
 function renderTaskFlow() {
   const e = ensureReviewStages(taskDraft.flow);
   (($("#task-step-content").innerHTML =
-    `<div class="task-row"><label>流程类型 <b>*</b></label><div class="task-controls">${radios("flow-type", ["通用流程", "定制流程"], e.type)}</div></div><div class="task-row"><label>选择节点 <b>*</b></label><div class="task-controls">${["免审", "机审", "标注", "质检"].map((t) => `<label><input type="checkbox" data-node="${t}" ${!taskDraft.id&&String(rev3MappedFlow(taskDraft)?.bizId)==="115543"&&t!=="机审"?"disabled":""} ${e.nodes.includes(t) ? "checked" : ""}>${stageName(t)}</label>`).join("")}</div></div><div class="task-tabs">${e.nodes.map((e) => `<button class="${nodeTab === e ? "active" : ""}" data-node-tab="${e}">${stageName(e)}</button>`).join("")}</div><div id="node-config"></div>`),
+    `<div class="task-row"><label>流程类型 <b>*</b></label><div class="task-controls">${radios("flow-type", ["通用流程", "定制流程"], e.type)}</div></div><div class="task-row"><label>选择节点 <b>*</b></label><div class="task-controls">${["免审", "机审", "标注", "质检"].map((t) => `<label><input type="checkbox" data-node="${t}" ${!taskDraft.id&&String(rev3MappedFlow(taskDraft)?.bizId)==="115543"&&t!=="机审"?"disabled":""} ${e.nodes.includes(t) ? "checked" : ""}>${stageName(t)}</label>`).join("")}</div></div><div class="task-tabs">${e.nodes.map((e) => `<button class="${nodeTab === e ? "active" : ""}" data-node-tab="${e}">${stageName(e)}</button>`).join("")}</div>${flowTemplateSource(nodeTab)}<div id="node-config"></div>`),
+    $("#open-flow-template") && ($("#open-flow-template").onclick = () => {
+      if (exemptionDraft) return toast("请先保存或取消当前免审任务");
+      const applied = effectiveTemplate(taskDraft, nodeTab);
+      templateNode = applied ? templateAssignments(taskDraft)[nodeTab] : "共用";
+      selectedBlock = null;
+      taskStep = 2;
+      renderTaskWizard();
+      if (!applied) $(".application-nodes").open = true;
+    }),
     document.querySelectorAll("[name=flow-type]").forEach(
       (t) =>
         (t.onchange = () => {
@@ -13171,8 +13748,9 @@ function auConfigureContent(rule,refresh) {
     const one=(c,idx)=>{
       const f=auRouteFeature(c.featureId),rels=f?.relations||["等于"],scope=f?.scope||"业务";
       const values=(c.values||[]).map(String);
-      const valueField=isNullRelation(c.relation)?'':f?.valueMode==="下拉选值"?
-        '<select aria-label="规则值" '+(f.component==="精准包含关系"?'multiple size="3"':'')+' data-edit="enum">'+(f.enums||[]).map(x=>'<option value="'+esc(x.value)+'" '+(values.includes(String(x.value))?'selected':'')+'>'+esc(x.label)+'</option>').join('')+'</select>':
+      const valueField=isNullRelation(c.relation)?'<span class="muted">无需配置值</span>':f?.valueMode==="下拉选值"?
+        '<button type="button" class="value-box" aria-label="选择规则值" aria-expanded="false" aria-haspopup="dialog" data-pick-values="'+esc(c.id)+'">'+
+          (values.map(value=>'<span class="chip">'+esc(f.enums.find(item=>String(item.value)===value)?.label||value)+'</span>').join('')||'<span class="muted">请选择</span>')+'<span class="value-add">⌄</span></button>':
         '<input aria-label="规则值" data-edit="value" placeholder="多个值用逗号分隔" value="'+esc(values.join(','))+'">';
       return '<div class="au-rule" data-cidx="'+idx+'"><label class="au-long au-v7-nested-pick">内容规则项<button type="button" data-au-rule-picker aria-label="选择内容规则项"><strong>'+esc(f?.name||c.featureId||'选择内容规则项')+'</strong><small>'+esc(scope)+' · '+esc(c.featureId||'')+'</small><span aria-hidden="true">⌄</span></button></label><label>关系<select data-edit="relation">'+options(rels,c.relation)+'</select></label><label>规则值'+valueField+'</label><button class="action" data-del>移除</button></div>';
     };
@@ -13219,8 +13797,11 @@ function auConfigureContent(rule,refresh) {
           }});
       };
       el.querySelector('[data-edit="relation"]').onchange=ev=>{c.relation=ev.target.value;renderDialog();};
-      const enumInput=el.querySelector('[data-edit="enum"]'),value=el.querySelector('[data-edit="value"]');
-      if(enumInput){if(!c.values.length)enumInput.selectedIndex=-1;enumInput.onchange=()=>c.values=Array.from(enumInput.selectedOptions,x=>x.value);}
+      const enumButton=el.querySelector('[data-pick-values]'),value=el.querySelector('[data-edit="value"]');
+      if(enumButton)enumButton.onclick=()=>{
+        const feature=auRouteFeature(c.featureId);
+        valuePicker(c,feature,renderDialog,feature.component==="精准包含关系");
+      };
       if(value)value.oninput=()=>c.values=value.value.split(/[,，]/).map(x=>x.trim()).filter(Boolean);
       el.querySelector('[data-del]').onclick=()=>{v.conditions.splice(idx,1);renderDialog();};
     });
@@ -13781,7 +14362,7 @@ function v5TargetRow(binding,task=taskDraft,node='机审'){
   const target=v5BindingTarget(binding);
   if(target===V5_CASE_TARGET)return '<span class="task-tag">通用结果</span><small class="v5-ref-meta">'+esc(v5CaseOptions(task).join(' / '))+'</small>';
   const question=nodeQuestions(task,node).find(q=>String(q.id)===target);
-  if(question?.type==='单选')return String(question.options||'').split(',').map(option=>'<span class="task-tag">'+esc(question.name)+'-'+esc(option)+'</span>').join('');
+  if(question?.type==='单选')return r25QuestionOptions(question).map(option=>'<span class="task-tag">'+esc(question.name)+'-'+esc(option)+'</span>').join('');
   return '<span class="task-tag">'+esc(question?.name||'题目已删除')+'</span>';
 }
 function v5ReferenceKind(binding) { return binding.referenceKind==='rule'?'rule':'operator'; }
@@ -14414,6 +14995,7 @@ const reviewTaxonomy = (() => {
     return '<label class="field"><span>关联标签树</span><select id="tx-question-tree" aria-label="关联标签树"><option value="">不使用标签树</option>'+store.trees.map(t=>'<option value="'+esc(t.id)+'" '+(question.labelTreeId===t.id?"selected":"")+'>'+esc(t.name)+'</option>').join("")+'</select></label>';
   }
   function questionTags(question,interactive) {
+    if(questionTreeSelection(question))return "";
     const t=store.trees.find(t=>t.id===question.labelTreeId);
     if(!t)return "";
     if(!interactive)return '<div class="tx-question-tags tx-muted">作业标签 · '+esc(t.name)+'</div>';
@@ -14436,6 +15018,349 @@ const reviewTaxonomy = (() => {
   return {treeSetting,questionTags,bindQuestions,open(name){filters={};pageNo=1;treeId="";if(name==="审核理由"){sourceFilter="";tab=0;reasonsPage();}else treesPage();},reasons:()=>structuredClone(store.reasons),trees:()=>structuredClone(store.trees)};
 })();
 window.reviewTaxonomy = reviewTaxonomy;
+
+function questionTreeSelection(question){
+  if(!['单选','多选'].includes(question.type)||question.optionMode!=='tree')return null;
+  return Array.isArray(question.treeSelection?.entries)?question.treeSelection:null;
+}
+
+function treeChoicePath(entry){
+  return [...entry.ancestorNames,entry.name].join(' / ');
+}
+
+function buildQuestionTreeSelection(tree,nodeIds){
+  const nodes=new Map(tree.nodes.map(node=>[String(node.id),node])),entries=[];
+  for(const id of new Set(nodeIds.map(String))){
+    const node=nodes.get(id);if(!node)continue;
+    const ancestors=[],visited=new Set([id]);
+    let parent=nodes.get(String(node.parentId));
+    while(parent&&!visited.has(String(parent.id))){
+      visited.add(String(parent.id));ancestors.unshift(parent);parent=nodes.get(String(parent.parentId));
+    }
+    entries.push({treeId:String(tree.id),nodeId:id,name:node.name,path:node.path||[...ancestors,node].map(n=>n.name).join(':'),
+      ancestorIds:ancestors.map(n=>String(n.id)),ancestorNames:ancestors.map(n=>n.name)});
+  }
+  return {treeId:String(tree.id),treeName:tree.name,entries};
+}
+
+function initialQuestionTreeSelection(question,tree){
+  if(question.treeSelection?.treeId===String(tree.id)){
+    return buildQuestionTreeSelection(tree,question.treeSelection.entries.map(entry=>entry.nodeId));
+  }
+  const scope=tree.nodes.find(node=>!node.parentId&&node.name===question.name),ids=[];
+  for(const parent of questionManualOptions(question)){
+    const source=question.optionSources?.find(entry=>entry.name===parent&&String(entry.treeId)===String(tree.id));
+    const parentNode=source?tree.nodes.find(node=>String(node.id)===String(source.nodeId)):
+      scope&&tree.nodes.find(node=>String(node.parentId)===String(scope.id)&&node.name===parent);
+    if(parentNode)ids.push(parentNode.id);
+    const branch=question.optionBranches?.find(b=>b.parent===parent);
+    const legacy=question.subOptions?.trigger===parent?question.subOptions.options:[];
+    for(const child of branch?.children??(legacy||[]).map(name=>({name}))){
+      if(child.nodeId!=null&&String(child.treeId)===String(tree.id)){ids.push(child.nodeId);continue;}
+      const match=parentNode&&tree.nodes.find(node=>String(node.parentId)===String(parentNode.id)&&node.name===child.name);
+      if(match)ids.push(match.id);
+    }
+  }
+  return buildQuestionTreeSelection(tree,ids);
+}
+
+function setQuestionTreeSelection(question,tree,nodeIds){
+  if(!tree){question.optionMode='manual';return null;}
+  question.optionMode='tree';
+  question.treeSelection=buildQuestionTreeSelection(tree,nodeIds);
+  return question.treeSelection;
+}
+
+function treeChoiceHTML(selection,{name,type,disabled=false,checkedIds=[]}){
+  if(!selection.entries.length)return '<small class="muted">此题尚未配置标注标签。</small>';
+  return selection.entries.map(entry=>{
+    const path=treeChoicePath(entry),ancestors=entry.ancestorNames.join(' / ');
+    return '<label class="option-tag" title="'+esc(path)+'"><input data-tree-choice data-node-id="'+esc(entry.nodeId)+'" aria-label="'+esc(path)+'" type="'+type+'" name="'+esc(name)+'" value="'+esc(entry.nodeId)+'" '+(disabled?'disabled ':'')+(checkedIds.includes(entry.nodeId)?'checked':'')+'><span class="tree-choice-caption">'+(ancestors?'<small>'+esc(ancestors)+'</small>':'')+'<b>'+esc(entry.name)+'</b></span></label>';
+  }).join('');
+}
+
+function questionOptionBranches(question) {
+  if(questionTreeSelection(question))return [];
+  const parents = questionManualOptions(question);
+  return [...new Set(parents)].map(parent => {
+    const configured = question.optionBranches?.find(branch => branch.parent === parent);
+    const legacy = question.subOptions?.trigger === parent ? question.subOptions.options : [];
+    return {parent, children: configured?.children ?? (legacy || []).map(name => ({name}))};
+  }).filter(branch => branch.children.length);
+}
+
+function childOptionEditor() {
+  return '<section class="option-editor" id="option-editor" aria-label="编辑二级标签">'+
+    '<label class="field"><span>二级标签 · 选择上级</span><select id="option-parent"></select><small class="option-path" id="option-parent-path" hidden></small></label>'+
+    '<div class="option-children" id="option-children"></div>'+
+    '<div class="option-add-row"><input id="option-child-name" maxlength="120" aria-label="二级标签名称" placeholder="输入二级标签名称"><button type="button" class="btn secondary" id="option-child-add">添加二级标签</button></div>'+
+    '<div role="status" aria-live="polite"></div></section>';
+}
+
+function bindChildOptionEditor(question) {
+  const panel = document.getElementById('option-editor');
+  if (!panel) return;
+  const get = id => panel.querySelector('#'+id);
+  const parentSelect = get('option-parent'), nameInput = get('option-child-name');
+  const status = panel.querySelector('[role=status]');
+  function drawChildren() {
+    const parents = [...new Set(r25QuestionOptions(question))];
+    const previous = parentSelect.value;
+    parentSelect.replaceChildren(...(parents.length ? parents.map(name => new Option(name,name)) : [new Option('请先添加一级标签','')]));
+    if (parents.includes(previous)) parentSelect.value=previous;
+    const parent = parentSelect.value;
+    const sources = (question.optionSources || []).filter(option => option.name === parent && option.path);
+    const sourcePath = get('option-parent-path');
+    sourcePath.hidden = !sources.length;
+    sourcePath.textContent = sources.length ? '来源：'+sources.map(s=>s.path.replaceAll(':',' / ')).join('；') : '';
+    nameInput.disabled = get('option-child-add').disabled = !parent;
+    const children = questionOptionBranches(question).find(branch => branch.parent === parent)?.children || [];
+    get('option-children').innerHTML = children.map((child,i) => '<div class="option-child"><span>'+esc(child.name)+
+      (child.path?'<small class="option-path">'+esc(child.path.replaceAll(':',' / '))+'</small>':'')+
+      '</span><button type="button" class="action" data-remove-child="'+i+'" aria-label="移除'+esc(child.name)+'">移除</button></div>').join('');
+  }
+  function setChildren(parent,children) {
+    question.optionBranches = [...(question.optionBranches || []).filter(branch => branch.parent !== parent), {parent,children}];
+    renderNodeCanvas();
+    drawChildren();
+  }
+  function addChild(parent,child) {
+    const children = questionOptionBranches(question).find(branch => branch.parent === parent)?.children || [];
+    if (children.some(c => c.name === child.name)) {
+      status.textContent = '「'+parent+'」下已有「'+child.name+'」。';
+      return false;
+    }
+    setChildren(parent,[...children,child]);
+    status.textContent = '已添加 '+parent+' / '+child.name;
+    return true;
+  }
+  function enterChild() {
+    const name = nameInput.value.trim();
+    if (!name) { status.textContent = '请输入二级标签名称。'; nameInput.focus(); return; }
+    if (parentSelect.value && addChild(parentSelect.value,{name})) {nameInput.value='';nameInput.focus();}
+  }
+  get('option-child-add').onclick = enterChild;
+  nameInput.onkeydown = e => { if (e.key==='Enter' && !e.isComposing) {e.preventDefault();enterChild();} };
+  get('option-children').onclick = e => {
+    const button=e.target.closest('[data-remove-child]');
+    if (!button) return;
+    const parent=parentSelect.value, children=questionOptionBranches(question).find(b=>b.parent===parent).children;
+    setChildren(parent,children.filter((_,i)=>i!==Number(button.dataset.removeChild)));
+    status.textContent='已移除二级标签。';
+  };
+  parentSelect.onchange=()=>{status.textContent='';drawChildren();};
+  document.getElementById('block-options').addEventListener('input',() => {
+    // The existing textarea handler writes question.options after this listener.
+    queueMicrotask(drawChildren);
+  });
+
+  drawChildren();
+  return drawChildren;
+}
+
+function bindQuestionAnnotationEditor(question, refreshManual) {
+  const inline=document.getElementById('question-annotation-data');
+  if (!inline) return;
+  const trees=reviewTaxonomy.trees(), saved=questionTreeSelection(question);
+  let tree=saved ? trees.find(t=>t.id===saved.treeId) || null : null;
+  let selected=new Set(tree ? initialQuestionTreeSelection(question,tree).entries.map(entry=>entry.nodeId) : []);
+  let trail=[], query='', expandedPanel=null;
+  const draftSelections=new Map();
+  const manual=document.getElementById('annotation-manual');
+  const byId=new Map(), children=new Map();
+  function indexTree() {
+    byId.clear();children.clear();
+    const rank=new Map((tree && question.treeOrder?.treeId===tree.id ? question.treeOrder.nodeIds : []).map((id,i)=>[id,i]));
+    for (const node of tree?.nodes || []) {
+      byId.set(node.id,node);
+      if (!children.has(node.parentId)) children.set(node.parentId,[]);
+      children.get(node.parentId).push(node);
+    }
+    if (rank.size) for (const list of children.values()) list.sort((a,b)=>(rank.get(a.id)??Infinity)-(rank.get(b.id)??Infinity));
+  }
+  function orderOf(parent='', grouped=children) {
+    return (grouped.get(parent)||[]).flatMap(node=>[node.id,...orderOf(node.id,grouped)]);
+  }
+  function fullPath(node) { return node.path.replaceAll(':',' / '); }
+  function pathTo(node) {
+    const ids=[];
+    for (let item=node;item;item=byId.get(item.parentId)) ids.unshift(item.id);
+    return ids;
+  }
+  function saveSelection() {
+    if (question.treeOrder?.treeId===tree.id)
+      selected=new Set(orderOf().filter(id=>selected.has(id)));
+    setQuestionTreeSelection(question,tree,[...selected]);
+    draftSelections.set(tree.id,[...selected]);
+    renderNodeCanvas();
+  }
+  function toggle(id) {
+    if(!byId.has(id)) return;
+    if(selected.has(id)) selected.delete(id); else selected.add(id);
+    const focus=document.activeElement, focusedHost=focus?.closest('.annotation-data');
+    const attr=['data-node-check','data-toggle-leaf','data-remove-node'].find(name=>focus?.hasAttribute(name));
+    saveSelection();
+    for(const [host,expanded] of [[inline,false],[expandedPanel,true]]) {
+      if(!host?.isConnected) continue;
+      const top=host.querySelector('.annotation-chips').scrollTop;
+      drawDirectory(host);drawSelected(host,expanded);
+      host.querySelector('.annotation-chips').scrollTop=top;
+    }
+    if(attr && focusedHost) {
+      const next=Array.from(focusedHost.querySelectorAll('['+attr+']')).find(el=>el.getAttribute(attr)===id)
+        || focusedHost.querySelector('[data-remove-node], .annotation-expand, [data-sort-annotation]');
+      next?.focus({preventScroll:true});
+    }
+  }
+  function changeTree(id) {
+    if(tree) draftSelections.set(tree.id,[...selected]);
+    tree=trees.find(t=>t.id===id) || null;
+    query='';trail=[];indexTree();
+    selected=new Set(tree?(draftSelections.get(tree.id) ?? initialQuestionTreeSelection(question,tree).entries.map(entry=>entry.nodeId)):[]);
+    setQuestionTreeSelection(question,tree,[...selected]);
+    if(!tree && expandedPanel?.isConnected) {close();expandedPanel=null;}
+    renderNodeCanvas();drawAll();
+    if(!tree) refreshManual?.();
+  }
+  function drawDirectory(host) {
+    const wrap=host.querySelector('.annotation-directory');
+    if(!wrap) return;
+    const prev=wrap.querySelector('.annotation-levels');
+    const left=prev?.scrollLeft || 0, scrolls=new Map([...(prev?.children || [])].map(col=>[col.dataset.level,col.scrollTop]));
+    const needle=query.trim().toLowerCase().replace(/\s*[／/]\s*/g,':');
+    const resultScroll=wrap.dataset.search===needle ? wrap.querySelector('.annotation-node-list')?.scrollTop || 0 : 0;
+    wrap.dataset.search=needle;
+    const partial=new Set();
+    for(const id of selected) {
+      for(let node=byId.get(id);node?.parentId;node=byId.get(node.parentId)) partial.add(node.parentId);
+    }
+    function row(node, searchResult=false) {
+      const checked=selected.has(node.id), mixed=!checked && partial.has(node.id);
+      const path=fullPath(node), hasChildren=children.has(node.id);
+      return '<div class="annotation-node'+(trail.includes(node.id)?' active':'')+'"><input type="checkbox" data-node-check="'+esc(node.id)+'" aria-label="选择 '+esc(path)+'" '+(checked?'checked ':'')+(mixed?'data-partial ':'')+'>'+
+        (hasChildren?'<button type="button" class="annotation-node-name" data-open-node="'+esc(node.id)+'" aria-label="展开 '+esc(path)+'" aria-expanded="'+trail.includes(node.id)+'" title="'+esc(path)+'">'+esc(searchResult?path:node.name)+'<span aria-hidden="true">›</span></button>':
+        '<div class="annotation-node-name" title="'+esc(path)+'"><button type="button" data-toggle-leaf="'+esc(node.id)+'" class="annotation-leaf" aria-label="勾选或取消 '+esc(path)+'">'+esc(searchResult?path:node.name)+'</button></div>')+'</div>';
+    }
+    if(needle) {
+      const matches=[...byId.values()].filter(node=>node.path.toLowerCase().includes(needle));
+      wrap.innerHTML='<div class="annotation-breadcrumb">搜索结果（'+matches.length+'）</div><div class="annotation-node-list">'+(matches.map(n=>row(n,true)).join('')||'<small>没有匹配的标签</small>')+'</div>';
+      wrap.querySelector('.annotation-node-list').scrollTop=resultScroll;
+    } else {
+      const labels=['根目录',...trail.map(id=>byId.get(id)?.name || '')];
+      const crumbs=labels.map((label,i)=>'<button type="button" data-crumb="'+i+'"'+(i===labels.length-1?' aria-current="true"':'')+'>'+esc(label)+'</button>').join('<span aria-hidden="true"> / </span>');
+      const columns=['',...trail].map(id=>'<div class="annotation-node-list" data-level="'+esc(id)+'" aria-label="'+esc(byId.get(id)?.name || '根目录')+'">'+
+        ((children.get(id)||[]).map(n=>row(n)).join('')||'<small>暂无标签</small>')+'</div>').join('');
+      wrap.innerHTML='<nav class="annotation-breadcrumb" aria-label="当前标签目录">'+crumbs+'</nav><div class="annotation-levels">'+columns+'</div>';
+      const levels=wrap.querySelector('.annotation-levels');
+      for (const col of levels.children) col.scrollTop=scrolls.get(col.dataset.level) || 0;
+      levels.scrollLeft=left;
+    }
+    wrap.querySelectorAll('[data-partial]').forEach(check=>check.indeterminate=true);
+  }
+  function drawSelected(host, expanded) {
+    const items=[...selected].map(id=>byId.get(id)).filter(Boolean);
+    const shown=expanded?items:items.slice(0,8);
+    const names=new Map();
+    for(const node of items) names.set(node.name,(names.get(node.name)||0)+1);
+    const chips=shown.map(node=>'<span class="annotation-chip" title="'+esc(fullPath(node))+'"><span>'+esc(names.get(node.name)>1?fullPath(node):node.name)+'</span><button type="button" data-remove-node="'+esc(node.id)+'" aria-label="移除 '+esc(fullPath(node))+'">×</button></span>').join('');
+    host.querySelector('.annotation-selected').innerHTML='<div class="annotation-count" aria-live="polite">已选 '+items.length+' 个</div><div class="annotation-chips">'+
+      (chips||'<small>勾选左侧标签后在这里查看</small>')+'</div>'+(!expanded?'<button type="button" class="annotation-expand action" data-expand-annotation>展开全部</button>':'');
+  }
+  function draw(host,expanded) {
+    const active=tree?.id||'';
+    host.innerHTML='<div class="annotation-heading"><strong>标注数据</strong>'+(tree?'<span>构建方式 · 各级节点向上回溯</span>':'')+'</div>'+
+      '<label class="annotation-tree-type"><span>标签类型</span><select aria-label="标签类型"><option value="">自定义选项</option>'+trees.map(t=>'<option value="'+esc(t.id)+'" '+(active===t.id?'selected':'')+'>'+esc(t.name)+'</option>').join('')+'</select></label>'+
+      (tree?'<div class="annotation-tools"><input type="search" aria-label="搜索标签名称" placeholder="搜索标签名称" value="'+esc(query)+'"><button type="button" class="btn" data-search-annotation>搜索</button><button type="button" class="btn secondary" data-sort-annotation>设置顺序</button></div>'+
+        '<div class="annotation-picker"><div class="annotation-directory"></div><div class="annotation-selected"></div></div>':'');
+    if(tree) {drawDirectory(host);drawSelected(host,expanded);}
+    host.onchange=e=>{
+      if(e.target.matches('.annotation-tree-type select')) changeTree(e.target.value);
+      else if(e.target.matches('[data-node-check]')) toggle(e.target.dataset.nodeCheck);
+    };
+    host.oninput=e=>{
+      if(!e.target.matches('input[type=search]')) return;
+      syncSearch(e.target.value);
+    };
+    host.onkeydown=e=>{
+      if(e.key==='Enter' && e.target.matches('input[type=search]')) {e.preventDefault();syncSearch(e.target.value);}
+    };
+    host.onclick=e=>{
+      const button=e.target.closest('button');if(!button)return;
+      if(button.hasAttribute('data-open-node') || button.hasAttribute('data-crumb')) {
+        trail=button.hasAttribute('data-crumb')?trail.slice(0,Number(button.dataset.crumb)):pathTo(byId.get(button.dataset.openNode));
+        syncSearch('');
+        const levels=host.querySelector('.annotation-levels');
+        if(levels) {
+          levels.scrollLeft=levels.scrollWidth;
+          if(e.detail===0) levels.lastElementChild?.querySelector('input')?.focus({preventScroll:true});
+        }
+      } else if(button.hasAttribute('data-toggle-leaf')) toggle(button.dataset.toggleLeaf);
+      else if(button.hasAttribute('data-remove-node')) toggle(button.dataset.removeNode);
+      else if(button.hasAttribute('data-search-annotation')) syncSearch(host.querySelector('input[type=search]').value);
+      else if(button.hasAttribute('data-expand-annotation')) openExpanded();
+      else if(button.hasAttribute('data-sort-annotation')) openOrder();
+    };
+  }
+  function syncSearch(value) {
+    query=value;
+    for(const host of [inline,expandedPanel]) {
+      if(!host?.isConnected) continue;
+      const input=host.querySelector('input[type=search]');
+      if(input.value!==value) input.value=value;
+      drawDirectory(host);
+    }
+  }
+  function drawAll(){
+    draw(inline,false);
+    if(expandedPanel?.isConnected) draw(expandedPanel,true);
+    manual.hidden=!!tree;
+  }
+  function openExpanded() {
+    wideModal(question.name+' · 标注数据','<section class="annotation-data" data-expanded></section>','<button type="button" class="btn" data-close>完成</button>','annotation-drawer');
+    expandedPanel=document.querySelector('.annotation-drawer .annotation-data');
+    draw(expandedPanel,true);
+  }
+  function openOrder() {
+    // Stage the complete directory; only 确定 updates the question's own order.
+    const groups=new Map([...children].map(([id,list])=>[id,[...list]])), opened=new Set();
+    wideModal('设置标签树顺序','<div class="annotation-sort"></div>','<button type="button" class="btn secondary" data-close>取消</button><button type="button" class="btn" data-confirm-order>确定</button>','annotation-drawer');
+    const drawer=document.querySelector('.annotation-drawer'), panel=drawer.querySelector('.annotation-sort');
+    function rows(id,depth) {
+      const list=groups.get(id)||[];
+      return list.map((node,index)=>{
+        const hasChildren=groups.has(node.id), open=opened.has(node.id), name=esc(node.name), path=esc(fullPath(node));
+        return '<div class="annotation-sort-row" style="--depth:'+depth+'">'+
+          (hasChildren?'<button type="button" class="action" data-sort-open="'+esc(node.id)+'" aria-label="'+(open?'收起 ':'展开 ')+path+'" aria-expanded="'+open+'">'+(open?'▾':'▸')+'</button>':'<span aria-hidden="true">·</span>')+
+          '<span title="'+path+'">'+name+'</span><button type="button" class="action" data-sort-up="'+esc(node.id)+'" aria-label="上移 '+path+'" '+(index===0?'disabled':'')+'>上移</button>'+
+          '<button type="button" class="action" data-sort-down="'+esc(node.id)+'" aria-label="下移 '+path+'" '+(index===list.length-1?'disabled':'')+'>下移</button></div>'+
+          (open?rows(node.id,depth+1):'');
+      }).join('');
+    }
+    const refresh=()=>panel.innerHTML=rows('',0)||'<small>暂无可排序的标签</small>';
+    refresh();panel.onclick=e=>{
+      const b=e.target.closest('button');if(!b)return;
+      const id=b.dataset.sortOpen||b.dataset.sortUp||b.dataset.sortDown;
+      if(!id)return;
+      if(b.hasAttribute('data-sort-open')) opened.has(id)?opened.delete(id):opened.add(id);
+      else {
+        const siblings=groups.get(byId.get(id).parentId),index=siblings.findIndex(node=>node.id===id);
+        const to=index+(b.hasAttribute('data-sort-up')?-1:1);
+        if(to<0||to>=siblings.length)return;
+        [siblings[index],siblings[to]]=[siblings[to],siblings[index]];
+      }
+      refresh();
+      const attr=['data-sort-open','data-sort-up','data-sort-down'].find(name=>b.hasAttribute(name));
+      const same=[...panel.querySelectorAll('['+attr+']')].find(button=>button.getAttribute(attr)===id);
+      const alternate=same?.closest('.annotation-sort-row')?.querySelector('button:enabled');
+      (same?.disabled?alternate:same)?.focus({preventScroll:true});
+    };
+    drawer.querySelector('[data-confirm-order]').onclick=()=>{
+      question.treeOrder={treeId:tree.id,nodeIds:orderOf('',groups)};
+      indexTree();saveSelection();close();drawAll();
+    };
+  }
+  indexTree();drawAll();
+}
 
 const TEMPLATE_KEY = "nex-node-template-library-v1",
   newQuestion = (e, t, a = [], n = {}) => ({
@@ -14640,7 +15565,7 @@ function validateNodeTemplates(e) {
     for (const t of a.questions) {
       if (!t.name.trim()) return `请填写${e}模板中的题目标题`;
       if (["单选", "多选"].includes(t.type)) {
-        const a = t.options.split(",").map((e) => e.trim());
+        const a = questionTreeSelection(t)?.entries.map(entry=>entry.nodeId) ?? t.options.split(",").map((e) => e.trim());
         if (a.length < ("单选" === t.type ? 2 : 1) || a.some((e) => !e))
           return `${e}模板「${t.name}」请配置有效选项（单选至少两项）`;
         if (new Set(a).size !== a.length)
@@ -14660,19 +15585,35 @@ function templateHeader() {
     : "";
 }
 function applicationNodesControl() {
-  const e = templateAssignments(taskDraft),
-    t = ["机审", "标注", "质检"],
-    a = t.filter((t) => e[t] === templateNode);
-  return `<details class="application-nodes"><summary>应用节点：${a.length === t.length ? "所有" : a.join("、") || "请选择"} <span>⌄</span></summary><div class="application-node-menu">${t
-    .map((t) => {
-      const a = e[t],
-        n = a === templateNode,
-        i = !!a && !n;
-      return `<label><input type="checkbox" data-application-node="${t}" ${n ? "checked" : ""} ${i ? "disabled" : ""}><span>${t}</span>${i ? `<small>已用于${"共用" === a ? "共用模板" : a + "副本"}</small>` : ""}</label>`;
-    })
-    .join(
-      "",
-    )}<p>每个节点仅能应用一个模板；更换前请先在原模板取消勾选。</p></div></details>`;
+  const assignments = templateAssignments(taskDraft);
+  const nodes = ["机审", "标注", "质检"];
+  const appliedNodes = nodes.filter(node => assignments[node] === templateNode);
+  return `<details class="application-nodes"><summary>应用节点：${appliedNodes.join("、") || "请选择"} <span aria-hidden="true">⌄</span></summary><div class="application-node-menu"><p>勾选需要使用本模板的节点。下一步「任务流程」决定哪些节点参与执行。</p>${nodes.map(node => {
+    const assigned = assignments[node];
+    const checked = assigned === templateNode;
+    const other = assigned && !checked;
+    const inFlow = taskDraft.flow.nodes.includes(node);
+    return `<label><input type="checkbox" data-application-node="${node}" ${checked ? "checked" : ""} ${other ? "disabled" : ""}><span>${node}<small>${inFlow ? "已加入任务流程" : "未加入任务流程"}</small></span>${other ? `<small>已应用${assigned === "共用" ? "共用模板" : esc(assigned) + "副本"}</small>` : ""}</label>`;
+  }).join("")}<p>每个节点可应用一个模板。更换前请先在原模板取消勾选。</p><button class="action" id="template-flow-settings" type="button">流程节点设置</button></div></details>`;
+}
+function templatePropertyScope() {
+  const assignments = templateAssignments(taskDraft);
+  const active = taskDraft.flow.nodes.filter(node => assignments[node] === templateNode && r16TemplateNodeEnabled(taskDraft.flow, node));
+  return active.length ? "当前流程使用此模板的节点：" + esc(active.join("、")) : "当前流程暂无启用此模板的节点";
+}
+function openTemplateFlowSettings() {
+  const nodes = taskDraft.flow.nodes;
+  const matches = nodes.filter(node => templateAssignments(taskDraft)[node] === templateNode);
+  if (!matches.includes(nodeTab)) nodeTab = matches[0] || (nodes.includes(nodeTab) ? nodeTab : nodes[0]);
+  taskStep = 3;
+  renderTaskWizard();
+}
+function flowTemplateSource(node) {
+  if (!node || node === "免审") return "";
+  const template = effectiveTemplate(taskDraft, node);
+  const assigned = templateAssignments(taskDraft)[node];
+  const source = assigned === "共用" ? "任务共用模板" : assigned + "模板副本";
+  return `<section class="flow-template-source" aria-label="节点应用模板"><strong>${esc(node)}节点模板</strong><span>${template ? esc(template.name || "未命名模板") : "尚未应用模板"}</span>${template ? `<small>${esc(source)} · ${template.questions.length} 道题</small>` : ""}<button type="button" class="action" id="open-flow-template">${template ? "编辑应用模板" : "选择应用模板"}</button></section>`;
 }
 function bindApplicationNodes() {
   document.querySelectorAll("[data-application-node]").forEach(
@@ -14847,26 +15788,29 @@ function materialPreview(e) {
           : `<div class="material-text">${esc({ title: "啄木鸟2026秋季新款男假两件衬衫领针织衫长袖休闲百搭POLO衫上衣", summary: "深色微亮的针织配上精致的格纹翻领，视觉上利落又大方。假两件设计，兼顾层次与日常穿着。", content_id: "3436111177675658", base_sku_name: "假两件衬衫领针织衫", confidence: "0.98" }[e.field] || "示例字段：" + e.field)}</div>`;
 }
 function questionPreview(e, t) { return baseQuestionPreview(e,t) + (["单选","多选"].includes(e.type) ? "" : reviewTaxonomy.questionTags(e,t)); }
+function previewOptionBranches(question,interactive,disabled) {
+  return questionOptionBranches(question).map(branch=>'<div class="review-sub-options" data-child-group="'+esc(branch.parent)+'" '+(interactive?'hidden':'')+'><span>'+esc(branch.parent)+' · 二级标签</span><div class="question-options">'+
+    branch.children.map(child=>'<label class="option-tag"'+(child.path?' title="'+esc(child.path.replaceAll(':',' / '))+'"':'')+'><input type="checkbox" value="'+esc(child.name)+'" '+disabled+'>'+esc(child.name)+'</label>').join('')+
+    '</div></div>').join('');
+}
 function baseQuestionPreview(e, t) {
   const a = t ? "" : "disabled";
   if (!["单选", "多选"].includes(e.type))
     return "文本" === e.type
       ? `<textarea class="preview-input" placeholder="请输入" ${a}></textarea>`
       : `<input class="preview-input" type="number" placeholder="请输入数值" ${a}>`;
-  const n = e.repeatLabels?.length ? e.repeatLabels : [""];
+  const n = e.repeatLabels?.length ? e.repeatLabels : [""],tree=questionTreeSelection(e);
   return `<div class="repeat-question" data-repeat-question="${e.id}">${n[0] ? `<div class="review-item-tabs" role="tablist">${n.map((e, t) => `<button type="button" role="tab" aria-selected="${0 === t}" data-repeat-index="${t}" class="${0 === t ? "active" : ""}">${esc(e)}</button>`).join("")}</div>` : ""}${n
     .map(
       (t, n) =>
-        `<div class="review-item-pane" data-repeat-pane="${n}" ${n ? "hidden" : ""}><div class="question-options ${"垂直" === e.direction ? "vertical" : ""}">${e.options
-          .split(",")
-          .filter(Boolean)
+        `<div class="review-item-pane" data-repeat-pane="${n}" ${n ? "hidden" : ""}><div class="question-options ${"垂直" === e.direction ? "vertical" : ""}">${tree?treeChoiceHTML(tree,{name:"answer-"+e.id+"-"+n,type:e.type==="单选"?"radio":"checkbox",disabled:!!a}):questionManualOptions(e)
           .map(
             (t) =>
-              `<label class="${"多选" === e.type ? "option-tag" : ""}"><input type="${"单选" === e.type ? "radio" : "checkbox"}" name="answer-${e.id}-${n}" value="${esc(t)}" ${e.subOptions && t === e.subOptions.trigger ? "data-sub-trigger" : ""} ${a}>${esc(t)}</label>`,
+              `<label class="${"多选" === e.type ? "option-tag" : ""}"><input type="${"单选" === e.type ? "radio" : "checkbox"}" name="answer-${e.id}-${n}" value="${esc(t)}" data-primary-option ${a}>${esc(t)}</label>`,
           )
           .join(
             "",
-          )}</div>${e.subOptions ? `<div class="review-sub-options"><span>${esc(e.subOptions.title)}：</span><div class="question-options">${e.subOptions.options.map((t) => `<label class="option-tag"><input type="checkbox" data-sub-value name="sub-${e.id}-${n}" value="${esc(t)}" ${a}>${esc(t)}</label>`).join("")}</div></div>` : ""}${reviewTaxonomy.questionTags(e,!a)}${e.customReason ? `<label class="custom-reason">自定义原因：<textarea aria-label="${esc(e.name + " " + t)} 自定义原因" placeholder="请输入补充原因" ${a}></textarea></label>` : ""}${e.prelabel ? `<div class="review-prelabel">算法预测标 <span>${n === (e.prelabelIndex || 0) ? esc(e.prelabel) : "暂无预标"}</span><small>示例</small></div>` : ""}</div>`,
+          )}</div>${previewOptionBranches(e,!a,a)}${reviewTaxonomy.questionTags(e,!a)}${e.customReason ? `<label class="custom-reason">自定义原因：<textarea aria-label="${esc(e.name + " " + t)} 自定义原因" placeholder="请输入补充原因" ${a}></textarea></label>` : ""}${e.prelabel ? `<div class="review-prelabel">算法预测标 <span>${n === (e.prelabelIndex || 0) ? esc(e.prelabel) : "暂无预标"}</span><small>示例</small></div>` : ""}</div>`,
     )
     .join("")}</div>`;
 }
@@ -14903,25 +15847,16 @@ function bindReviewInteractions(e) {
                 : "图片" + (+e.dataset.galleryIndex + 1)));
         }),
     ),
-    e.querySelectorAll("[data-sub-value]").forEach(
-      (e) =>
-        (e.onchange = () => {
-          const t = e
-            .closest(".review-item-pane")
-            .querySelector("[data-sub-trigger]");
-          t && e.checked && (t.checked = !0);
-        }),
-    ),
-    e.querySelectorAll("[data-sub-trigger]").forEach(
-      (e) =>
-        (e.onchange = () => {
-          e.checked ||
-            e
-              .closest(".review-item-pane")
-              .querySelectorAll("[data-sub-value]")
-              .forEach((e) => (e.checked = !1));
-        }),
-    ));
+    e.querySelectorAll('[data-primary-option]:not(:disabled)').forEach(input=>{
+      input.onchange=()=>{
+        const pane=input.closest('.review-item-pane');
+        const selected=new Set([...pane.querySelectorAll('[data-primary-option]:checked')].map(el=>el.value));
+        pane.querySelectorAll('[data-child-group]').forEach(group=>{
+          group.hidden=!selected.has(group.dataset.childGroup);
+          if(group.hidden)group.querySelectorAll('input').forEach(child=>child.checked=false);
+        });
+      };
+    }));
 }
 function previewNodeTemplate() { showReviewTemplate(activeTemplate(), templateNode + "模板预览"); }
 function showReviewTemplate(e, title) {
@@ -14958,7 +15893,7 @@ function renderTaskTemplate() {
     [...e.questions, ...e.materials].some((e) => e.id === selectedBlock.id)) ||
     (selectedBlock = e.questions[0]
       ? { kind: "question", id: e.questions[0].id }
-      : null),
+      : e.materials[0] ? { kind: "material", id: e.materials[0].id } : null),
     $("#task-step-content").classList.add("template-step"),
     ($("#task-step-content").innerHTML =
       `${templateHeader()}<div class="template-toolbar">${"共用" === templateNode ? "" : `<span class="type-badge">${templateNode}专属</span>`}<input id="node-template-name" aria-label="模板名称" value="${esc(e.name)}" placeholder="请输入模板名称">${templateObjectControl(e)}<div class="template-toolbar-actions">${templateNode === "共用" ? reviewTemplateSelect(taskDraft.sharedTemplate) : ""}${applicationNodesControl()}<button class="btn secondary" id="preview-node">◉ 预览</button><button class="soft-btn" id="publish-node">保存为新模板 →</button></div></div><div class="template-builder"><aside class="builder-tools"><strong>工具栏</strong><div class="tool-heading">布局</div><div class="layout-choices">${["双栏", "单栏"].map((t) => `<button class="${e.layout === t ? "active" : ""}" data-template-layout="${t}">${"双栏" === t ? "▥" : "▤"} ${t}</button>`).join("")}</div><div class="tool-heading">展示组件</div><div class="tool-grid">${[
@@ -14984,7 +15919,10 @@ function renderTaskTemplate() {
         )
         .join(
           "",
-        )}</div><div class="tool-tip">点击组件添加至当前节点。选中画布内容，在右侧编辑属性。</div></aside><section class="builder-canvas"><div class="canvas-bar">画布 <span id="canvas-count"></span></div><div id="node-canvas"></div></section><section class="builder-properties"><div class="property-tabs"><strong>组件属性</strong><span>节点配置</span></div><div id="node-properties"></div></section></div><div class="template-draft-note">点击第三步「完成」保存共用模板及已拆分的专属模板。节点差异化请在任务流程中按需配置。</div>`),
+        )}</div><div class="tool-tip">展示组件添加到素材区，题目组件添加到标注区。点击组件可编辑属性。</div></aside>
+        <section class="builder-canvas"><div class="canvas-bar">画布 <span id="canvas-count"></span></div><div id="node-canvas"></div></section>
+        <section class="builder-properties"><div class="property-tabs"><strong>组件属性</strong></div><div class="template-current-component" id="selected-component" hidden></div><div id="node-properties"></div></section></div>
+        <div class="template-draft-note">在「任务流程」选择参与执行的节点，点击「完成」保存模板和流程设置。</div>`),
     document.querySelectorAll("[data-template-node]").forEach(
       (e) =>
         (e.onclick = () => {
@@ -15040,6 +15978,7 @@ function renderTaskTemplate() {
         }),
     ),
     bindApplicationNodes(),
+    ($("#template-flow-settings").onclick = openTemplateFlowSettings),
     ($("#preview-node").onclick = previewNodeTemplate),
     ($("#publish-node").onclick = publishNodeTemplate),
     renderNodeCanvas(),
@@ -15052,19 +15991,16 @@ function renderNodeCanvas() {
     ($("#node-canvas").className =
       "node-canvas " + ("单栏" === e.layout ? "single" : "")),
     ($("#node-canvas").innerHTML =
-      `<div class="material-column">${e.materials.map((t, a) => `<article class="builder-card ${selectedBlock?.id === t.id ? "selected" : ""}" data-select-block="${t.id}" data-kind="material"><div class="card-bar"><span>☰ ${t.type}</span>${blockButtons("material", t.id, a, e.materials.length)}</div><h3>${esc(t.name)}</h3>${materialPreview(t)}</article>`).join("") || '<div class="builder-empty">从左侧添加内容展示组件</div>'}</div><div class="question-column">${e.questions.map((t, a) => `<article class="builder-card ${selectedBlock?.id === t.id ? "selected" : ""}" data-select-block="${t.id}" data-kind="question"><div class="card-bar"><span><em>${a + 1}</em> ☰ ${"文本" === t.type ? "文本输入" : t.type}</span>${blockButtons("question", t.id, a, e.questions.length)}</div><h3>${esc(t.name)} ${t.required ? "<b>*</b>" : ""}</h3>${t.hint ? `<p class="question-hint">${esc(t.hint)}</p>` : ""}${questionPreview(t, !1)}</article>`).join("") || '<div class="builder-empty">从左侧添加题目组件</div>'}</div>`),
-    document.querySelectorAll("[data-select-block]").forEach(
-      (e) =>
-        (e.onclick = (t) => {
-          t.target.closest("[data-block-action]") ||
-            ((selectedBlock = {
-              kind: e.dataset.kind,
-              id: e.dataset.selectBlock,
-            }),
-            renderNodeCanvas(),
-            renderNodeProperties());
-        }),
-    ),
+      `<div class="material-column"><h3 class="template-area-heading">素材区</h3>${e.materials.map((t, a) => `<article class="builder-card ${selectedBlock?.id === t.id ? "selected" : ""}" data-select-block="${t.id}" data-kind="material"><div class="card-bar"><span>☰ ${t.type}</span>${blockButtons("material", t.id, a, e.materials.length)}</div><h3>${blockTitleButton(t, "素材区")}</h3>${materialPreview(t)}</article>`).join("") || '<div class="builder-empty">从左侧添加内容展示组件</div>'}</div><div class="question-column"><h3 class="template-area-heading">标注区</h3>${e.questions.map((t, a) => `<article class="builder-card ${selectedBlock?.id === t.id ? "selected" : ""}" data-select-block="${t.id}" data-kind="question"><div class="card-bar"><span><em>${a + 1}</em> ☰ ${"文本" === t.type ? "文本输入" : t.type}</span>${blockButtons("question", t.id, a, e.questions.length)}</div><h3>${blockTitleButton(t, "标注区")} ${t.required ? "<b>*</b>" : ""}</h3>${t.hint ? `<p class="question-hint">${esc(t.hint)}</p>` : ""}${questionPreview(t, !1)}</article>`).join("") || '<div class="builder-empty">从左侧添加题目组件</div>'}</div>`),
+    updateSelectedComponent(),
+    document.querySelectorAll("[data-select-block]").forEach(card => {
+      card.addEventListener("click", event => {
+        if (event.target.closest("[data-block-action]") || selectedBlock?.id === card.dataset.selectBlock) return;
+        selectedBlock = { kind: card.dataset.kind, id: card.dataset.selectBlock };
+        updateSelectedComponent();
+        renderNodeProperties();
+      }, true);
+    }),
     document.querySelectorAll("[data-block-action]").forEach(
       (t) =>
         (t.onclick = (a) => {
@@ -15090,6 +16026,23 @@ function renderNodeCanvas() {
     ),
     bindReviewInteractions($("#node-canvas")));
 }
+function blockTitleButton(block, area) {
+  const title = block.name || "未命名组件";
+  return `<button type="button" data-edit-block aria-pressed="${selectedBlock?.id === block.id}" aria-label="编辑${area}组件：${esc(title)}">${esc(title)}</button>`;
+}
+function updateSelectedComponent() {
+  const template = activeTemplate();
+  const isQuestion = selectedBlock?.kind === "question";
+  const block = (isQuestion ? template.questions : template.materials).find(item => item.id === selectedBlock?.id);
+  const heading = $("#selected-component");
+  heading.hidden = !block;
+  heading.textContent = block ? `${isQuestion ? "标注区" : "素材区"} · ${block.name || "未命名组件"}（${block.type}）` : "";
+  $("#node-canvas").querySelectorAll("[data-select-block]").forEach(card => {
+    const selected = card.dataset.selectBlock === selectedBlock?.id;
+    card.classList.toggle("selected", selected);
+    card.querySelector("[data-edit-block]").setAttribute("aria-pressed", String(selected));
+  });
+}
 function blockButtons(e, t, a, n) {
   return `<div class="block-actions"><button data-block-action="up" data-kind="${e}" data-id="${t}" ${0 === a ? "disabled" : ""} title="上移" aria-label="上移组件">↑</button><button data-block-action="down" data-kind="${e}" data-id="${t}" ${a === n - 1 ? "disabled" : ""} title="下移" aria-label="下移组件">↓</button><button data-block-action="copy" data-kind="${e}" data-id="${t}" title="复制" aria-label="复制组件">⧉</button><button data-block-action="delete" data-kind="${e}" data-id="${t}" title="删除" aria-label="删除组件">×</button></div>`;
 }
@@ -15104,19 +16057,12 @@ function renderNodeProperties() {
       '<div class="builder-empty">选择画布中的组件以配置属性</div>');
   const n = "question" === t.kind;
   (($("#node-properties").innerHTML =
-    `<div class="property-id">组件 ID<span>${esc(a.id)}</span></div><label class="field"><span>标题 <b class="required">*</b></span><input id="block-title" value="${esc(a.name)}"></label>${n ? `<label class="field"><span>题目类型</span><select id="block-type">${options(["单选", "多选", "文本", "数值"], a.type)}</select></label><label class="field"><span>提示</span><input id="block-hint" value="${esc(a.hint || "")}" placeholder="请输入提示"></label><div class="property-switch"><span>是否必填</span>${switchButton("block-required", a.required, "题目必填")}</div>${["单选", "多选"].includes(a.type) ? `<label class="field"><span>文本选项 <b class="required">*</b></span><textarea id="block-options" rows="7" placeholder="每行一个选项">${esc(a.options.split(",").join("\n"))}</textarea><small>每行一个选项</small></label><label class="field"><span>排列</span><select id="block-direction">${options(["水平", "垂直"], a.direction)}</select></label><div class="property-switch"><span>自定义原因</span>${switchButton("block-reason", a.customReason, "自定义原因")}</div>` : ""}` : `<label class="field"><span>元数据字段</span><select id="block-field">${fieldOptions(a.field)}</select></label><div class="info">将送审素材字段展示在当前节点。图片与视频使用演示占位。</div>`}${n && a.repeatLabels ? `<label class="field"><span>审核对象标签（每行一个）</span><textarea id="block-repeat-labels">${esc(a.repeatLabels.join("\n"))}</textarea></label>` : ""}${n && a.subOptions ? `<label class="field"><span>${esc(a.subOptions.title)}子选项</span><textarea id="block-sub-options">${esc(a.subOptions.options.join("\n"))}</textarea></label>` : ""}${n ? reviewTaxonomy.treeSetting(a) : ""}<div class="property-scope">${"共用" === templateNode ? "修改作用于所有复用共用模板的节点" : "仅修改「" + templateNode + "专属模板」"}</div>`),
+    `<div class="property-id">组件 ID<span>${esc(a.id)}</span></div><label class="field"><span>标题 <b class="required">*</b></span><input id="block-title" value="${esc(a.name)}"></label>${n ? `<label class="field"><span>题目类型</span><select id="block-type">${options(["单选", "多选", "文本", "数值"], a.type)}</select></label><label class="field"><span>提示</span><input id="block-hint" value="${esc(a.hint || "")}" placeholder="请输入提示"></label><div class="property-switch"><span>是否必填</span>${switchButton("block-required", a.required, "题目必填")}</div>${["单选", "多选"].includes(a.type) ? `<section class="annotation-data" id="question-annotation-data"></section><div class="option-manual" id="annotation-manual"><label class="field"><span>一级标签（选项） <b class="required">*</b></span><textarea id="block-options" rows="7" placeholder="每行一个选项">${esc(a.options.split(",").join("\n"))}</textarea><small>每行一个一级标签</small></label>${childOptionEditor()}${a.labelTreeId ? reviewTaxonomy.treeSetting(a) : ""}</div><label class="field"><span>排列</span><select id="block-direction">${options(["水平", "垂直"], a.direction)}</select></label><div class="property-switch"><span>自定义原因</span>${switchButton("block-reason", a.customReason, "自定义原因")}</div>` : ""}` : `<label class="field"><span>元数据字段</span><select id="block-field">${fieldOptions(a.field)}</select></label><div class="info">将送审素材字段展示在当前节点。图片与视频使用演示占位。</div>`}${n && a.repeatLabels ? `<label class="field"><span>审核对象标签（每行一个）</span><textarea id="block-repeat-labels">${esc(a.repeatLabels.join("\n"))}</textarea></label>` : ""}${n && !["单选","多选"].includes(a.type) ? reviewTaxonomy.treeSetting(a) : ""}<div class="property-scope">${templatePropertyScope()}</div>`),
+    n && bindQuestionAnnotationEditor(a, bindChildOptionEditor(a)),
     $("#tx-question-tree") && ($("#tx-question-tree").onchange = event => { a.labelTreeId=event.target.value; renderNodeCanvas(); }),
     $("#block-repeat-labels") &&
       ($("#block-repeat-labels").oninput = (e) => {
         ((a.repeatLabels = e.target.value
-          .split("\n")
-          .map((e) => e.trim())
-          .filter(Boolean)),
-          renderNodeCanvas());
-      }),
-    $("#block-sub-options") &&
-      ($("#block-sub-options").oninput = (e) => {
-        ((a.subOptions.options = e.target.value
           .split("\n")
           .map((e) => e.trim())
           .filter(Boolean)),
@@ -16926,12 +17872,24 @@ r25InstallApprovalExample();
     ),
   "#metadata" === location.hash && switchSection("平台工坊"),
   "#tasks" === location.hash && switchSection("管理中心"),
-  "#templates" === location.hash &&
-    (switchSection("管理中心"),
-    taskEditor(),
-    (taskDraft.name = "内容审核 · 共用模板与按需拆分"),
-    (taskStep = 2),
-    renderTaskWizard()));
+  "#templates" === location.hash && openTemplateDemo());
+
+function openTemplateDemo() {
+  switchSection("管理中心");
+  taskEditor();
+  taskDraft.name = "内容审核 · 共用模板与按需拆分";
+  const question = taskDraft.sharedTemplate.questions.find(item => item.name === "图片");
+  const tree = reviewTaxonomy.trees().find(item => item.code === "quality_tag_tree");
+  if (question && tree) {
+    const samplePaths = ["图片", "图片:低俗色情", "图片:低俗色情:封面低俗",
+      "图片:基础美观不达标", "图片:基础美观不达标:封面黑边", "图片:虚假夸大宣传:夸张文案"];
+    const sampleIds = samplePaths.map(path => tree.nodes.find(node => node.path === path)?.id).filter(Boolean);
+    const initialIds = initialQuestionTreeSelection(question, tree).entries.map(entry => entry.nodeId);
+    if (sampleIds.length) setQuestionTreeSelection(question, tree, [...sampleIds, ...initialIds]);
+  }
+  taskStep = 2;
+  renderTaskWizard();
+}
 
 function openMigrationStep(hash){
   if(hash==='#feeds-105317-export'){
