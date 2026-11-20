@@ -4398,6 +4398,40 @@ span.v6-new,
 .r29-biz .r25-question-options input:disabled:not(:checked)+span{color:#b9b7c1;background:#f0eff5}
 .r29-biz .r25-sub-options{display:flex;gap:8px;flex-wrap:wrap;padding:12px;margin-top:12px;border-radius:3px;background:#f8f8fc;font-size:12px}
 .r29-biz .r25-sub-options[hidden]{display:none}
+
+.review-label-tree { min-width:0; flex:1 1 100%; width:100%; color:#34415a; }
+.review-label-options { display:flex; flex-wrap:wrap; align-items:flex-start; gap:7px; }
+.review-label-tree .review-label-chip {
+  position:relative; display:inline-flex; align-items:stretch; padding:0; margin:0;
+  background:none; border:0; font:inherit; color:inherit; cursor:pointer;
+}
+.review-label-chip > b {
+  position:relative; display:block; overflow:hidden; box-sizing:border-box; border:1px solid #cad0df;
+  border-radius:5px; background:#fff; padding:5px 11px; font-size:12px; font-weight:400;
+  line-height:20px; text-align:center; overflow-wrap:anywhere; color:#56627c;
+}
+.review-label-chip input[data-tree-choice] { position:absolute; width:1px; height:1px; opacity:0; margin:0; }
+.review-label-chip:hover > b { border-color:#9187ff; }
+.review-label-chip input:focus-visible + b, .review-label-chip:focus-visible { outline:2px solid #6455ef; outline-offset:2px; }
+.review-label-chip input:checked + b, .review-label-chip[aria-expanded=true] > b,
+.review-label-chip:has(input:not(:checked)[aria-expanded=true]) > b { border-color:#7062f4; color:#6253e7; }
+.review-label-chip input:checked + b::after {
+  content:"✓"; position:absolute; bottom:0; right:0; height:13px; width:15px; padding-right:1px;
+  background:#7162ee; color:white; font:bold 9px/16px system-ui; text-align:right;
+  clip-path:polygon(100% 0,100% 100%,0 100%);
+}
+.review-label-tree [disabled], .review-label-chip:has(input:disabled) { cursor:default; }
+.review-label-group { border-radius:6px; padding:10px 12px; margin-top:10px; background:#f6f7fb; }
+.review-label-group[hidden], .review-trial-reason [hidden] { display:none !important; }
+.review-label-group-head { display:flex; align-items:center; gap:7px; margin-bottom:7px; }
+.review-label-group-head strong { font-size:13px; font-weight:500; color:#54617a; }
+.review-label-clear { display:inline-flex; align-items:center; justify-content:center; border:0; padding:2px; background:transparent; color:#737d91; cursor:pointer; }
+.review-label-clear:hover { color:#5147c5; }
+.review-trial-reason { display:grid; margin-top:14px; gap:5px; }
+.review-trial-reason .review-reason-toggle { justify-self:start; background:transparent; border:0; color:#38425a; font:inherit; }
+.review-reason-toggle i { font-style:normal; color:#6b5de7; }
+.review-trial-reason textarea { width:100%; min-height:48px; padding:7px; resize:vertical; font:inherit; }
+
 .option-tag .tree-choice-caption{display:inline-flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left}
 .option-tag .tree-choice-caption small{font-weight:400;font-size:.75rem;line-height:1.3;color:#57596d}
 .r25-recorded-labels{margin-top:10px;padding:10px 12px;border-left:3px solid #c5b9ee;background:#f6f4fb;color:#4e475e}
@@ -4412,6 +4446,12 @@ span.v6-new,
 .r29-biz .r25-custom-reason textarea{border:1px solid #e5e4ed;border-radius:4px;min-height:38px;resize:vertical;font-size:12px;padding:8px;color:#4c4c58}
 .r29-biz .r25-custom-reason textarea[readonly]{background:transparent;border-color:transparent;padding:0;min-height:20px;resize:none}
 .r29-biz .r25-custom-reason textarea[readonly]::placeholder{color:transparent}
+.r29-biz :is(.r25-reason-editor,.r25-reason-readonly){margin-top:16px;font-size:13px;color:#30303a}
+.r25-reason-readonly{white-space:pre-wrap;overflow-wrap:anywhere}
+.r25-reason-editor summary{display:inline-flex;align-items:center;gap:6px;cursor:pointer;list-style:none}
+.r25-reason-editor summary::-webkit-details-marker{display:none}
+.r25-reason-editor summary span{color:#6455de;font-size:16px}
+.r25-reason-editor textarea{display:block;box-sizing:border-box;margin-top:8px;width:100%;min-height:44px;resize:vertical;font:inherit;border:1px solid #d7dae7;border-radius:4px;padding:8px;color:inherit}
 .r29-biz [data-r25-question-pane]>textarea,.r29-biz [data-r25-question-pane]>input{width:100%;border:1px solid #e5e4ed;border-radius:4px;box-sizing:border-box;padding:9px;font:inherit;font-size:12px;min-height:40px;color:#515563}
 .r29-biz [data-r25-question-pane]>textarea{min-height:70px;resize:vertical}
 .r29-member-line{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;padding:10px 12px;background:#f7f8fd;border:1px solid #e6e9f3;border-radius:5px;font-size:12px}
@@ -11708,7 +11748,7 @@ function r25BindRecordCards(root,state,rerender){
 function questionManualOptions(q){return (Array.isArray(q.options)?q.options:String(q.options||'').split(/[,，\n]/)).map(o=>typeof o==='object'?String(o.label||o.name||o.value||''):String(o)).filter(Boolean);}
 function r25QuestionOptions(q){
   const tree=questionTreeSelection(q);
-  return tree?tree.entries.map(treeChoicePath):questionManualOptions(q);
+  return tree?questionReviewEntries(q,tree).map(treeChoicePath):questionManualOptions(q);
 }
 function r25AnswerDisplay(value){if(Array.isArray(value))return value.join('、');return value==null?'':String(value);}
 function r25ResultText(answer,detail){
@@ -11743,14 +11783,15 @@ function r25SavedTreeChoices(selection,saved,current,question){
 }
 function r25HistoricalLabels(tree,saved,current,question){
   if(!['单选','多选'].includes(question.type))return '';
+  const available=tree ? questionReviewEntries(question,tree) : [];
   let missing=[];
   if(saved.treeSelections){
-    missing=saved.treeSelections.filter(entry=>!tree?.entries.some(active=>
+    missing=saved.treeSelections.filter(entry=>!available.some(active=>
       active.treeId===entry.treeId&&active.nodeId===entry.nodeId&&treeChoicePath(active)===treeChoicePath(entry)
     )).map(treeChoicePath);
   }else if(current){
-    const options=tree?tree.entries.map(treeChoicePath):questionManualOptions(question);
-    missing=current.split('、').filter(value=>!options.includes(value)&&(!tree||tree.entries.filter(entry=>entry.name===value).length!==1));
+    const options=tree?available.map(treeChoicePath):questionManualOptions(question);
+    missing=current.split('、').filter(value=>!options.includes(value)&&(!tree||available.filter(entry=>entry.name===value).length!==1));
     const branches=tree?[]:questionOptionBranches(question);
     for(const child of saved.subSelections||(saved.sub||[]).map(name=>({parent:question.subOptions?.trigger,name}))){
       const shown=tree?r25SavedTreeChoices(tree,{subSelections:[child]},'',question).length:
@@ -11801,6 +11842,16 @@ function r29RecordMetaHTML(task,row,fields){
   return '<details class="r29-record-meta"><summary>送审信息</summary><dl>'+refs.map(([k,v])=>'<div><dt>'+esc(k)+'</dt><dd>'+esc(v||'—')+'</dd></div>').join('')+'</dl><details><summary>全部送审字段</summary><pre>'+esc(JSON.stringify(fields,null,2))+'</pre></details></details>';
 }
 
+function r25QuestionReason(key,question,label,reason,editable){
+  if(!question.customReason)return '';
+  if(!questionTreeSelection(question))return '<label class="r25-custom-reason"><span>自定义原因：</span><textarea name="r25-custom-'+key+'" '+(editable?'':'readonly')+' placeholder="补充审核理由">'+esc(reason)+'</textarea></label>';
+  const title='自定义原因：';
+  if(!editable)return '<div class="r25-reason-readonly">'+title+' '+esc(reason||'—')+'</div>';
+  return '<details class="r25-reason-editor" '+(reason?'open':'')+'><summary>'+title+' <span aria-hidden="true">✎</span></summary>'+
+    '<textarea name="r25-custom-'+key+'" aria-label="'+esc([question.name,label,'自定义原因'].filter(Boolean).join(' · '))+
+    '" placeholder="请输入补充原因">'+esc(reason)+'</textarea></details>';
+}
+
 function r25OpenRecord(task,row,opts={}){
   if(!row)return;
   const mode=opts.mode||'view',editable=mode!=='view',processing=mode==='process',human=opts.human??['标注','人审'].includes(row.stage),quality=processing&&row.stage==='质检';
@@ -11822,11 +11873,12 @@ function r25OpenRecord(task,row,opts={}){
           '<label><input '+(editable&&active?'':'disabled')+' type="checkbox" name="r25-sub-'+key+'-'+index+'" value="'+childIndex+'" '+(active&&r25SelectedChild(saved,branch,child,q)?'checked':'')+'><span>'+esc(child.name)+'</span></label>'
         ).join('')+'</div>';
       }).join('');
-      const choices=tree?'<div class="r25-question-options">'+treeChoiceHTML(tree,{name:'r25-q-'+key,type:kind,disabled:!editable,checkedIds:r25SavedTreeChoices(tree,saved,current,q)})+'</div>':
+      const choices=tree?treeChoiceHTML(tree,{question:q,name:'r25-q-'+key,type:kind,disabled:!editable,checkedIds:r25SavedTreeChoices(tree,saved,current,q)}):
         values.length?'<div class="r25-question-options">'+values.map(v=>'<label><input '+disabled+' type="'+kind+'" name="r25-q-'+key+'" value="'+esc(v)+'" '+((kind==='checkbox'?current.split('、').includes(v):v===current)?'checked':'')+'><span>'+esc(v)+'</span></label>').join('')+'</div>':'<'+(/文本/.test(q.type)?'textarea':'input')+' name="r25-q-'+key+'" aria-label="'+esc(q.name+' '+label)+'" '+(editable?'':'readonly')+(/文本/.test(q.type)?'>'+esc(current)+'</textarea>':' type="'+(/数字|数值/.test(q.type)?'number':'text')+'" value="'+esc(current)+'">');
       return '<div data-r25-question-pane="'+n+'" '+(n?'hidden':'')+'>'+choices+
         branchHTML+(editable?'':r25HistoricalLabels(tree,saved,current,q))+
-        (q.customReason?'<label class="r25-custom-reason"><span>自定义原因：</span><textarea name="r25-custom-'+key+'" '+(editable?'':'readonly')+' placeholder="补充审核理由">'+esc(reason)+'</textarea></label>':'')+'</div>';
+        r25QuestionReason(key,q,label,reason,editable)+
+        (tree&&q.prelabel?'<div class="review-prelabel">算法预测标 <span>'+esc(n===(q.prelabelIndex||0)?q.prelabel:'暂无预标')+'</span><small>示例</small></div>':'')+'</div>';
     }).join('');
     return '<section class="r25-question" data-r25-question="'+esc(q.id)+'" '+(repeatsImages(q)?'data-r25-images':'')+'><h3>'+esc(q.name)+(required(q)?'<b class="required">*</b>':'')+'</h3>'+
       (labels[0]?'<nav class="r25-repeat-tabs">'+labels.map((label,n)=>'<button type="button" data-r25-question-tab="'+n+'" class="'+(n===0?'active':'')+'">'+esc(label)+'</button>').join('')+'</nav>':'')+panes+'</section>';
@@ -11851,6 +11903,7 @@ function r25OpenRecord(task,row,opts={}){
   wideModal('审核详情',body,'','r25-immersive');
   const host=document.querySelector('.r25-immersive'),form=$('#r25-review-form');
   host.classList.add('r29-biz');
+  bindTreeChoices(form);
   if(editable)form.addEventListener('change',event=>{
     if(!event.target.closest('.r25-question-options'))return;
     const pane=event.target.closest('[data-r25-question-pane]');
@@ -11906,7 +11959,7 @@ function r25OpenRecord(task,row,opts={}){
       const instances=[],tree=questionTreeSelection(q);
       for(const [n,label]of repeatLabels(q).entries()){
         const key=i+'-'+n,chosen=fd.getAll('r25-q-'+key).map(v=>String(v).trim()).filter(Boolean),reason=String(fd.get('r25-custom-'+key)||'').trim();
-        const treeSelections=tree?.entries.filter(entry=>chosen.includes(entry.nodeId));
+        const treeSelections=tree ? questionReviewEntries(q,tree).filter(entry=>chosen.includes(entry.nodeId)) : null;
         if(required(q)&&!(treeSelections||chosen).length){error.textContent='请完成「'+q.name+(label?' · '+label:'')+'」';return;}
         if(tree){
           instances.push({label,answer:treeSelections.map(treeChoicePath).join('、'),sub:[],reason,treeSelections});
@@ -15046,6 +15099,61 @@ function buildQuestionTreeSelection(tree,nodeIds){
   return {treeId:String(tree.id),treeName:tree.name,entries};
 }
 
+function questionReviewTree(question, selection = questionTreeSelection(question)) {
+  if (!selection) return [];
+  const roots = [], nodes = new Map();
+  // Use the configuration snapshot so edits to the source dictionary do not alter a saved question.
+  for (const entry of selection.entries) {
+    const ids = [...entry.ancestorIds, entry.nodeId];
+    const names = [...entry.ancestorNames, entry.name];
+    let siblings = roots;
+    ids.forEach((id, index) => {
+      id = String(id);
+      let node = nodes.get(id);
+      if (!node) {
+        node = {nodeId:id, name:names[index], entry:null, children:[]};
+        nodes.set(id, node);
+        siblings.push(node);
+      }
+      if (index === ids.length - 1) node.entry = entry;
+      siblings = node.children;
+    });
+  }
+  const ranks = new Map((question.treeOrder?.treeId === selection.treeId ? question.treeOrder.nodeIds : [])
+    .map((id, index) => [String(id), index]));
+  function sortSiblings(list) {
+    list.sort((a, b) => (ranks.get(a.nodeId) ?? Infinity) - (ranks.get(b.nodeId) ?? Infinity));
+    list.forEach(node => sortSiblings(node.children));
+  }
+  if (ranks.size) sortSiblings(roots);
+  const options = roots.flatMap(root => {
+    const pictureDirectory = root.name === '图片' && (selection.treeId === '57' || question.name === '图片');
+    return pictureDirectory ? root.children : [root];
+  });
+  if (question.multiLevelAnnotation !== false) return options;
+
+  const flat = [];
+  function visit(node) {
+    if (node.entry) flat.push({...node, children:[]});
+    node.children.forEach(visit);
+  }
+  options.forEach(visit);
+  const names = new Map();
+  flat.forEach(node => names.set(node.name, (names.get(node.name) || 0) + 1));
+  flat.forEach(node => { if (names.get(node.name) > 1) node.name = treeChoicePath(node.entry); });
+  return flat;
+}
+
+function questionReviewEntries(question, selection = questionTreeSelection(question)) {
+  const entries = [];
+  function visit(node) {
+    if (node.entry) entries.push(node.entry);
+    node.children.forEach(visit);
+  }
+  questionReviewTree(question, selection).forEach(visit);
+  return entries;
+}
+
 function initialQuestionTreeSelection(question,tree){
   if(question.treeSelection?.treeId===String(tree.id)){
     return buildQuestionTreeSelection(tree,question.treeSelection.entries.map(entry=>entry.nodeId));
@@ -15074,12 +15182,162 @@ function setQuestionTreeSelection(question,tree,nodeIds){
   return question.treeSelection;
 }
 
-function treeChoiceHTML(selection,{name,type,disabled=false,checkedIds=[]}){
-  if(!selection.entries.length)return '<small class="muted">此题尚未配置标注标签。</small>';
-  return selection.entries.map(entry=>{
-    const path=treeChoicePath(entry),ancestors=entry.ancestorNames.join(' / ');
-    return '<label class="option-tag" title="'+esc(path)+'"><input data-tree-choice data-node-id="'+esc(entry.nodeId)+'" aria-label="'+esc(path)+'" type="'+type+'" name="'+esc(name)+'" value="'+esc(entry.nodeId)+'" '+(disabled?'disabled ':'')+(checkedIds.includes(entry.nodeId)?'checked':'')+'><span class="tree-choice-caption">'+(ancestors?'<small>'+esc(ancestors)+'</small>':'')+'<b>'+esc(entry.name)+'</b></span></label>';
+function treeChoiceHTML(selection,{name,type,disabled=false,checkedIds=[],question}) {
+  const roots=questionReviewTree(question,selection);
+  if(!roots.length)return '<small class="muted">此题尚未配置标注标签。</small>';
+  const selected=new Set(checkedIds.map(String)), groups=[];
+  function chip(node,parentId) {
+    const id=esc(node.nodeId), branch=node.children.length>0;
+    const path=node.entry?treeChoicePath(node.entry):node.name;
+    const attrs=' data-label-node="'+id+'" data-label-parent="'+esc(parentId)+'"';
+    const expand=branch?' aria-expanded="false"':'';
+    if (!node.entry)
+      return '<button type="button" class="review-label-chip"'+attrs+expand+
+        ' aria-label="'+esc(node.name)+'" '+(disabled?'disabled':'')+'><b>'+esc(node.name)+'</b></button>';
+    return '<label class="review-label-chip" title="'+esc(path)+'"><input data-tree-choice data-node-id="'+id+'"'+attrs+
+      ' name="'+esc(name)+'" value="'+id+'" type="'+type+'" aria-label="'+esc(path)+'"'+expand+
+      (disabled?' disabled':'')+(selected.has(node.nodeId)?' checked':'')+'><b>'+esc(node.name)+'</b></label>';
+  }
+  function row(nodes,parentId='') {
+    return '<div class="review-label-options">'+nodes.map(n=>chip(n,parentId)).join('')+'</div>';
+  }
+  function branches(nodes) {
+    for(const node of nodes) if(node.children.length){
+      const clear=disabled?'':'<button type="button" class="review-label-clear" data-label-clear="'+esc(node.nodeId)+
+        '" aria-label="清除'+esc(node.name)+'及其下级选择" title="清除此组">'+
+        '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" aria-hidden="true">'+
+        '<path d="M2 4h12M6 4V2h4v2M4 4l.7 9h6.6l.7-9M6.7 6v5m2.6-5v5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>';
+      groups.push('<section class="review-label-group" data-label-group="'+esc(node.nodeId)+'" hidden>'+
+        '<div class="review-label-group-head"><strong>'+esc(node.name)+'：</strong>'+clear+'</div>'+row(node.children,node.nodeId)+'</section>');
+      branches(node.children);
+    }
+  }
+  branches(roots);
+  return '<div class="review-label-tree" data-review-label-tree>'+row(roots)+groups.join('')+'</div>';
+}
+
+function bindTreeChoices(root) {
+  for(const tree of root.querySelectorAll('[data-review-label-tree]')){
+    if(tree.dataset.bound)continue;
+    tree.dataset.bound='true';
+    const nodes=new Map([...tree.querySelectorAll('[data-label-node]')].map(el=>[el.dataset.labelNode,el]));
+    const groups=new Map([...tree.querySelectorAll('[data-label-group]')].map(el=>[el.dataset.labelGroup,el]));
+    const open=new Set();
+    function openPath(control){
+      for(let node=control;node;node=nodes.get(node.dataset.labelParent))
+        if(groups.has(node.dataset.labelNode))open.add(node.dataset.labelNode);
+    }
+    function closeBranch(id,clearAnswers){
+      for(const [otherId,el] of nodes){
+        let n=el;
+        while(n && n.dataset.labelNode!==id)n=nodes.get(n.dataset.labelParent);
+        if(n){
+          if(clearAnswers && el.matches('input[data-tree-choice]'))el.checked=false;
+          open.delete(otherId);
+        }
+      }
+    }
+    function refresh(){
+      for(const [id,group] of groups){
+        const expanded=open.has(id);
+        group.hidden=!expanded;
+        nodes.get(id).setAttribute('aria-expanded',String(expanded));
+      }
+    }
+    for(const el of nodes.values())if(el.checked)openPath(el);
+    refresh();
+    tree.addEventListener('change', event=>{
+      const input=event.target;
+      if(!input.matches('input[data-tree-choice]'))return;
+      if(input.checked){
+        if(input.type==='radio')open.clear();
+        openPath(input);
+      }else closeBranch(input.dataset.labelNode,true);
+      refresh();
+    });
+    tree.addEventListener('click',event=>{
+      const clear=event.target.closest('[data-label-clear]');
+      const nav=event.target.closest('button[data-label-node]');
+      if(!clear&&!nav)return;
+      if(clear){
+        const id=clear.dataset.labelClear;
+        closeBranch(id,true);nodes.get(id).focus({preventScroll:true});
+      }else if(open.has(nav.dataset.labelNode))closeBranch(nav.dataset.labelNode,false);
+      else openPath(nav);
+      refresh();
+      tree.dispatchEvent(new Event('change',{bubbles:true}));
+    });
+  }
+}
+
+// Canvas answers are local trials for one question object; they never enter template storage.
+const questionCanvasTrials=new WeakMap();
+function canvasQuestionTrial(question,tree){
+  let trial=questionCanvasTrials.get(question);
+  if(!trial||trial.treeId!==tree.treeId){
+    trial={treeId:tree.treeId,activeKey:'',instances:new Map()};
+    questionCanvasTrials.set(question,trial);
+  }
+  const allowed=new Set(tree.entries.map(entry=>entry.nodeId));
+  for(const instance of trial.instances.values()){
+    instance.ids=instance.ids.filter(id=>allowed.has(id));
+    if(question.type==='单选')instance.ids=instance.ids.slice(-1);
+  }
+  return trial;
+}
+function repeatTrialKey(labels,index){
+  const label=labels[index];
+  return JSON.stringify([label,labels.slice(0,index).filter(value=>value===label).length]);
+}
+function bindTrialReason(root){
+  root.querySelectorAll('[data-review-reason-toggle]').forEach(button=>{
+    button.onclick=()=>{
+      const editor=button.closest('.review-trial-reason').querySelector('textarea');
+      editor.hidden=!editor.hidden;button.setAttribute('aria-expanded',String(!editor.hidden));
+      if(!editor.hidden)editor.focus();
+    };
+  });
+}
+function bindCanvasTrials(root){
+  for(const field of root.querySelectorAll('[data-tree-trial]')){
+    const q=activeTemplate().questions.find(question=>question.id===field.dataset.repeatQuestion);
+    const trial=questionCanvasTrials.get(q);
+    if(!trial)continue;
+    field.addEventListener('click',event=>{
+      const tab=event.target.closest('[data-repeat-index]');
+      if(tab)trial.activeKey=field.querySelector('[data-repeat-pane="'+tab.dataset.repeatIndex+'"]').dataset.trialKey;
+    },true);
+    const remember=event=>{
+      const pane=event.target.closest('[data-repeat-pane]');
+      if(!pane)return;
+      trial.instances.set(pane.dataset.trialKey,{
+        ids:[...pane.querySelectorAll('input[data-tree-choice]:checked')].map(el=>el.value),
+        reason:pane.querySelector('.review-trial-reason textarea')?.value||''
+      });
+    };
+    field.addEventListener('change',remember);
+    field.addEventListener('input',event=>{if(event.target.matches('textarea'))remember(event);});
+  }
+}
+
+function previewTreeQuestion(q,tree,interactive){
+  const labels=q.repeatLabels?.length?q.repeatLabels:[''];
+  const trial=interactive?null:canvasQuestionTrial(q,tree);
+  const keys=labels.map((label,index)=>repeatTrialKey(labels,index));
+  const active=Math.max(0,keys.indexOf(trial?.activeKey));
+  const tabs=labels[0]?'<div class="review-item-tabs" role="tablist">'+labels.map((label,index)=>
+    '<button type="button" role="tab" aria-selected="'+(index===active)+'" data-repeat-index="'+index+'" class="'+(index===active?'active':'')+'">'+esc(label)+'</button>').join('')+'</div>':'';
+  const panes=labels.map((label,i)=>{
+    const instance=trial?.instances.get(keys[i]);
+    const choices=treeChoiceHTML(tree,{question:q,name:(interactive?'preview-':'canvas-')+q.id+'-'+i,type:q.type==='单选'?'radio':'checkbox',checkedIds:instance?.ids||[]});
+    const reason=instance?.reason||'';
+    const custom=q.customReason?'<div class="review-trial-reason"><button type="button" class="review-reason-toggle" data-review-reason-toggle aria-expanded="'+Boolean(reason)+'">自定义原因： <i aria-hidden="true">✎</i></button>'+
+      '<textarea aria-label="'+esc(q.name+' '+label)+' 自定义原因" placeholder="请输入补充原因"'+(reason?'':' hidden')+'>'+esc(reason)+'</textarea></div>':'';
+    const prediction=q.prelabel?'<div class="review-prelabel">算法预测标 <span>'+esc(i===(q.prelabelIndex||0)?q.prelabel:'暂无预标')+'</span></div>':'';
+    return '<div class="review-item-pane" data-repeat-pane="'+i+'" data-trial-key="'+esc(keys[i])+'"'+(i===active?'':' hidden')+'>'+choices+
+      reviewTaxonomy.questionTags(q,interactive)+custom+prediction+'</div>';
   }).join('');
+  return '<div class="repeat-question" data-repeat-question="'+esc(q.id)+'"'+(interactive?'':' data-tree-trial')+'>'+tabs+panes+'</div>';
 }
 
 function questionOptionBranches(question) {
@@ -15273,7 +15531,8 @@ function bindQuestionAnnotationEditor(question, refreshManual) {
     host.innerHTML='<div class="annotation-heading"><strong>标注数据</strong>'+(tree?'<span>构建方式 · 各级节点向上回溯</span>':'')+'</div>'+
       '<label class="annotation-tree-type"><span>标签类型</span><select aria-label="标签类型"><option value="">自定义选项</option>'+trees.map(t=>'<option value="'+esc(t.id)+'" '+(active===t.id?'selected':'')+'>'+esc(t.name)+'</option>').join('')+'</select></label>'+
       (tree?'<div class="annotation-tools"><input type="search" aria-label="搜索标签名称" placeholder="搜索标签名称" value="'+esc(query)+'"><button type="button" class="btn" data-search-annotation>搜索</button><button type="button" class="btn secondary" data-sort-annotation>设置顺序</button></div>'+
-        '<div class="annotation-picker"><div class="annotation-directory"></div><div class="annotation-selected"></div></div>':'');
+        '<div class="annotation-picker"><div class="annotation-directory"></div><div class="annotation-selected"></div></div>'+
+        (expanded ? '' : '<div class="property-switch"><span>多级标注</span>'+switchButton('block-multilevel',question.multiLevelAnnotation!==false,'多级标注')+'</div>'):'');
     if(tree) {drawDirectory(host);drawSelected(host,expanded);}
     host.onchange=e=>{
       if(e.target.matches('.annotation-tree-type select')) changeTree(e.target.value);
@@ -15288,7 +15547,11 @@ function bindQuestionAnnotationEditor(question, refreshManual) {
     };
     host.onclick=e=>{
       const button=e.target.closest('button');if(!button)return;
-      if(button.hasAttribute('data-open-node') || button.hasAttribute('data-crumb')) {
+      if(button.id==='block-multilevel') {
+        question.multiLevelAnnotation=question.multiLevelAnnotation===false;
+        button.setAttribute('aria-checked',String(question.multiLevelAnnotation));
+        renderNodeCanvas();
+      } else if(button.hasAttribute('data-open-node') || button.hasAttribute('data-crumb')) {
         trail=button.hasAttribute('data-crumb')?trail.slice(0,Number(button.dataset.crumb)):pathTo(byId.get(button.dataset.openNode));
         syncSearch('');
         const levels=host.querySelector('.annotation-levels');
@@ -15561,21 +15824,27 @@ function validateNodeTemplates(e) {
     ["共用", e.sharedTemplate],
     ...Object.entries(e.nodeTemplates).filter(([name]) => name!=="Agent辅助标注" && enabledNodes.some(node=>templateAssignments(e)[node]===name)),
   ].filter(([,template])=>enabledNodes.some(node=>effectiveTemplate(e,node)===template));
-  for (const [e, a] of t) {
-    if (!a?.name.trim()) return `请填写${e}模板名称`;
-    if (!a.questions.length) return `${e}模板至少需要一道题目`;
-    for (const t of a.questions) {
-      if (!t.name.trim()) return `请填写${e}模板中的题目标题`;
-      if (["单选", "多选"].includes(t.type)) {
-        const a = questionTreeSelection(t)?.entries.map(entry=>entry.nodeId) ?? t.options.split(",").map((e) => e.trim());
-        if (a.length < ("单选" === t.type ? 2 : 1) || a.some((e) => !e))
-          return `${e}模板「${t.name}」请配置有效选项（单选至少两项）`;
-        if (new Set(a).size !== a.length)
-          return `${e}模板「${t.name}」存在重复选项`;
-      }
-    }
+  for (const [name, template] of t) {
+    const error = validateTemplateQuestions(name, template);
+    if (error) return error;
   }
-  return "";
+  return '';
+}
+function validateTemplateQuestions(name, template) {
+  if (!template?.name?.trim()) return '请填写' + name + '模板名称';
+  if (!template.questions.length) return name + '模板至少需要一道题目';
+  for (const q of template.questions) {
+    if (!q.name.trim()) return '请填写' + name + '模板中的题目标题';
+    if (!['单选', '多选'].includes(q.type)) continue;
+    const selection = questionTreeSelection(q);
+    const options = selection ? questionReviewEntries(q, selection).map(entry => entry.nodeId)
+      : (Array.isArray(q.options) ? q.options : String(q.options || '').split(',')).map(value => String(value).trim());
+    if (selection && !options.length) return name + '模板「' + q.name + '」请至少配置一个可作答的标签';
+    if (options.length < (q.type === '单选' ? 2 : 1) || options.some(value => !value))
+      return name + '模板「' + q.name + '」请配置有效选项（单选至少两项）';
+    if (new Set(options).size !== options.length) return name + '模板「' + q.name + '」存在重复选项';
+  }
+  return '';
 }
 function templateHeader() {
   const e = Object.keys(taskDraft.nodeTemplates).filter(
@@ -15762,6 +16031,42 @@ const graphicCommonTemplate = {
     }),
   ],
 };
+const legacyGraphicImageQuestion = structuredClone(graphicCommonTemplate.questions[0]);
+function presetImageLabels() {
+  const tree = reviewTaxonomy.trees().find(item => item.code === 'quality_tag_tree');
+  if (!tree) return;
+  const q = graphicCommonTemplate.questions[0];
+  const parentNames = ['内容已被删除','处方药','时效性过期','刻意制造噱头','劣质AI','商品营销表达',
+    '虚假夸大宣传','低俗色情','引人不适','基础美观不达标','站外引流','社会安全'];
+  const childNames = ['情趣用品','臀部低俗','丝袜场景低俗','人体敏感部位','裸露面积较大','胸部低俗','透明衣服'];
+  const byPath = new Map(tree.nodes.map(node => [node.path, node.id]));
+  const paths = [...parentNames.map(name => '图片:' + name), ...childNames.map(name => '图片:低俗色情:' + name)];
+  const ids = paths.map(path => byPath.get(path)).filter(Boolean);
+  if (ids.length === paths.length) setQuestionTreeSelection(q, tree, ids);
+}
+presetImageLabels();
+
+function upgradeDemoImageLabels() {
+  const preset = graphicCommonTemplate.questions[0];
+  if (!questionTreeSelection(preset)) return;
+  let changed = false;
+  for (const task of tasks) {
+    const catalog = String(task.r19SourceFlowId) === '105317' && task.r19ContentType === '图文';
+    if (!catalog && !['feeds-105317-graphic-practice-v1', 'feeds-first-quality-mock-graphic-v1'].includes(task.practiceKey)) continue;
+    const template = task.sharedTemplate;
+    if (!['preset-feed-graphic', 'builtin-graphic-common'].includes(template?.referenceId)) continue;
+    const q = template.questions.find(question => question.name === '图片');
+    if (!q || q.optionMode || q.treeSelection) continue;
+    // Only replace the exact untouched built-in question. Keep customized options, branches and task answers.
+    const keys = new Set([...Object.keys(q), ...Object.keys(legacyGraphicImageQuestion)]);
+    keys.delete('id');
+    if ([...keys].some(key => JSON.stringify(q[key]) !== JSON.stringify(legacyGraphicImageQuestion[key]))) continue;
+    q.optionMode = 'tree';
+    q.treeSelection = structuredClone(preset.treeSelection);
+    changed = true;
+  }
+  if (changed) writeLocal(TASK_KEY, tasks);
+}
 function galleryHTML(e) {
   const t = e.count || 9;
   return `<div class="review-gallery" data-gallery><div class="material-placeholder"><span>▧</span><strong data-gallery-title>封面图</strong><small>图文素材演示占位 · ${esc(e.field)}</small></div><div class="gallery-thumbs">${Array.from({ length: t }, (e, t) => `<button type="button" data-gallery-index="${t}" class="${0 === t ? "active" : ""}" aria-label="查看${0 === t ? "封面图" : "图片" + (t + 1)}"><span>▧</span>${0 === t ? "封面图" : "图片" + (t + 1)}</button>`).join("")}</div></div>`;
@@ -15801,11 +16106,14 @@ function baseQuestionPreview(e, t) {
     return "文本" === e.type
       ? `<textarea class="preview-input" placeholder="请输入" ${a}></textarea>`
       : `<input class="preview-input" type="number" placeholder="请输入数值" ${a}>`;
-  const n = e.repeatLabels?.length ? e.repeatLabels : [""],tree=questionTreeSelection(e);
+  const tree=questionTreeSelection(e);
+  if(tree)return previewTreeQuestion(e,tree,t);
+  if(!t)questionCanvasTrials.delete(e);
+  const n=e.repeatLabels?.length?e.repeatLabels:[""];
   return `<div class="repeat-question" data-repeat-question="${e.id}">${n[0] ? `<div class="review-item-tabs" role="tablist">${n.map((e, t) => `<button type="button" role="tab" aria-selected="${0 === t}" data-repeat-index="${t}" class="${0 === t ? "active" : ""}">${esc(e)}</button>`).join("")}</div>` : ""}${n
     .map(
       (t, n) =>
-        `<div class="review-item-pane" data-repeat-pane="${n}" ${n ? "hidden" : ""}><div class="question-options ${"垂直" === e.direction ? "vertical" : ""}">${tree?treeChoiceHTML(tree,{name:"answer-"+e.id+"-"+n,type:e.type==="单选"?"radio":"checkbox",disabled:!!a}):questionManualOptions(e)
+        `<div class="review-item-pane" data-repeat-pane="${n}" ${n ? "hidden" : ""}><div class="question-options ${"垂直" === e.direction ? "vertical" : ""}">${questionManualOptions(e)
           .map(
             (t) =>
               `<label class="${"多选" === e.type ? "option-tag" : ""}"><input type="${"单选" === e.type ? "radio" : "checkbox"}" name="answer-${e.id}-${n}" value="${esc(t)}" data-primary-option ${a}>${esc(t)}</label>`,
@@ -15817,6 +16125,9 @@ function baseQuestionPreview(e, t) {
     .join("")}</div>`;
 }
 function bindReviewInteractions(e) {
+  bindTreeChoices(e);
+  bindTrialReason(e);
+  if(e.id==="node-canvas")bindCanvasTrials(e);
   reviewTaxonomy.bindQuestions(e);
   (e.querySelectorAll("[data-repeat-index]").forEach(
     (e) =>
@@ -16114,11 +16425,7 @@ function renderNodeProperties() {
 }
 function publishNodeTemplate() {
   const e = activeTemplate(),
-    t = validateNodeTemplates({
-      sharedTemplate: e,
-      nodeTemplates: {},
-      flow: { nodes: [] },
-    });
+    t = validateTemplateQuestions(templateNode, e);
   t
     ? toast(t)
     : (modal(
@@ -17795,6 +18102,7 @@ r25InstallApprovalExample();
   migrateFeedsMediaExamples(),
   tasks.forEach(task=>rev3NormalizeAllocation(task.flow)),
   tasks.forEach(ensureNodeTemplates),
+  upgradeDemoImageLabels(),
   r30InstallCaseSamples(),
   ($("#help").onclick = () =>
     modal(
@@ -17874,23 +18182,15 @@ r25InstallApprovalExample();
     ),
   "#metadata" === location.hash && switchSection("平台工坊"),
   "#tasks" === location.hash && switchSection("管理中心"),
-  "#templates" === location.hash && openTemplateDemo());
+  ["#templates", "#templates-preview"].includes(location.hash) && openTemplateDemo());
 
 function openTemplateDemo() {
   switchSection("管理中心");
   taskEditor();
   taskDraft.name = "内容审核 · 共用模板与按需拆分";
-  const question = taskDraft.sharedTemplate.questions.find(item => item.name === "图片");
-  const tree = reviewTaxonomy.trees().find(item => item.code === "quality_tag_tree");
-  if (question && tree) {
-    const samplePaths = ["图片", "图片:低俗色情", "图片:低俗色情:封面低俗",
-      "图片:基础美观不达标", "图片:基础美观不达标:封面黑边", "图片:虚假夸大宣传:夸张文案"];
-    const sampleIds = samplePaths.map(path => tree.nodes.find(node => node.path === path)?.id).filter(Boolean);
-    const initialIds = initialQuestionTreeSelection(question, tree).entries.map(entry => entry.nodeId);
-    if (sampleIds.length) setQuestionTreeSelection(question, tree, [...sampleIds, ...initialIds]);
-  }
   taskStep = 2;
   renderTaskWizard();
+  if (location.hash === '#templates-preview') previewNodeTemplate();
 }
 
 function openMigrationStep(hash){
