@@ -2076,6 +2076,7 @@ tbody tr:hover {
   background: #30394d;
 }
 .builder-canvas {
+  min-height: 0;
   background: #f3f5f8;
   flex-direction: column;
   min-width: 0;
@@ -3476,6 +3477,7 @@ body {
 }
 .template-builder {
   grid-template-columns: clamp(110px, 10%, 155px) minmax(0, 1fr) clamp(335px, 32%, 475px);
+  grid-template-rows: minmax(0, 1fr);
 }
 .annotation-data {
   container: annotation-editor / inline-size;
@@ -3762,6 +3764,7 @@ body {
 @container template-workspace (max-width: 640px) {
   .template-builder {
     grid-template-columns: minmax(78px, 22%) minmax(0, 1fr);
+    grid-template-rows: auto auto;
     height: auto;
     max-height: none;
     overflow: visible;
@@ -15259,10 +15262,9 @@ function bindQuestionAnnotationEditor(question, refreshManual) {
   }
   function drawSelected(host, expanded) {
     const items=[...selected].map(id=>byId.get(id)).filter(Boolean);
-    const shown=expanded?items:items.slice(0,8);
     const names=new Map();
     for(const node of items) names.set(node.name,(names.get(node.name)||0)+1);
-    const chips=shown.map(node=>'<span class="annotation-chip" title="'+esc(fullPath(node))+'"><span>'+esc(names.get(node.name)>1?fullPath(node):node.name)+'</span><button type="button" data-remove-node="'+esc(node.id)+'" aria-label="移除 '+esc(fullPath(node))+'">×</button></span>').join('');
+    const chips=items.map(node=>'<span class="annotation-chip" title="'+esc(fullPath(node))+'"><span>'+esc(names.get(node.name)>1?fullPath(node):node.name)+'</span><button type="button" data-remove-node="'+esc(node.id)+'" aria-label="移除 '+esc(fullPath(node))+'">×</button></span>').join('');
     host.querySelector('.annotation-selected').innerHTML='<div class="annotation-count" aria-live="polite">已选 '+items.length+' 个</div><div class="annotation-chips">'+
       (chips||'<small>勾选左侧标签后在这里查看</small>')+'</div>'+(!expanded?'<button type="button" class="annotation-expand action" data-expand-annotation>展开全部</button>':'');
   }
