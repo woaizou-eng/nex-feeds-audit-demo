@@ -165,7 +165,7 @@
                 : '<button class="ds-action" data-action="toggle">' +
                   (row.paused ? '恢复' : '暂停') +
                   '</button>';
-            return `<tr data-id="${esc(row.id)}"><td><strong>${esc(row.name)}</strong><small class="ds-meta">${esc(row.id)}</small></td><td>${esc(row.type)}</td><td>${esc(row.flow)}</td><td>${esc(row.done)} / ${esc(row.total)}<progress aria-label="审核进度" value="${progress}" max="100">${progress}%</progress></td><td><span class="ds-status" data-status="${state}">${state}</span></td><td>${esc(row.at)}<small class="ds-meta">${esc(row.operator)}</small></td><td><div class="ds-actions">${toggle}<button class="ds-action" data-action="copy">复制</button><button class="ds-action" data-action="delete">删除</button></div></td></tr>`;
+            return `<tr data-id="${esc(row.id)}"><td><strong>${esc(row.name)}</strong><small class="ds-meta">${esc(row.id)}</small></td><td>${esc(row.type)}</td><td><span class="flow-tag">${esc(row.flow)}</span></td><td>${esc(row.done)} / ${esc(row.total)}<progress aria-label="审核进度" value="${progress}" max="100">${progress}%</progress></td><td><span class="ds-status" data-status="${state}">${state}</span></td><td>${esc(row.at)}<small class="ds-meta">${esc(row.operator)}</small></td><td><div class="ds-actions">${toggle}<button class="ds-action" data-action="copy">复制</button><button class="ds-action" data-action="delete">删除</button></div></td></tr>`;
           })
           .join('') || '<tr><td class="ds-empty" colspan="7">没有符合条件的数据集</td></tr>';
     }

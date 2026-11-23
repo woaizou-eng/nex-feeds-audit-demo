@@ -507,6 +507,20 @@
         padding: 8px 1px;
         font-size: 13px;
       }
+      .map-media {
+        margin: 0 0 12px;
+      }
+      .mapped-category + .mapped-category {
+        margin-top: 12px;
+      }
+      .mapped-category > strong {
+        font-size: 13px;
+      }
+      .media-kind {
+        color: var(--mute);
+        margin-right: 8px;
+        font-size: 12px;
+      }
       .stage-list {
         padding: 0 2px 8px 24px;
       }
@@ -952,8 +966,8 @@
         <div class="sr-only" aria-live="polite" id="announcement"></div>
       </main>
     </div>
-    <script src="biz-nex-scenarios.js"></script>
-    <script src="biz-nex-datasets.js"></script>
+    <script src="biz-nex-scenarios.js?v=b7aaf00b"></script>
+    <script src="biz-nex-datasets.js?v=4299f5b2"></script>
     <script>
       'use strict';
       const icons = {
@@ -975,14 +989,19 @@
         `<svg class="ui" viewBox="0 0 24 24" aria-hidden="true"><path d="${icons[name]}"></path></svg>`;
       const tabs = {
         mapping: ['流程映射', '按 3.0 的分组、流程或任务 ID，核对 NEX 的承接位置。'],
-        scope: ['送审范围', '分别调整图文和视频的来源，预览哪些样本会进入任务。'],
-        rule: ['共享规则', '修改一次规则，查看引用任务、审批状态和生效后的样本结果。'],
+        scope: ['送审范围', '在内容一审任务内，按素材类型调整送审来源并核对样本。'],
+        rule: ['共享规则', '查看内容一审任务中引用同一规则的子任务，试算并审批规则变更。'],
         template: ['模板与标签', '从数据类型找到作业模板，再到审核员视角查看题目。'],
         exemption: ['免审配置', '建立仅免审任务，试送一条样本，查看规则命中和结果归属。'],
         datasets: ['数据集列表', '从列表查看进度、最近操作，并维护送审数据集。'],
       };
-      const kindNames = { graphic: '图文', video: '视频' },
-        stages = ['免机审', '机审', '免人审', '人审'];
+      const reviewTask = { name: '内容一审任务', flowId: '105317', flowName: '内容一审流程' };
+      const kindNames = { graphic: '图文', video: '视频' };
+      const reviewNodes = [
+        { name: '机审节点', types: ['免机审', '机审'] },
+        { name: '标注节点（人审）', types: ['免人审', '人审'] },
+      ];
+      const flowTag = `<span class="flow-tag">所属流程 · ${reviewTask.flowId}</span>`;
       const sources = ['逛逛', '光合', '千牛'];
       const samples = [
         ['G01', 'graphic', '逛逛', '周末逛花市，三种鲜切花搭配', 0.22],
@@ -1090,6 +1109,7 @@
       }
       let active = '',
         query = '',
+        mediaFilter = '',
         kind = 'graphic',
         draftScope = [],
         draftThreshold = model.pending?.threshold ?? model.threshold,
@@ -1172,14 +1192,14 @@
         return inventory.filter(
           (i) =>
             !q ||
-            [i[0], i[1], i[2], kindNames[i[3]], '105317', '推荐一审', '内容一审流程', '80002620'].some((x) =>
+            [i[0], i[1], i[2], kindNames[i[3]], reviewTask.name, reviewTask.flowId, reviewTask.flowName, '推荐一审', '80002620'].some((x) =>
               x.toLowerCase().includes(q),
             ),
         );
       }
       function renderMapping() {
         qs('#scene').innerHTML =
-          `<section class="panel panel-pad"><div class="pane-title"><h2>查找流程与任务</h2><span class="sub">BIZ 上线任务清单 · 2026/11/16</span></div><form class="searchbar" id="map-form"><label class="searchbox">${ico('search')}<input type="search" id="map-input" aria-label="分组、旧流程 ID 或旧任务 ID" placeholder="输入分组、旧流程 ID 或旧任务 ID" value="${safe(query)}"></label><button class="btn primary">查询</button><button type="button" class="btn" id="map-reset">重置</button></form></section><div id="matching"></div>`;
+          `<section class="panel panel-pad"><div class="pane-title"><h2>查找流程与任务</h2><span class="sub">BIZ 上线任务清单 · 2026/11/16</span></div><form class="searchbar" id="map-form"><label class="searchbox">${ico('search')}<input type="search" id="map-input" aria-label="分组、流程、任务名称或 ID" placeholder="输入分组、流程、任务名称或 ID" value="${safe(query)}"></label><button class="btn primary">查询</button><button type="button" class="btn" id="map-reset">重置</button></form></section><div id="matching"></div>`;
         qs('#map-form').onsubmit = (e) => {
           e.preventDefault();
           query = qs('#map-input').value.trim();
@@ -1194,64 +1214,69 @@
         };
         qs('#map-reset').onclick = () => {
           query = '';
+          mediaFilter = '';
           qs('#map-input').value = '';
           paintMapping();
           qs('#map-input').focus();
         };
         paintMapping();
       }
+      function mappedNode(node, records, expanded) {
+        const inNode = records.filter((r) => node.types.includes(r[2]));
+        if (!inNode.length) return '';
+        const categories = node.types.map((type) => {
+          const rows = inNode.filter((r) => r[2] === type);
+          if (!rows.length) return '';
+          const label = type.startsWith('免') ? type + '配置' : type + '子任务';
+          const entries = rows.map(([id, name, , media]) => `
+            <div class="entry"><span><span class="media-kind">${kindNames[media]}</span>${safe(name)}</span><span class="mono">BIZ ${safe(id)}</span></div>`).join('');
+          return `<div class="mapped-category"><strong>${label}</strong><span class="sub"> · ${rows.length} 项</span>${entries}</div>`;
+        }).join('');
+        return `<details class="stage" ${expanded ? 'open' : ''}><summary><span class="chev">${ico('down')}</span>${node.name}<span class="sub">${inNode.length} 项</span></summary><div class="stage-list">${categories}</div></details>`;
+      }
       function paintMapping() {
-        const subset = searchResults(),
+        const matches = searchResults(),
           root = qs('#matching');
-        if (!subset.length) {
-          root.innerHTML =
-            '<div class="empty">未找到对应记录。可输入旧流程 ID 105317，或输入旧任务 ID 2031414。</div>';
+        if (!matches.length) {
+          root.innerHTML = '<div class="empty">未找到对应记录。可输入流程 ID 105317，或输入原任务 ID 2031414。</div>';
           return;
         }
-        const matchesAll = subset.length === inventory.length,
-          heading = query && !matchesAll ? '匹配的子任务' : '任务与子任务';
-        let kinds = Object.keys(kindNames).filter((k) => subset.some((row) => row[3] === k));
-        root.innerHTML = `<section class="panel panel-pad mapping"><div><div class="flow-label"><span class="source-mark">BIZ</span>审核流程</div><div class="flowbox"><span class="id mono">105317</span><strong>内容一审流程</strong><span class="dim">所属分组 · 推荐一审</span></div></div><div class="hops">${ico('arrow')}</div><div><div class="flow-label"><span class="source-mark nex-mark">NEX</span>两个任务分别执行图文、视频审核</div><div class="branch">${Object.keys(
-          kindNames,
-        )
-          .map(
-            (k) =>
-              `<button class="branchrow" data-jump="${k}" title="展开${kindNames[k]}任务的子任务清单"><span class="kicon">${ico(k)}</span><span class="mapped-task"><strong>内容一审 · ${kindNames[k]}</strong><span class="flow-tag">所属流程 · 105317</span></span><span class="sub">${inventory.filter((i) => i[3] === k).length} 个子任务 ›</span></button>`,
-          )
-          .join(
-            '',
-          )}</div><div class="source-caption">「所属流程」是归属标签，用于归集数据集和任务，按原流程统计。</div></div></section><div class="list-head"><h2>${heading}</h2><span class="sub">${kinds.length} 个任务 · ${subset.length} 个子任务</span></div>${kinds
-          .map(
-            (k) =>
-              `<details class="task-group" data-task-group="${k}" ${k === 'graphic' || !matchesAll ? 'open' : ''}><summary><span class="chev">${ico('down')}</span>${ico(k)}内容一审 · ${kindNames[k]}<span class="sub">${subset.filter((i) => i[3] === k).length} 项</span></summary><div class="stage-wrap">${stages
-                .map((stage) => {
-                  const rows = subset.filter((i) => i[3] === k && i[2] === stage);
-                  if (!rows.length) return '';
-                  return `<details class="stage" ${!matchesAll ? 'open' : ''}><summary><span class="chev">${ico('down')}</span>${stage.includes('机') ? '机审节点' : '标注节点'} / ${stage}子任务<span class="sub">${rows.length} 项</span></summary><div class="stage-list">${rows.map((r) => `<div class="entry"><span>${safe(r[1])}</span><span class="mono">BIZ ${safe(r[0])}</span></div>`).join('')}</div></details>`;
-                })
-                .join(
-                  '',
-                )}<button class="link-btn" data-scope-task="${k}">调整${kindNames[k]}送审范围 ${ico('arrow')}</button></div></details>`,
-          )
-          .join('')}`;
-        root.querySelectorAll('[data-jump]').forEach(
-          (b) =>
-            (b.onclick = () => {
-              const k = b.dataset.jump;
-              if (!root.querySelector('[data-task-group="' + k + '"]')) {
-                query = '';
-                qs('#map-input').value = '';
-                paintMapping();
-              }
-              const group = root.querySelector('[data-task-group="' + k + '"]');
-              group.open = true;
-              group.querySelector('summary').focus({ preventScroll: true });
-              group.scrollIntoView({ block: 'center' });
-            }),
-        );
-        root
-          .querySelectorAll('[data-scope-task]')
-          .forEach((b) => (b.onclick = () => showScope(b.dataset.scopeTask)));
+        const records = mediaFilter ? matches.filter((r) => r[3] === mediaFilter) : matches;
+        const filters = [['', '全部素材'], ...Object.entries(kindNames)].map(([key, name]) =>
+          `<button type="button" data-map-media="${key}" aria-pressed="${mediaFilter === key}">${name}</button>`).join('');
+        const nodes = reviewNodes.map((node) => mappedNode(node, records, !!query || !!mediaFilter)).join('');
+        const scopeActions = Object.entries(kindNames).map(([key, name]) =>
+          `<button type="button" class="link-btn" data-scope-task="${key}">调整${name}送审范围 ${ico('arrow')}</button>`).join('');
+        root.innerHTML = `
+          <section class="panel panel-pad mapping">
+            <div><div class="flow-label"><span class="source-mark">BIZ</span>审核流程</div>
+              <div class="flowbox"><span class="id mono">${reviewTask.flowId}</span><strong>${reviewTask.flowName}</strong><span class="dim">所属分组 · 推荐一审</span></div></div>
+            <div class="hops">${ico('arrow')}</div>
+            <div><div class="flow-label"><span class="source-mark nex-mark">NEX</span>执行任务</div>
+              <div class="branch"><button type="button" class="branchrow" data-jump aria-controls="mapped-review-task">
+                <span class="kicon">${ico('mapping')}</span><span class="mapped-task"><strong>${reviewTask.name}</strong>${flowTag}</span><span class="sub">查看节点 ›</span>
+              </button></div><div class="source-caption">图文、视频在同一任务内分配。「所属流程」用于归集数据集和任务，按原流程统计。</div></div>
+          </section>
+          <div class="list-head"><h2>节点与原 BIZ 任务对照</h2><span class="sub">1 个 NEX 任务</span></div>
+          <details class="task-group" id="mapped-review-task" open><summary><span class="chev">${ico('down')}</span>${reviewTask.name}<span class="sub">${records.length} 项匹配</span></summary>
+            <div class="stage-wrap"><div class="seg map-media" role="group" aria-label="筛选原任务的素材类型">${filters}</div>
+              ${nodes || '<p class="sub">当前素材类型无匹配，可切换到全部素材。</p>'}
+              <div class="toolbar">${scopeActions}</div></div>
+          </details>`;
+        root.querySelector('[data-jump]').onclick = () => {
+          const group = root.querySelector('#mapped-review-task');
+          group.open = true;
+          group.querySelector('summary').focus();
+        };
+        root.querySelectorAll('[data-map-media]').forEach((button) => {
+          button.onclick = () => {
+            mediaFilter = button.dataset.mapMedia;
+            paintMapping();
+            root.querySelector(`[data-map-media="${mediaFilter}"]`).focus();
+            announce('已按素材类型筛选原任务');
+          };
+        });
+        root.querySelectorAll('[data-scope-task]').forEach((b) => (b.onclick = () => showScope(b.dataset.scopeTask)));
       }
       function scopeMatches(record, selected) {
         return selected.includes(record[2]);
@@ -1264,15 +1289,15 @@
           before = list.filter((s) => scopeMatches(s, saved)).length,
           after = list.filter((s) => scopeMatches(s, draftScope)).length;
         qs('#scene').innerHTML =
-          `<section class="panel panel-pad filter-panel"><div><span class="sub">所属流程</span>　<strong>105317 · 内容一审流程</strong></div><div class="seg" aria-label="编辑的 NEX 任务">${Object.entries(
+          `<section class="panel panel-pad filter-panel"><div><strong>${reviewTask.name}</strong>　${flowTag}</div><div class="seg" role="group" aria-label="编辑素材的送审范围">${Object.entries(
             kindNames,
           )
             .map(
-              ([k, n]) => `<button data-kind="${k}" aria-pressed="${k === kind}">${ico(k)} ${n}任务</button>`,
+              ([k, n]) => `<button data-kind="${k}" aria-pressed="${k === kind}">${ico(k)} ${n}</button>`,
             )
             .join(
               '',
-            )}</div></section><section class="panel"><div class="panel-pad"><div class="pane-title"><h2>${kindNames[kind]}任务的送审范围</h2><span class="flag">任务级配置</span></div><div>内容类型固定为<strong>${kindNames[kind]}</strong>，来源匹配以下任一渠道。</div><div class="checks" role="group" aria-label="纳入的送审来源">${sources.map((s) => `<label class="check"><input type="checkbox" data-source="${s}" ${draftScope.includes(s) ? 'checked' : ''}>${s}</label>`).join('')}</div><div class="sub">当前生效范围：${saved.join('、')}。</div></div><div class="statebar"><span class="sub">此处只调整数据分配，共享规则仍为 v${model.version}。</span><button id="save-scope" class="btn primary" ${same || !draftScope.length ? 'disabled' : ''}>保存${kindNames[kind]}范围</button></div></section>${flash ? `<p class="note success" role="status">${safe(flash)}</p>` : ''}${!draftScope.length ? '<p class="note warning" role="status">至少保留一个送审来源后才能保存。</p>' : ''}<section class="panel panel-pad"><div class="pane-title"><h2>样本对照</h2><span class="sub">${list.length} 条模拟送审记录</span></div><div class="scope-total"><span class="dim">进入${kindNames[kind]}任务</span><b class="number">${before}</b><span class="arrowtext">→</span><b class="number">${after}</b><span class="sub">条</span></div><div class="table-scroll"><table class="data"><thead><tr><th>内容</th><th>来源</th><th>当前生效</th><th>调整后</th></tr></thead><tbody>${list
+            )}</div></section><section class="panel"><div class="panel-pad"><div class="pane-title"><h2>${kindNames[kind]}送审范围</h2><span class="flag">任务内条件分配</span></div><div>内容类型固定为<strong>${kindNames[kind]}</strong>，来源匹配以下任一渠道。</div><div class="checks" role="group" aria-label="纳入的送审来源">${sources.map((s) => `<label class="check"><input type="checkbox" data-source="${s}" ${draftScope.includes(s) ? 'checked' : ''}>${s}</label>`).join('')}</div><div class="sub">当前生效范围：${saved.join('、')}。</div></div><div class="statebar"><span class="sub">此处只调整数据分配，共享规则仍为 v${model.version}。</span><button id="save-scope" class="btn primary" ${same || !draftScope.length ? 'disabled' : ''}>保存${kindNames[kind]}范围</button></div></section>${flash ? `<p class="note success" role="status">${safe(flash)}</p>` : ''}${!draftScope.length ? '<p class="note warning" role="status">至少保留一个送审来源后才能保存。</p>' : ''}<section class="panel panel-pad"><div class="pane-title"><h2>样本对照</h2><span class="sub">${list.length} 条模拟送审记录</span></div><div class="scope-total"><span class="dim">进入任务的${kindNames[kind]}</span><b class="number">${before}</b><span class="arrowtext">→</span><b class="number">${after}</b><span class="sub">条</span></div><div class="table-scroll"><table class="data"><thead><tr><th>内容</th><th>来源</th><th>当前生效</th><th>调整后</th></tr></thead><tbody>${list
             .map((r) => {
               const old = scopeMatches(r, saved),
                 now = scopeMatches(r, draftScope);
@@ -1280,7 +1305,7 @@
             })
             .join(
               '',
-            )}</tbody></table></div><hr class="smalldiv"><div class="sub">${kindNames[other]}任务独立使用「${model.scopes[other].join('、')}」渠道，本次调整对其影响为 0 条。</div></section>`;
+            )}</tbody></table></div><hr class="smalldiv"><div class="sub">同一任务内，${kindNames[other]}按「${model.scopes[other].join('、')}」渠道送审。</div></section>`;
         qs('#scene')
           .querySelectorAll('[data-kind]')
           .forEach(
@@ -1306,7 +1331,7 @@
           );
         qs('#save-scope').onclick = () => {
           model.scopes[kind] = [...draftScope];
-          flash = `${kindNames[kind]}范围已保存。${before} → ${after} 条模拟记录进入任务，${kindNames[other]}范围和审核规则保持原配置。`;
+          flash = `${kindNames[kind]}范围已保存。${before} → ${after} 条${kindNames[kind]}记录进入${reviewTask.name}。`;
           save();
           renderScope();
           announce(flash);
@@ -1390,15 +1415,15 @@
         const decision = (score, limit) => (score >= limit ? '不通过' : '通过');
         const affected = samples.filter((r) => decision(r[4], threshold) !== decision(r[4], proposed));
         qs('#rule-detail').innerHTML =
-          `${flash ? `<p class="note success" role="status">${safe(flash)}</p>` : ''}<div class="twin"><section class="panel"><div class="panel-pad"><div class="pane-title"><h2>封面清晰度</h2><span class="flag live">v${model.version} 生效中</span></div><div class="sub">推荐审核 / 图片规则 · 演示阈值</div><p>封面模糊分达到阈值，机审结果记为「不通过」。</p><div class="fieldline"><span>当前阈值</span><strong class="mono">${threshold.toFixed(2)}</strong><span class="arrowtext">→</span><label for="proposed">拟调整为</label><select id="proposed" ${pending ? 'disabled' : ''}>${[0.6, 0.7, 0.8, 0.9].map((v) => `<option value="${v}" ${v === proposed ? 'selected' : ''}>${v.toFixed(2)}</option>`).join('')}</select></div></div><div class="statebar"><span class="sub">${pending ? '待审批的新版本' : '默认审批人：演示创建人、琼香'}</span><button class="btn primary" id="submit-rule" ${pending || proposed === threshold ? 'disabled' : ''}>提交审批</button></div></section><section class="panel panel-pad"><div class="pane-title"><h2>被以下子任务引用</h2><span class="sub">2 处</span></div>${Object.keys(
+          `${flash ? `<p class="note success" role="status">${safe(flash)}</p>` : ''}<div class="twin"><section class="panel"><div class="panel-pad"><div class="pane-title"><h2>封面清晰度</h2><span class="flag live">v${model.version} 生效中</span></div><div class="sub">推荐审核 / 图片规则 · 演示阈值</div><p>封面模糊分达到阈值，机审结果记为「不通过」。</p><div class="fieldline"><span>当前阈值</span><strong class="mono">${threshold.toFixed(2)}</strong><span class="arrowtext">→</span><label for="proposed">拟调整为</label><select id="proposed" ${pending ? 'disabled' : ''}>${[0.6, 0.7, 0.8, 0.9].map((v) => `<option value="${v}" ${v === proposed ? 'selected' : ''}>${v.toFixed(2)}</option>`).join('')}</select></div></div><div class="statebar"><span class="sub">${pending ? '待审批的新版本' : '默认审批人：演示创建人、琼香'}</span><button class="btn primary" id="submit-rule" ${pending || proposed === threshold ? 'disabled' : ''}>提交审批</button></div></section><section class="panel panel-pad"><div class="pane-title"><h2>${reviewTask.name}</h2><span class="sub">2 个子任务引用</span></div>${Object.keys(
             kindNames,
           )
             .map(
               (k) =>
-                `<div class="ref-row"><span class="kicon">${ico(k)}</span><div><strong>内容一审 · ${kindNames[k]}</strong><span class="sub">机审 / ${kindNames[k]}兜底子任务 · 生效版本 v${model.version}</span></div></div>`,
+                `<div class="ref-row"><span class="kicon">${ico(k)}</span><div><strong>${kindNames[k]}兜底子任务</strong><span class="sub">机审节点 · BIZ ${k === 'graphic' ? '2031416' : '2031650'} · 生效版本 v${model.version}</span></div></div>`,
             )
             .join('')}</section></div>
-${pending ? `<section class="panel panel-pad approval"><div class="pane-title"><h2>规则变更审批</h2><span class="flag pending">待审批</span></div><p>v${model.version} → v${model.version + 1}　阈值 ${threshold.toFixed(2)} → ${proposed.toFixed(2)}</p><p class="sub">默认审批人：演示创建人（算子创建人）、琼香。当前两个引用仍使用 v${model.version}。</p><div class="toolbar" style="margin-top:12px"><button id="approve-rule" class="btn primary">模拟审批通过</button><button id="reject-rule" class="btn">模拟驳回</button></div></section>` : model.lastChange ? `<section class="panel panel-pad"><div class="pane-title"><h2>最近一次审批</h2><span class="flag ${model.lastChange.status === '通过' ? 'live' : ''}">${model.lastChange.status}</span></div><div>阈值 ${model.lastChange.before.toFixed(2)} → ${model.lastChange.after.toFixed(2)}　·　当前生效 v${model.version}</div></section>` : ''}
+${pending ? `<section class="panel panel-pad approval"><div class="pane-title"><h2>规则变更审批</h2><span class="flag pending">待审批</span></div><p>v${model.version} → v${model.version + 1}　阈值 ${threshold.toFixed(2)} → ${proposed.toFixed(2)}</p><p class="sub">默认审批人：演示创建人（算子创建人）、琼香。两个子任务当前使用 v${model.version}。</p><div class="toolbar" style="margin-top:12px"><button id="approve-rule" class="btn primary">模拟审批通过</button><button id="reject-rule" class="btn">模拟驳回</button></div></section>` : model.lastChange ? `<section class="panel panel-pad"><div class="pane-title"><h2>最近一次审批</h2><span class="flag ${model.lastChange.status === '通过' ? 'live' : ''}">${model.lastChange.status}</span></div><div>阈值 ${model.lastChange.before.toFixed(2)} → ${model.lastChange.after.toFixed(2)}　·　当前生效 v${model.version}</div></section>` : ''}
 <section class="panel panel-pad"><div class="pane-title"><h2>规则试算</h2><span class="sub">12 条固定样本 · ${affected.length} 条结论变化</span></div><div class="table-scroll"><table class="data"><thead><tr><th>样本</th><th>类型</th><th>模糊分</th><th>生效结论</th><th>拟调整后</th></tr></thead><tbody>${samples.map((r) => `<tr><td>${r[3]}</td><td>${kindNames[r[1]]}</td><td class="mono">${r[4].toFixed(2)}</td><td>${decision(r[4], threshold)}</td><td><span class="flag ${decision(r[4], proposed) !== decision(r[4], threshold) ? 'changed' : ''}">${decision(r[4], proposed)}</span></td></tr>`).join('')}</tbody></table></div></section>`;
         qs('#proposed').onchange = (e) => {
           draftThreshold = Number(e.target.value);
@@ -1410,7 +1435,7 @@ ${pending ? `<section class="panel panel-pad approval"><div class="pane-title"><
           if (model.pending || proposed === threshold) return;
           model.pending = { threshold: proposed };
           save();
-          flash = '已提交模拟审批。两个引用任务仍使用原阈值。';
+          flash = '已提交模拟审批。两个子任务仍使用原阈值。';
           renderRule();
           announce(flash);
         };

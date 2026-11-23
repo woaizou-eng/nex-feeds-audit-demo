@@ -204,9 +204,9 @@
       )
       .join('');
     const templateField =
-      '<label class="nx-field">内容一审 · ' +
+      '<label class="nx-field">内容一审任务 / ' +
       model.type +
-      '任务的作业模板<select data-template-id>' +
+      '素材的作业模板<select data-template-id>' +
       Object.entries(models)
         .map(([k, m]) => opt(k, m.template, selectedTemplate))
         .join('') +
@@ -282,7 +282,7 @@
           '</p>') +
       '</div>';
     root.innerHTML =
-      '<div class="nxw nx-stack"><section class="nx-card"><div class="nx-head"><h3>样本与模板</h3><span class="nx-dim">105317 · 图文与视频混合送审</span></div><div class="nx-samples">' +
+      '<div class="nxw nx-stack"><section class="nx-card"><div class="nx-head"><h3>样本与模板</h3><span class="nx-dim">内容一审任务 · 所属流程 105317</span></div><div class="nx-samples">' +
       sourceSamples +
       '</div></section><section class="nx-card"><div class="nx-head"><h3>' +
       (preview ? '审核员作业预览' : '题目与标签配置') +
@@ -473,8 +473,8 @@
       ) +
       '</div><p class="nx-note">' +
       (regular
-        ? '节点内优先判断免审条件。未命中时继续本任务的普通审核。'
-        : '<b>讨论方案</b>　独立建任务，可分别配置免机审和免人审。命中后写对应环节结果。') +
+        ? '105317 内容一审任务在机审、标注节点内判断免审条件。未命中时继续该节点的普通审核。'
+        : '<b>其他场景 · 讨论方案</b>　业务仅需免审时可独立建任务，可分别配置免机审和免人审。命中后写对应环节结果。') +
       '</p>' +
       '<form class="nx-config" data-config><div>' +
       configBox('machine', draft, regular) +
