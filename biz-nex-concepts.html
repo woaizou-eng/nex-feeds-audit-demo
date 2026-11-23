@@ -397,6 +397,23 @@
       .branchrow strong {
         font-size: 14px;
       }
+      .mapped-task {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px 9px;
+        text-align: left;
+      }
+      .flow-tag {
+        display: inline-block;
+        white-space: nowrap;
+        border: 1px solid #b9ded3;
+        border-radius: 999px;
+        padding: 1px 8px;
+        color: #11674f;
+        background: #eff9f5;
+        font-size: 12px;
+      }
       .branchrow .sub {
         margin-left: auto;
       }
@@ -1194,16 +1211,16 @@
         const matchesAll = subset.length === inventory.length,
           heading = query && !matchesAll ? '匹配的子任务' : '任务与子任务';
         let kinds = Object.keys(kindNames).filter((k) => subset.some((row) => row[3] === k));
-        root.innerHTML = `<section class="panel panel-pad mapping"><div><div class="flow-label"><span class="source-mark">BIZ</span>审核流程</div><div class="flowbox"><span class="id mono">105317</span><strong>内容一审流程</strong><span class="dim">所属分组 · 推荐一审<br>两个 NEX 任务均归属此流程，可按旧 ID 核对与汇总</span></div></div><div class="hops">${ico('arrow')}</div><div><div class="flow-label"><span class="source-mark nex-mark">NEX</span>按素材类型拆为 2 个任务</div><div class="branch">${Object.keys(
+        root.innerHTML = `<section class="panel panel-pad mapping"><div><div class="flow-label"><span class="source-mark">BIZ</span>审核流程</div><div class="flowbox"><span class="id mono">105317</span><strong>内容一审流程</strong><span class="dim">所属分组 · 推荐一审</span></div></div><div class="hops">${ico('arrow')}</div><div><div class="flow-label"><span class="source-mark nex-mark">NEX</span>两个任务分别执行图文、视频审核</div><div class="branch">${Object.keys(
           kindNames,
         )
           .map(
             (k) =>
-              `<button class="branchrow" data-jump="${k}" title="展开${kindNames[k]}任务的子任务清单"><span class="kicon">${ico(k)}</span><strong>内容一审 · ${kindNames[k]}</strong><span class="sub">${inventory.filter((i) => i[3] === k).length} 个子任务 ›</span></button>`,
+              `<button class="branchrow" data-jump="${k}" title="展开${kindNames[k]}任务的子任务清单"><span class="kicon">${ico(k)}</span><span class="mapped-task"><strong>内容一审 · ${kindNames[k]}</strong><span class="flow-tag">所属流程 · 105317</span></span><span class="sub">${inventory.filter((i) => i[3] === k).length} 个子任务 ›</span></button>`,
           )
           .join(
             '',
-          )}</div></div></section><div class="list-head"><h2>${heading}</h2><span class="sub">${kinds.length} 个任务 · ${subset.length} 个子任务</span></div>${kinds
+          )}</div><div class="source-caption">「所属流程」是归属标签，用于归集数据集和任务，按原流程统计。</div></div></section><div class="list-head"><h2>${heading}</h2><span class="sub">${kinds.length} 个任务 · ${subset.length} 个子任务</span></div>${kinds
           .map(
             (k) =>
               `<details class="task-group" data-task-group="${k}" ${k === 'graphic' || !matchesAll ? 'open' : ''}><summary><span class="chev">${ico('down')}</span>${ico(k)}内容一审 · ${kindNames[k]}<span class="sub">${subset.filter((i) => i[3] === k).length} 项</span></summary><div class="stage-wrap">${stages
