@@ -1,0 +1,1426 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>信息流迁移工作台 · NEX</title>
+    <style>
+      :root {
+        --ink: #19233b;
+        --mute: #586880;
+        --line: #dee4ed;
+        --paper: #fff;
+        --bg: #f3f5f9;
+        --violet: #4d47de;
+        --active: #eeeefe;
+        --green: #117861;
+        --blue: #3158ab;
+        --sky: #edf4ff;
+        --amber: #935810;
+        --radius: 12px;
+        --font: Inter, -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font: 14px/1.55 var(--font);
+        -webkit-font-smoothing: antialiased;
+      }
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+      button,
+      a,
+      input,
+      select {
+        outline-offset: 3px;
+      }
+      button:focus-visible,
+      a:focus-visible,
+      input:focus-visible,
+      select:focus-visible,
+      summary:focus-visible {
+        outline: 3px solid #7670fb;
+      }
+      button {
+        cursor: pointer;
+      }
+      button:disabled {
+        cursor: not-allowed;
+        opacity: 0.48;
+      }
+      a {
+        color: var(--violet);
+        text-decoration: none;
+      }
+      button {
+        border: 0;
+        background: none;
+        color: inherit;
+      }
+      svg.ui {
+        width: 18px;
+        height: 18px;
+        stroke: currentColor;
+        stroke-width: 1.7;
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        flex: none;
+      }
+      .top {
+        height: 60px;
+        background: white;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 0 28px;
+        position: sticky;
+        top: 0;
+        z-index: 5;
+      }
+      .brand {
+        font: bold italic 28px/1 var(--font);
+        letter-spacing: -2.1px;
+        color: #4740d4;
+      }
+      .barline {
+        height: 18px;
+        border-left: 1px solid var(--line);
+      }
+      .suite {
+        font-size: 14px;
+        font-weight: 650;
+      }
+      .top-end {
+        margin-left: auto;
+        display: flex;
+        gap: 16px;
+        align-items: center;
+      }
+      .demo-pill {
+        font-size: 12px;
+        color: #55518e;
+        background: #f1f0ff;
+        padding: 3px 9px;
+        border-radius: 5px;
+      }
+      .top-link {
+        color: var(--mute);
+        font-size: 13px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .top-link svg {
+        width: 15px;
+        height: 15px;
+      }
+      .wrap {
+        min-height: calc(100vh - 60px);
+        display: grid;
+        grid-template-columns: 218px minmax(0, 1fr);
+      }
+      .rail {
+        border-right: 1px solid var(--line);
+        background: #fbfcfe;
+        padding: 29px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      .rail-inner {
+        position: sticky;
+        top: 86px;
+      }
+      .rail h2 {
+        color: #65738b;
+        font-size: 12px;
+        font-weight: 600;
+        margin: 0 12px 13px;
+        letter-spacing: 0.06em;
+      }
+      .rail nav {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .navitem {
+        width: 100%;
+        border-radius: 8px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        text-align: left;
+        padding: 11px 13px;
+        color: #4d5970;
+        font-weight: 550;
+        white-space: nowrap;
+      }
+      .navitem:hover {
+        background: #f2f3f8;
+      }
+      .navitem[aria-current] {
+        color: var(--violet);
+        background: #eae9ff;
+      }
+      .rail hr {
+        margin: 22px 9px 12px;
+        border: 0;
+        border-top: 1px solid var(--line);
+      }
+      .rail .link {
+        font-size: 13px;
+        font-weight: 450;
+      }
+      .workspace {
+        min-width: 0;
+        width: 100%;
+        max-width: 1480px;
+        margin: 0 auto;
+        padding: 28px clamp(18px, 3.25vw, 54px) 50px;
+      }
+      .crumb {
+        color: var(--mute);
+        font-size: 12px;
+        margin-bottom: 14px;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .crumb b {
+        font-weight: 500;
+        color: #3a4960;
+      }
+      .page-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 23px;
+      }
+      .page-head h1 {
+        margin: 0;
+        font-size: clamp(26px, 2.3vw, 34px);
+        line-height: 1.25;
+        letter-spacing: -0.04em;
+      }
+      .lead {
+        margin: 7px 0 0;
+        color: var(--mute);
+        font-size: 14px;
+      }
+      .link-btn,
+      .btn {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 13px;
+        min-height: 34px;
+        border-radius: 7px;
+        font-weight: 550;
+        font-size: 13px;
+        white-space: nowrap;
+        line-height: 1.45;
+      }
+      .btn {
+        background: #fff;
+        border: 1px solid #cbd3e1;
+        color: #344157;
+      }
+      .btn:hover {
+        background: #f8f9fc;
+      }
+      .btn.primary {
+        background: var(--violet);
+        border-color: var(--violet);
+        color: white;
+      }
+      .btn.amber {
+        color: var(--amber);
+        background: #fff9ed;
+        border-color: #ebd9b7;
+      }
+      .link-btn {
+        color: var(--violet);
+        padding-inline: 3px;
+      }
+      .link-btn:hover,
+      .top-link:hover {
+        text-decoration: underline;
+      }
+      .btn svg {
+        width: 15px;
+        height: 15px;
+      }
+      .panel {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        margin-bottom: 16px;
+        overflow: hidden;
+      }
+      .panel-pad {
+        padding: 20px 23px;
+      }
+      .pane-title {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        margin-bottom: 13px;
+      }
+      .pane-title h2,
+      .panel h2 {
+        font-size: 17px;
+        font-weight: 650;
+        line-height: 1.4;
+        margin: 0;
+        letter-spacing: -0.02em;
+      }
+      .dim,
+      .sub {
+        color: var(--mute);
+      }
+      .sub {
+        font-size: 12px;
+      }
+      .mono {
+        font-variant-numeric: tabular-nums;
+        font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+      }
+      .searchbar {
+        display: flex;
+        gap: 9px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .searchbox {
+        min-width: 195px;
+        max-width: 440px;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: white;
+        border: 1px solid #c7d0dd;
+        padding: 0 10px;
+        border-radius: 7px;
+        color: #8390a3;
+      }
+      .searchbox input {
+        border: 0;
+        outline: 0;
+        width: 100%;
+        min-height: 35px;
+        color: var(--ink);
+        background: transparent;
+      }
+      .searchbox:focus-within {
+        outline: 2px solid #a7a2ff;
+      }
+      .searchbox input:focus-visible {
+        outline: 0;
+      }
+      .source-caption {
+        padding: 7px 0 0;
+        font-size: 12px;
+        color: var(--mute);
+      }
+      .mapping {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 60px minmax(0, 1.16fr);
+        gap: 21px;
+        align-items: center;
+      }
+      .flowbox {
+        background: #f1f6ff;
+        border: 1px solid #ceddf6;
+        border-radius: 10px;
+        padding: 18px 20px;
+      }
+      .flowbox .id {
+        font-size: 13px;
+        color: var(--blue);
+      }
+      .flowbox strong {
+        display: block;
+        font-size: 23px;
+        letter-spacing: -0.035em;
+        margin: 5px 0 8px;
+      }
+      .flowbox .dim {
+        font-size: 13px;
+      }
+      .flow-label {
+        font-weight: 650;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        margin: 0 0 8px;
+        color: #344967;
+      }
+      .hops {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        color: #827ef1;
+      }
+      .hops svg {
+        width: 32px;
+        height: 22px;
+      }
+      .branch {
+        display: grid;
+        gap: 6px;
+      }
+      .branchrow {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 9px 12px;
+        border: 1px solid #dad8fb;
+        background: #f7f6ff;
+        border-radius: 7px;
+      }
+      .branchrow strong {
+        font-size: 14px;
+      }
+      .branchrow .sub {
+        margin-left: auto;
+      }
+      .kicon {
+        width: 29px;
+        height: 29px;
+        display: inline-grid;
+        flex: none;
+        place-items: center;
+        border-radius: 7px;
+        background: #e6e4fc;
+        color: #514bcb;
+      }
+      .seg {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: #f0f2f6;
+        border-radius: 8px;
+        padding: 3px;
+      }
+      .seg button {
+        min-width: 70px;
+        padding: 5px 12px;
+        border-radius: 5px;
+        color: var(--mute);
+        font-weight: 550;
+      }
+      .seg button[aria-pressed='true'] {
+        background: #fff;
+        color: var(--violet);
+        box-shadow: 0 1px 3px #1d264024;
+      }
+      .list-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin: 21px 0 10px;
+      }
+      .list-head h2 {
+        font-size: 17px;
+        margin: 0;
+      }
+      .task-group {
+        margin-bottom: 10px;
+        background: white;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      .task-group > summary,
+      .stage > summary {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        list-style: none;
+      }
+      .task-group summary::-webkit-details-marker {
+        display: none;
+      }
+      .task-group > summary {
+        font-weight: 650;
+        padding: 13px 18px;
+      }
+      .task-group > summary .sub,
+      .stage > summary .sub {
+        margin-left: auto;
+        font-weight: 450;
+      }
+      .chev {
+        display: inline-flex;
+        transform: rotate(-90deg);
+        color: #69768e;
+      }
+      .chev svg {
+        width: 14px;
+        height: 14px;
+      }
+      details[open] > summary > .chev {
+        transform: rotate(0);
+      }
+      .stage-wrap {
+        padding: 0 16px 10px 43px;
+      }
+      .stage {
+        border-top: 1px solid #edf0f5;
+      }
+      .stage > summary {
+        padding: 8px 1px;
+        font-size: 13px;
+      }
+      .stage-list {
+        padding: 0 2px 8px 24px;
+      }
+      .entry {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 145px;
+        align-items: baseline;
+        gap: 10px;
+        padding: 5px 0;
+        border-top: 1px dashed #edf0f4;
+        font-size: 13px;
+        overflow-wrap: anywhere;
+      }
+      .entry .mono {
+        font-size: 12px;
+        color: var(--mute);
+      }
+      .toolbar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .toolbar.end {
+        justify-content: flex-end;
+      }
+      .empty {
+        padding: 22px;
+        text-align: center;
+        color: var(--mute);
+        background: #fafbfc;
+        border: 1px dashed var(--line);
+        border-radius: 8px;
+      }
+      .checks {
+        display: flex;
+        gap: 9px;
+        flex-wrap: wrap;
+        margin: 12px 0;
+      }
+      .check {
+        border: 1px solid #cdd4df;
+        padding: 6px 11px;
+        border-radius: 7px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        background: white;
+      }
+      .check:has(:checked) {
+        background: var(--active);
+        color: var(--violet);
+        border-color: #aca8fd;
+      }
+      input[type='checkbox'] {
+        accent-color: var(--violet);
+      }
+      .note {
+        padding: 10px 13px;
+        border-radius: 7px;
+        background: #f2f6fc;
+        color: #40536d;
+        font-size: 13px;
+        overflow-wrap: anywhere;
+      }
+      .note.success {
+        color: #126950;
+        background: #edf8f3;
+      }
+      .note.warning {
+        color: #7e581b;
+        background: #fff6df;
+      }
+      .scope-total {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        flex-wrap: wrap;
+        margin-bottom: 15px;
+      }
+      .number {
+        font-size: 25px;
+        font-weight: 650;
+        letter-spacing: -0.04em;
+      }
+      .arrowtext {
+        color: #8d98ab;
+      }
+      .flag {
+        display: inline-block;
+        background: #edf1f6;
+        color: #59697d;
+        padding: 2px 7px;
+        border-radius: 5px;
+        font-size: 11px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      .flag.live {
+        background: #e4f4ed;
+        color: #197252;
+      }
+      .flag.pending {
+        background: #fff1ce;
+        color: #835b14;
+      }
+      .flag.changed {
+        background: #eeeaff;
+        color: #5c44ae;
+      }
+      .table-scroll {
+        overflow-x: auto;
+      }
+      .data {
+        width: 100%;
+        border-spacing: 0;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      .data th,
+      .data td {
+        text-align: left;
+        padding: 9px 12px;
+        border-top: 1px solid #e7ebf1;
+        vertical-align: middle;
+      }
+      .data th {
+        background: #f6f8fb;
+        font-size: 12px;
+        color: #5b697f;
+        font-weight: 550;
+        white-space: nowrap;
+      }
+      .data th:first-child,
+      .data td:first-child {
+        padding-left: 4px;
+      }
+      .data tbody tr:hover {
+        background: #fafbfe;
+      }
+      .twin {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(240px, 0.9fr);
+        gap: 16px;
+        align-items: start;
+      }
+      .ref-row {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        border-top: 1px solid var(--line);
+        padding: 12px 0;
+      }
+      .ref-row:first-of-type {
+        border-top: 0;
+      }
+      .ref-row strong {
+        font-weight: 600;
+        display: block;
+      }
+      .fieldline {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        flex-wrap: wrap;
+        margin: 14px 0;
+      }
+      .fieldline select {
+        background: #fff;
+        border: 1px solid #c9d1de;
+        border-radius: 7px;
+        color: var(--ink);
+        padding: 7px 10px;
+      }
+      .vtag {
+        font-size: 12px;
+        color: #6b628e;
+        font-weight: 550;
+      }
+      .statebar {
+        border-top: 1px solid var(--line);
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        flex-wrap: wrap;
+        background: #fbfcfe;
+      }
+      .filter-panel {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .filter-panel label {
+        font-weight: 600;
+      }
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+      .mobile-menu {
+        display: none;
+      }
+      .extra-host {
+        min-width: 0;
+      }
+      .hint {
+        color: var(--mute);
+        font-size: 13px;
+        margin: 10px 0;
+      }
+      .approval {
+        margin-top: 12px;
+      }
+      .approval h3 {
+        font-size: 14px;
+        margin: 0 0 4px;
+      }
+      .approval p {
+        margin: 4px 0;
+      }
+      .overview-link {
+        font-size: 13px;
+      }
+      .actions-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .source-mark {
+        height: 22px;
+        min-width: 34px;
+        display: inline-grid;
+        place-items: center;
+        border-radius: 5px;
+        background: #e4edfc;
+        color: var(--blue);
+        font-size: 11px;
+        font-weight: 700;
+      }
+      .nex-mark {
+        background: #edebfe;
+        color: var(--violet);
+      }
+      .smalldiv {
+        margin: 16px 0;
+        border: 0;
+        border-top: 1px solid var(--line);
+      }
+      .foot {
+        margin-top: 20px;
+        color: var(--mute);
+        font-size: 12px;
+      }
+      @media (max-width: 1100px) {
+        .wrap {
+          grid-template-columns: 175px minmax(0, 1fr);
+        }
+        .rail {
+          padding-inline: 9px;
+        }
+        .workspace {
+          padding-inline: 22px;
+        }
+        .mapping {
+          gap: 10px;
+          grid-template-columns: minmax(0, 1fr) 32px minmax(0, 1.1fr);
+        }
+        .panel-pad {
+          padding: 17px;
+        }
+        .branchrow .sub {
+          white-space: nowrap;
+        }
+        .twin {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      @media (max-width: 770px) {
+        .top {
+          height: 51px;
+          padding: 0 15px;
+          gap: 10px;
+        }
+        .wrap {
+          display: block;
+        }
+        .rail {
+          display: none;
+        }
+        .rail.open {
+          display: block;
+          position: fixed;
+          inset: 51px 0 auto 0;
+          z-index: 6;
+          border-bottom: 1px solid var(--line);
+          box-shadow: 0 5px 12px #19233b18;
+          padding: 12px;
+        }
+        .rail-inner {
+          position: static;
+        }
+        .rail.open h2 {
+          display: none;
+        }
+        .rail.open hr {
+          margin: 7px;
+        }
+        .mobile-menu {
+          display: inline-flex;
+          padding: 3px;
+        }
+        .workspace {
+          padding: 18px 13px 35px;
+        }
+        .top-end {
+          gap: 8px;
+        }
+        .top-link {
+          font-size: 12px;
+        }
+        .suite {
+          font-size: 13px;
+        }
+        .brand {
+          font-size: 23px;
+        }
+        .page-head {
+          align-items: flex-start;
+          margin-bottom: 14px;
+        }
+        .page-head h1 {
+          font-size: 24px;
+        }
+        .lead {
+          font-size: 13px;
+        }
+        .panel-pad {
+          padding: 14px;
+        }
+        .mapping {
+          grid-template-columns: 1fr;
+          gap: 9px;
+        }
+        .hops {
+          display: none;
+        }
+        .flowbox {
+          padding: 10px 12px;
+        }
+        .flowbox strong {
+          font-size: 20px;
+          margin: 2px 0;
+        }
+        .branchrow {
+          padding: 7px 10px;
+        }
+        .twin {
+          grid-template-columns: 1fr;
+          gap: 0;
+        }
+        .crumb {
+          margin-bottom: 9px;
+        }
+        .data td,
+        .data th {
+          padding: 6px 7px;
+        }
+        .task-group > summary {
+          padding: 11px;
+        }
+        .stage-wrap {
+          padding: 0 10px 6px 21px;
+        }
+        .entry {
+          grid-template-columns: minmax(0, 1fr) auto;
+        }
+        .top-end .demo-pill {
+          display: none;
+        }
+        .statebar {
+          padding: 12px;
+        }
+        .branchrow .sub {
+          font-size: 11px;
+        }
+        .top-link svg {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="top">
+      <button
+        class="mobile-menu"
+        aria-expanded="false"
+        aria-controls="sidebar"
+        aria-label="打开导航"
+        id="menu"
+      ></button
+      ><a class="brand" href="#mapping" aria-label="NEX 流程映射">NEX</a><span class="barline"></span
+      ><span class="suite">信息流迁移工作台</span>
+      <div class="top-end">
+        <span class="demo-pill">交互演示</span><a class="top-link" href="./#tasks">完整 Demo ↗</a>
+      </div>
+    </header>
+    <div class="wrap">
+      <aside id="sidebar" class="rail">
+        <div class="rail-inner">
+          <h2>迁移场景</h2>
+          <nav id="nav" aria-label="迁移场景"></nav>
+          <hr />
+          <a class="navitem link" href="biz-nex-concepts.png" target="_blank" rel="noopener" id="diagram"
+            >概念对照图 ↗</a
+          >
+        </div>
+      </aside>
+      <main class="workspace">
+        <div class="crumb"><span>信息流审核</span><span aria-hidden="true">/</span><b id="crumb"></b></div>
+        <header class="page-head">
+          <div>
+            <h1 id="page-title" tabindex="-1"></h1>
+            <p class="lead" id="lead"></p>
+          </div>
+        </header>
+        <div id="scene"></div>
+        <div id="extra-root" class="extra-host" hidden></div>
+        <p class="foot">本页使用演示数据，操作仅保存在当前浏览器。</p>
+        <div class="sr-only" aria-live="polite" id="announcement"></div>
+      </main>
+    </div>
+    <script src="biz-nex-scenarios.js"></script>
+    <script src="biz-nex-datasets.js"></script>
+    <script>
+      'use strict';
+      const icons = {
+        datasets: 'M3 5h18v14H3z M3 10h18 M3 14h18 M9 5v14',
+        mapping: 'M3 5h6v5H3z M15 3h6v5h-6z M15 15h6v5h-6z M9 7.5h3v10h3 M12 5.5h3',
+        scope: 'M4 5h16l-6.5 7.5V19l-3 1v-7.5z',
+        rule: 'M4 5h16 M4 12h16 M4 19h16 M9 3v4 M15 10v4 M10 17v4',
+        template: 'M4 4h16v16H4z M4 9h16 M10 9v11',
+        exemption: 'M12 3l8 3v6c0 4-4 7-8 9-4-2-8-5-8-9V6z M8.5 12l2.5 2.5 4.5-5',
+        graphic: 'M3 4h18v16H3z M3 16l5-5 4 4 3-3 6 6 M15 8h.1',
+        video: 'M3 5h13v14H3z M16 10l5-3v10l-5-3',
+        search: 'M15 15l5 5 M17 10a7 7 0 1 1-14 0 7 7 0 1 1 14 0',
+        down: 'm6 9 6 6 6-6',
+        arrow: 'M3 12h17 M14 6l6 6-6 6',
+        menu: 'M3 5h18 M3 12h18 M3 19h18',
+        check: 'm4 12 5 5 11-11',
+      };
+      const ico = (name) =>
+        `<svg class="ui" viewBox="0 0 24 24" aria-hidden="true"><path d="${icons[name]}"></path></svg>`;
+      const tabs = {
+        mapping: ['流程映射', '按 3.0 的分组、流程或任务 ID，核对 NEX 的承接位置。'],
+        scope: ['送审范围', '分别调整图文和视频的来源，预览哪些样本会进入任务。'],
+        rule: ['共享规则', '修改一次规则，查看引用任务、审批状态和生效后的样本结果。'],
+        template: ['模板与标签', '从数据类型找到作业模板，再到审核员视角查看题目。'],
+        exemption: ['免审配置', '建立仅免审任务，试送一条样本，查看规则命中和结果归属。'],
+        datasets: ['数据集列表', '从列表查看进度、最近操作，并维护送审数据集。'],
+      };
+      const kindNames = { graphic: '图文', video: '视频' },
+        stages = ['免机审', '机审', '免人审', '人审'];
+      const sources = ['逛逛', '光合', '千牛'];
+      const samples = [
+        ['G01', 'graphic', '逛逛', '周末逛花市，三种鲜切花搭配', 0.22],
+        ['G02', 'graphic', '光合', '轻徒步背包实测', 0.73],
+        ['G03', 'graphic', '千牛', '春季露营收纳清单', 0.45],
+        ['G04', 'graphic', '逛逛', '家常酸汤鱼做法', 0.84],
+        ['G05', 'graphic', '光合', '街拍里的留白构图', 0.68],
+        ['G06', 'graphic', '千牛', '小户型书桌布置', 0.58],
+        ['V01', 'video', '逛逛', '三分钟做一份凉面', 0.72],
+        ['V02', 'video', '光合', '山路骑行第一视角', 0.87],
+        ['V03', 'video', '千牛', '通勤保温杯测评', 0.39],
+        ['V04', 'video', '逛逛', '手冲咖啡的水流练习', 0.34],
+        ['V05', 'video', '光合', '夜景人像补光对比', 0.59],
+        ['V06', 'video', '千牛', '阳台香草种植记录', 0.67],
+      ];
+      const inventory = [
+        ['2031414', '一审图文机审任务（处方药）', '机审', 'graphic'],
+        ['2045564', '信息流人审缓存洗白送审-图文', '机审', 'graphic'],
+        ['2045565', '信息流人审缓存洗白送审-视频', '机审', 'video'],
+        ['2070879', '评价内容豁免去重/封面相关性/封面牛皮癣', '机审', 'graphic'],
+        ['2096806', '光合视频（重点商家SSKA/KA/T8/T7及review账号）豁免高召模型', '机审', 'video'],
+        ['2033185', '头图短视频封面变更机审', '机审', 'video'],
+        ['2045140', '一审图文top商家分层任务', '机审', 'graphic'],
+        ['2045143', '一审视频top商家分层任务', '机审', 'video'],
+        ['2031415', '一审图文机审任务（逛逛）', '机审', 'graphic'],
+        ['2031417', '一审视频机审任务（逛逛）', '机审', 'video'],
+        ['2031416', '一审图文机审任务（兜底）', '机审', 'graphic'],
+        ['2031650', '一审视频机审任务（兜底）', '机审', 'video'],
+        ['2087495', '不在池商品关联SA主图放开一审图文--严格审(疑似牛/低/引/AI)', '机审', 'graphic'],
+        ['2087496', '不在池商品关联SA主图放开一审视频--严格审(疑似牛/低/引/AI)', '机审', 'video'],
+        ['2031419', '品牌针对主图豁免910（苹果910，Fendi1005）', '免机审', 'graphic'],
+        ['2098687', '热点图文免机审', '免机审', 'graphic'],
+        ['2098702', '热点视频免机审', '免机审', 'video'],
+        ['2105070', '双11古人aigc免机审_图文', '免机审', 'graphic'],
+        ['2105071', '双11古人aigc免机审_视频', '免机审', 'video'],
+        ['2105360', '千牛子渠道命中高召视频模型_不通过', '免机审', 'video'],
+        ['2109223', 'AI账号命中高准2.0和高召模型图文_不通过', '免机审', 'graphic'],
+        ['2109329', 'AI账号命中高准2.0和高召模型视频_不通过', '免机审', 'video'],
+        ['2031420', '【勿动】淘宝超级直播预告-视频免机审', '免机审', 'video'],
+        ['2063112', '静菡（P0热点、F88、SAB新品）图文任务', '人审', 'graphic'],
+        ['2063116', '静菡（P0热点、F88、SAB新品）视频任务', '人审', 'video'],
+        ['2067733', 'AI素材专审任务（图文）', '人审', 'graphic'],
+        ['2067737', 'AI素材专审任务（视频）', '人审', 'video'],
+        ['2071180', '评价内容豁免去重/封面牛皮癣-图文人审任务', '人审', 'graphic'],
+        ['2097092', 'AI素材高召模型送人审_视频', '人审', 'video'],
+        ['2031421', '一审图文人审任务-top商家特殊', '人审', 'graphic'],
+        ['2031427', '一审视频人审任务-top商家特殊', '人审', 'video'],
+        ['2034473', '一审图文人审任务-大促高优', '人审', 'graphic'],
+        ['2034476', '一审视频人审任务-大促高优', '人审', 'video'],
+        ['2031422', '一审图文人审任务-多品', '人审', 'graphic'],
+        ['2031428', '一审视频人审任务-多品', '人审', 'video'],
+        ['2031423', '一审图文人审任务-开白情趣用品', '人审', 'graphic'],
+        ['2031424', '一审图文人审任务-处方药审核', '人审', 'graphic'],
+        ['2096388', '先发后审图文捞回审核任务', '人审', 'graphic'],
+        ['2096389', '先发后审视频捞回审核任务', '人审', 'video'],
+        ['2048449', '一审图文人审任务-智能派单（引人不适）', '人审', 'graphic'],
+        ['2048452', '一审视频人审任务-智能派单（引人不适）', '人审', 'video'],
+        ['2050910', '一审图文人审任务-智能派单（低俗色情）', '人审', 'graphic'],
+        ['2050911', '一审视频人审任务-智能派单（低俗色情）', '人审', 'video'],
+        ['2063521', '一审图文人审任务-智能派单（牛皮癣）', '人审', 'graphic'],
+        ['2063523', '一审视频人审任务-智能派单（牛皮癣）', '人审', 'video'],
+        ['2063528', '一审视频人审任务-智能派单（PPT）', '人审', 'video'],
+        ['2064418', '一审图文人审任务-智能派单（质量分）', '人审', 'graphic'],
+        ['2064419', '一审视频人审任务-智能派单（质量分）', '人审', 'video'],
+        ['2064420', '一审图文人审任务-智能派单（违禁词）', '人审', 'graphic'],
+        ['2064422', '一审视频人审任务-智能派单（违禁词）', '人审', 'video'],
+        ['2064423', '一审图文人审任务-智能派单（相关性）', '人审', 'graphic'],
+        ['2064424', '一审视频人审任务-智能派单（相关性）', '人审', 'video'],
+        ['2031425', '一审图文人审任务-逛逛', '人审', 'graphic'],
+        ['2031429', '一审视频人审任务-逛逛', '人审', 'video'],
+        ['2031426', '一审图文人审任务-兜底', '人审', 'graphic'],
+        ['2031430', '一审视频人审任务-兜底', '人审', 'video'],
+        ['2072205', '评价内容豁免去重/封面相关性/封面牛皮癣-图文免人审任务', '免人审', 'graphic'],
+        ['2095779', '苹果910一审图文免人审', '免人审', 'graphic'],
+        ['2098696', '热点图文免人审', '免人审', 'graphic'],
+        ['2098698', '热点视频免人审', '免人审', 'video'],
+        ['2105073', '双11古人aigc免人审通过_视频', '免人审', 'video'],
+        ['2105074', '双11古人aigc免人审通过_图文', '免人审', 'graphic'],
+        ['2031431', '一审图文二编免人审任务', '免人审', 'graphic'],
+        ['2031432', '一审图文免人审任务', '免人审', 'graphic'],
+        ['2031433', '一审视频免人审任务', '免人审', 'video'],
+        ['2033213', '头图短视频默认封面从有值变为空值免人审', '免人审', 'video'],
+        ['2081837', '新发商品图文免人审', '免人审', 'graphic'],
+        ['2081838', '新发商品视频免人审', '免人审', 'video'],
+        ['2031435', '【勿动】淘宝超级直播预告-视频免人审', '免人审', 'video'],
+        ['2086692', '不在池商品关联SA主图放开一审图文免人审', '免人审', 'graphic'],
+        ['2087132', '不在池商品关联SA主图放开一审视频免人审', '免人审', 'video'],
+        ['2086919', '一审历史通过免人审', '免人审', 'graphic'],
+        ['2095243', '一审命中黑店铺图文免人审拒绝', '免人审', 'graphic'],
+        ['2095244', '一审命中黑店铺视频免人审拒绝', '免人审', 'video'],
+      ];
+      const storeKey = 'biz-nex-concepts-core-v1';
+      const defaults = {
+        scopes: { graphic: ['逛逛', '光合'], video: ['逛逛', '光合'] },
+        threshold: 0.8,
+        version: 1,
+        pending: null,
+        lastChange: null,
+      };
+      let model;
+      try {
+        model = JSON.parse(localStorage.getItem(storeKey)) || structuredClone(defaults);
+      } catch {
+        model = structuredClone(defaults);
+      }
+      let active = '',
+        query = '',
+        kind = 'graphic',
+        draftScope = [],
+        draftThreshold = model.pending?.threshold ?? model.threshold,
+        flash = '';
+      const qs = (s) => document.querySelector(s);
+      const safe = (s) =>
+        String(s).replace(
+          /[&<>"']/g,
+          (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c],
+        );
+      function save() {
+        try {
+          localStorage.setItem(storeKey, JSON.stringify(model));
+        } catch {
+          announce('浏览器存储不可用，本次修改仅在当前页面有效。');
+        }
+      }
+      function announce(message) {
+        qs('#announcement').textContent = message;
+      }
+      const qty = (a) => a.length;
+      const nav = qs('#nav');
+      nav.innerHTML = Object.entries(tabs)
+        .map(([key, [name]]) => `<a class="navitem" data-nav="${key}" href="#${key}">${ico(key)}${name}</a>`)
+        .join('');
+      qs('#menu').innerHTML = ico('menu');
+      qs('#menu').onclick = () => {
+        let open = qs('#sidebar').classList.toggle('open');
+        qs('#menu').setAttribute('aria-expanded', open);
+        qs('#menu').setAttribute('aria-label', open ? '关闭导航' : '打开导航');
+      };
+      function switchPage(key) {
+        if (!tabs[key]) key = 'mapping';
+        const changed = active !== key;
+        active = key;
+        if (changed) {
+          flash = '';
+          draftScope = [...model.scopes[kind]];
+          draftThreshold = model.pending?.threshold ?? model.threshold;
+        }
+        for (const el of nav.children) {
+          if (el.dataset.nav === key) el.setAttribute('aria-current', 'page');
+          else el.removeAttribute('aria-current');
+        }
+        qs('#sidebar').classList.remove('open');
+        qs('#menu').setAttribute('aria-expanded', 'false');
+        qs('#menu').setAttribute('aria-label', '打开导航');
+        qs('#crumb').textContent = tabs[key][0];
+        qs('#page-title').textContent = tabs[key][0];
+        qs('#lead').textContent = tabs[key][1];
+        const extra = ['template', 'exemption', 'datasets'].includes(key);
+        qs('#extra-root').hidden = !extra;
+        qs('#scene').hidden = extra;
+        if (extra) {
+          if (key === 'datasets' && typeof window.renderDatasets === 'function') {
+            window.renderDatasets(qs('#extra-root'));
+          } else if (key !== 'datasets' && typeof window.renderExtra === 'function') {
+            window.renderExtra(key, qs('#extra-root'));
+          } else {
+            qs('#extra-root').innerHTML = '<p class="empty">场景资源加载失败，请刷新页面。</p>';
+          }
+        } else {
+          qs('#extra-root').innerHTML = '';
+          ({ mapping: renderMapping, scope: renderScope, rule: renderRule })[key]();
+        }
+        if (changed) {
+          window.scrollTo(0, 0);
+          document.title = tabs[key][0] + ' · NEX 信息流迁移工作台';
+        }
+      }
+      window.addEventListener('hashchange', () => switchPage(location.hash.slice(1)));
+      function showScope(type) {
+        kind = type;
+        draftScope = [...model.scopes[kind]];
+        location.hash = 'scope';
+        if (active === 'scope') renderScope();
+      }
+      function searchResults() {
+        const q = query.toLowerCase().trim();
+        return inventory.filter(
+          (i) =>
+            !q ||
+            [i[0], i[1], i[2], kindNames[i[3]], '105317', '推荐一审', '内容一审流程', '80002620'].some((x) =>
+              x.toLowerCase().includes(q),
+            ),
+        );
+      }
+      function renderMapping() {
+        qs('#scene').innerHTML =
+          `<section class="panel panel-pad"><div class="pane-title"><h2>查找流程与任务</h2><span class="sub">BIZ 上线任务清单 · 2026/11/16</span></div><form class="searchbar" id="map-form"><label class="searchbox">${ico('search')}<input type="search" id="map-input" aria-label="分组、旧流程 ID 或旧任务 ID" placeholder="输入分组、旧流程 ID 或旧任务 ID" value="${safe(query)}"></label><button class="btn primary">查询</button><button type="button" class="btn" id="map-reset">重置</button></form></section><div id="matching"></div>`;
+        qs('#map-form').onsubmit = (e) => {
+          e.preventDefault();
+          query = qs('#map-input').value.trim();
+          paintMapping();
+          announce('已更新查询结果');
+        };
+        qs('#map-input').onsearch = (e) => {
+          if (!e.target.value) {
+            query = '';
+            paintMapping();
+          }
+        };
+        qs('#map-reset').onclick = () => {
+          query = '';
+          qs('#map-input').value = '';
+          paintMapping();
+          qs('#map-input').focus();
+        };
+        paintMapping();
+      }
+      function paintMapping() {
+        const subset = searchResults(),
+          root = qs('#matching');
+        if (!subset.length) {
+          root.innerHTML =
+            '<div class="empty">未找到对应记录。可输入旧流程 ID 105317，或输入旧任务 ID 2031414。</div>';
+          return;
+        }
+        const matchesAll = subset.length === inventory.length,
+          heading = query && !matchesAll ? '匹配的子任务' : '任务与子任务';
+        let kinds = Object.keys(kindNames).filter((k) => subset.some((row) => row[3] === k));
+        root.innerHTML = `<section class="panel panel-pad mapping"><div><div class="flow-label"><span class="source-mark">BIZ</span>审核流程</div><div class="flowbox"><span class="id mono">105317</span><strong>内容一审流程</strong><span class="dim">所属分组 · 推荐一审<br>两个 NEX 任务均归属此流程，可按旧 ID 核对与汇总</span></div></div><div class="hops">${ico('arrow')}</div><div><div class="flow-label"><span class="source-mark nex-mark">NEX</span>按素材类型拆为 2 个任务</div><div class="branch">${Object.keys(
+          kindNames,
+        )
+          .map(
+            (k) =>
+              `<button class="branchrow" data-jump="${k}" title="展开${kindNames[k]}任务的子任务清单"><span class="kicon">${ico(k)}</span><strong>内容一审 · ${kindNames[k]}</strong><span class="sub">${inventory.filter((i) => i[3] === k).length} 个子任务 ›</span></button>`,
+          )
+          .join(
+            '',
+          )}</div></div></section><div class="list-head"><h2>${heading}</h2><span class="sub">${kinds.length} 个任务 · ${subset.length} 个子任务</span></div>${kinds
+          .map(
+            (k) =>
+              `<details class="task-group" data-task-group="${k}" ${k === 'graphic' || !matchesAll ? 'open' : ''}><summary><span class="chev">${ico('down')}</span>${ico(k)}内容一审 · ${kindNames[k]}<span class="sub">${subset.filter((i) => i[3] === k).length} 项</span></summary><div class="stage-wrap">${stages
+                .map((stage) => {
+                  const rows = subset.filter((i) => i[3] === k && i[2] === stage);
+                  if (!rows.length) return '';
+                  return `<details class="stage" ${!matchesAll ? 'open' : ''}><summary><span class="chev">${ico('down')}</span>${stage.includes('机') ? '机审节点' : '标注节点'} / ${stage}子任务<span class="sub">${rows.length} 项</span></summary><div class="stage-list">${rows.map((r) => `<div class="entry"><span>${safe(r[1])}</span><span class="mono">BIZ ${safe(r[0])}</span></div>`).join('')}</div></details>`;
+                })
+                .join(
+                  '',
+                )}<button class="link-btn" data-scope-task="${k}">调整${kindNames[k]}送审范围 ${ico('arrow')}</button></div></details>`,
+          )
+          .join('')}`;
+        root.querySelectorAll('[data-jump]').forEach(
+          (b) =>
+            (b.onclick = () => {
+              const k = b.dataset.jump;
+              if (!root.querySelector('[data-task-group="' + k + '"]')) {
+                query = '';
+                qs('#map-input').value = '';
+                paintMapping();
+              }
+              const group = root.querySelector('[data-task-group="' + k + '"]');
+              group.open = true;
+              group.querySelector('summary').focus({ preventScroll: true });
+              group.scrollIntoView({ block: 'center' });
+            }),
+        );
+        root
+          .querySelectorAll('[data-scope-task]')
+          .forEach((b) => (b.onclick = () => showScope(b.dataset.scopeTask)));
+      }
+      function scopeMatches(record, selected) {
+        return selected.includes(record[2]);
+      }
+      function renderScope() {
+        const list = samples.filter((s) => s[1] === kind),
+          other = kind === 'graphic' ? 'video' : 'graphic',
+          same = JSON.stringify([...draftScope].sort()) === JSON.stringify([...model.scopes[kind]].sort()),
+          saved = model.scopes[kind],
+          before = list.filter((s) => scopeMatches(s, saved)).length,
+          after = list.filter((s) => scopeMatches(s, draftScope)).length;
+        qs('#scene').innerHTML =
+          `<section class="panel panel-pad filter-panel"><div><span class="sub">所属流程</span>　<strong>105317 · 内容一审流程</strong></div><div class="seg" aria-label="编辑的 NEX 任务">${Object.entries(
+            kindNames,
+          )
+            .map(
+              ([k, n]) => `<button data-kind="${k}" aria-pressed="${k === kind}">${ico(k)} ${n}任务</button>`,
+            )
+            .join(
+              '',
+            )}</div></section><section class="panel"><div class="panel-pad"><div class="pane-title"><h2>${kindNames[kind]}任务的送审范围</h2><span class="flag">任务级配置</span></div><div>内容类型固定为<strong>${kindNames[kind]}</strong>，来源匹配以下任一渠道。</div><div class="checks" role="group" aria-label="纳入的送审来源">${sources.map((s) => `<label class="check"><input type="checkbox" data-source="${s}" ${draftScope.includes(s) ? 'checked' : ''}>${s}</label>`).join('')}</div><div class="sub">当前生效范围：${saved.join('、')}。</div></div><div class="statebar"><span class="sub">此处只调整数据分配，共享规则仍为 v${model.version}。</span><button id="save-scope" class="btn primary" ${same || !draftScope.length ? 'disabled' : ''}>保存${kindNames[kind]}范围</button></div></section>${flash ? `<p class="note success" role="status">${safe(flash)}</p>` : ''}${!draftScope.length ? '<p class="note warning" role="status">至少保留一个送审来源后才能保存。</p>' : ''}<section class="panel panel-pad"><div class="pane-title"><h2>样本对照</h2><span class="sub">${list.length} 条模拟送审记录</span></div><div class="scope-total"><span class="dim">进入${kindNames[kind]}任务</span><b class="number">${before}</b><span class="arrowtext">→</span><b class="number">${after}</b><span class="sub">条</span></div><div class="table-scroll"><table class="data"><thead><tr><th>内容</th><th>来源</th><th>当前生效</th><th>调整后</th></tr></thead><tbody>${list
+            .map((r) => {
+              const old = scopeMatches(r, saved),
+                now = scopeMatches(r, draftScope);
+              return `<tr><td>${r[3]}</td><td>${r[2]}</td><td>${old ? '进入' : '排除'}</td><td><span class="flag ${now !== old ? 'changed' : now ? 'live' : ''}">${now !== old ? (now ? '新增进入' : '移出范围') : now ? '进入' : '排除'}</span></td></tr>`;
+            })
+            .join(
+              '',
+            )}</tbody></table></div><hr class="smalldiv"><div class="sub">${kindNames[other]}任务独立使用「${model.scopes[other].join('、')}」渠道，本次调整对其影响为 0 条。</div></section>`;
+        qs('#scene')
+          .querySelectorAll('[data-kind]')
+          .forEach(
+            (b) =>
+              (b.onclick = () => {
+                kind = b.dataset.kind;
+                draftScope = [...model.scopes[kind]];
+                flash = '';
+                renderScope();
+                qs(`[data-kind="${kind}"]`).focus();
+              }),
+          );
+        qs('#scene')
+          .querySelectorAll('[data-source]')
+          .forEach(
+            (c) =>
+              (c.onchange = () => {
+                draftScope = sources.filter((x) => qs(`[data-source="${x}"]`).checked);
+                flash = '';
+                renderScope();
+                qs(`[data-source="${c.dataset.source}"]`).focus();
+              }),
+          );
+        qs('#save-scope').onclick = () => {
+          model.scopes[kind] = [...draftScope];
+          flash = `${kindNames[kind]}范围已保存。${before} → ${after} 条模拟记录进入任务，${kindNames[other]}范围和审核规则保持原配置。`;
+          save();
+          renderScope();
+          announce(flash);
+        };
+      }
+      let ruleRange = 'recommended',
+        ruleQuery = '',
+        ruleFocus = 'own';
+      const dictRules = [
+        { id: 'own', name: '封面清晰度', owner: '推荐审核', description: '按封面模糊分识别不清晰素材。' },
+        {
+          id: 'other',
+          name: '商品主图完整性',
+          owner: '商品审核',
+          description: '公开规则，只读。用于判断商品主图是否完整。',
+        },
+      ];
+      function renderRule() {
+        const list = dictRules.filter(
+          (r) =>
+            (ruleRange === 'all' || r.id === 'own') &&
+            (!ruleQuery || [r.name, r.owner].some((s) => s.includes(ruleQuery))),
+        );
+        if (!list.some((r) => r.id === ruleFocus)) ruleFocus = list[0]?.id || '';
+        const results = list
+          .map(
+            (r) =>
+              `<button class="btn ${ruleFocus === r.id ? 'primary' : ''}" data-rule-id="${r.id}" aria-pressed="${ruleFocus === r.id}">${r.name}${r.id === 'other' ? ' · 只读' : ''}</button>`,
+          )
+          .join('');
+        qs('#scene').innerHTML =
+          `<section class="panel panel-pad"><div class="pane-title"><h2>规则目录</h2><div class="seg" aria-label="可见范围"><button data-range="recommended" aria-pressed="${ruleRange === 'recommended'}">推荐审核</button><button data-range="all" aria-pressed="${ruleRange === 'all'}">全部可见</button></div></div><form class="searchbar" id="rule-search-form"><label class="searchbox">${ico('search')}<input type="search" id="rule-search" value="${safe(ruleQuery)}" aria-label="检索规则" placeholder="搜索规则或所属业务"></label><button class="btn">查询</button>${ruleQuery ? '<button type="button" class="link-btn" id="clear-rule">清除</button>' : ''}</form><div class="toolbar" style="margin-top:12px">${results || '<span class="dim">没有匹配规则。</span>'}</div></section><div id="rule-detail"></div>`;
+        qs('#scene')
+          .querySelectorAll('[data-range]')
+          .forEach(
+            (b) =>
+              (b.onclick = () => {
+                ruleRange = b.dataset.range;
+                flash = '';
+                renderRule();
+              }),
+          );
+        qs('#rule-search-form').onsubmit = (e) => {
+          e.preventDefault();
+          ruleQuery = qs('#rule-search').value.trim();
+          flash = '';
+          renderRule();
+          announce('已更新规则查询结果');
+        };
+        qs('#rule-search').onsearch = (e) => {
+          if (!e.target.value) {
+            ruleQuery = '';
+            renderRule();
+          }
+        };
+        if (qs('#clear-rule'))
+          qs('#clear-rule').onclick = () => {
+            ruleQuery = '';
+            renderRule();
+            qs('#rule-search').focus();
+          };
+        qs('#scene')
+          .querySelectorAll('[data-rule-id]')
+          .forEach(
+            (b) =>
+              (b.onclick = () => {
+                ruleFocus = b.dataset.ruleId;
+                flash = '';
+                renderRule();
+              }),
+          );
+        if (ruleFocus === 'other') {
+          qs('#rule-detail').innerHTML =
+            '<section class="panel panel-pad"><div class="pane-title"><h2>商品主图完整性</h2><span class="flag">只读</span></div><p>所属业务为商品审核。这条规则在当前空间公开可见，编辑权归创建方。</p><p class="sub">扩大列表的查询范围不会改变编辑权限。</p></section>';
+          return;
+        }
+        if (ruleFocus !== 'own') return;
+        const pending = model.pending,
+          proposed = pending?.threshold ?? draftThreshold,
+          threshold = model.threshold;
+        const decision = (score, limit) => (score >= limit ? '不通过' : '通过');
+        const affected = samples.filter((r) => decision(r[4], threshold) !== decision(r[4], proposed));
+        qs('#rule-detail').innerHTML =
+          `${flash ? `<p class="note success" role="status">${safe(flash)}</p>` : ''}<div class="twin"><section class="panel"><div class="panel-pad"><div class="pane-title"><h2>封面清晰度</h2><span class="flag live">v${model.version} 生效中</span></div><div class="sub">推荐审核 / 图片规则 · 演示阈值</div><p>封面模糊分达到阈值，机审结果记为「不通过」。</p><div class="fieldline"><span>当前阈值</span><strong class="mono">${threshold.toFixed(2)}</strong><span class="arrowtext">→</span><label for="proposed">拟调整为</label><select id="proposed" ${pending ? 'disabled' : ''}>${[0.6, 0.7, 0.8, 0.9].map((v) => `<option value="${v}" ${v === proposed ? 'selected' : ''}>${v.toFixed(2)}</option>`).join('')}</select></div></div><div class="statebar"><span class="sub">${pending ? '待审批的新版本' : '默认审批人：演示创建人、琼香'}</span><button class="btn primary" id="submit-rule" ${pending || proposed === threshold ? 'disabled' : ''}>提交审批</button></div></section><section class="panel panel-pad"><div class="pane-title"><h2>被以下子任务引用</h2><span class="sub">2 处</span></div>${Object.keys(
+            kindNames,
+          )
+            .map(
+              (k) =>
+                `<div class="ref-row"><span class="kicon">${ico(k)}</span><div><strong>内容一审 · ${kindNames[k]}</strong><span class="sub">机审 / ${kindNames[k]}兜底子任务 · 生效版本 v${model.version}</span></div></div>`,
+            )
+            .join('')}</section></div>
+${pending ? `<section class="panel panel-pad approval"><div class="pane-title"><h2>规则变更审批</h2><span class="flag pending">待审批</span></div><p>v${model.version} → v${model.version + 1}　阈值 ${threshold.toFixed(2)} → ${proposed.toFixed(2)}</p><p class="sub">默认审批人：演示创建人（算子创建人）、琼香。当前两个引用仍使用 v${model.version}。</p><div class="toolbar" style="margin-top:12px"><button id="approve-rule" class="btn primary">模拟审批通过</button><button id="reject-rule" class="btn">模拟驳回</button></div></section>` : model.lastChange ? `<section class="panel panel-pad"><div class="pane-title"><h2>最近一次审批</h2><span class="flag ${model.lastChange.status === '通过' ? 'live' : ''}">${model.lastChange.status}</span></div><div>阈值 ${model.lastChange.before.toFixed(2)} → ${model.lastChange.after.toFixed(2)}　·　当前生效 v${model.version}</div></section>` : ''}
+<section class="panel panel-pad"><div class="pane-title"><h2>规则试算</h2><span class="sub">12 条固定样本 · ${affected.length} 条结论变化</span></div><div class="table-scroll"><table class="data"><thead><tr><th>样本</th><th>类型</th><th>模糊分</th><th>生效结论</th><th>拟调整后</th></tr></thead><tbody>${samples.map((r) => `<tr><td>${r[3]}</td><td>${kindNames[r[1]]}</td><td class="mono">${r[4].toFixed(2)}</td><td>${decision(r[4], threshold)}</td><td><span class="flag ${decision(r[4], proposed) !== decision(r[4], threshold) ? 'changed' : ''}">${decision(r[4], proposed)}</span></td></tr>`).join('')}</tbody></table></div></section>`;
+        qs('#proposed').onchange = (e) => {
+          draftThreshold = Number(e.target.value);
+          flash = '';
+          renderRule();
+          qs('#proposed').focus();
+        };
+        qs('#submit-rule').onclick = () => {
+          if (model.pending || proposed === threshold) return;
+          model.pending = { threshold: proposed };
+          save();
+          flash = '已提交模拟审批。两个引用任务仍使用原阈值。';
+          renderRule();
+          announce(flash);
+        };
+        if (pending) {
+          qs('#approve-rule').onclick = () => settleRule(true);
+          qs('#reject-rule').onclick = () => settleRule(false);
+        }
+      }
+      function settleRule(approved) {
+        if (!model.pending) return;
+        const before = model.threshold,
+          after = model.pending.threshold;
+        model.lastChange = { before, after, status: approved ? '通过' : '驳回' };
+        if (approved) {
+          model.version++;
+          model.threshold = after;
+        }
+        model.pending = null;
+        draftThreshold = model.threshold;
+        save();
+        flash = approved
+          ? `审批通过，两处引用均已使用 v${model.version}。阈值从 ${before.toFixed(2)} 更新至 ${after.toFixed(2)}。`
+          : `变更已驳回，两处引用继续使用 v${model.version}。`;
+        renderRule();
+        announce(flash);
+      }
+      switchPage(location.hash.slice(1) || 'mapping');
+    </script>
+  </body>
+</html>
