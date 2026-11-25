@@ -4147,6 +4147,39 @@ span.v6-new,
 #task-detail-body .r16-record-table td:last-child,#task-detail-body .r16-record-table th:last-child{width:184px;min-width:184px;max-width:184px;white-space:normal}.r16-row-actions{display:flex;flex-wrap:wrap;gap:8px 10px;max-width:154px}.r16-row-actions button.action{margin:0!important;padding:0;display:inline-block}
 </style>
 <style id="rev18-media">#task-detail-body .r16-record-table .r5-media-cell:has(.r5-media-expanded){width:244px;min-width:244px;max-width:244px}</style>
+<style id="nex-filtered-result-table">
+#task-detail-body .r25-result-scroll{max-width:100%;overflow:auto;border:1px solid #dfe5ef;border-radius:10px;background:#fff;isolation:isolate;max-height:min(64vh,680px)}
+#task-detail-body .r25-result-scroll:focus-visible{outline:2px solid #545fea;outline-offset:2px}
+#task-detail-body .r16-record-table{border-collapse:separate;border-spacing:0;font-size:13px}
+#task-detail-body .r16-record-table :is(th,td){box-sizing:border-box;border:0;border-bottom:1px solid #e9edf4;padding:11px 14px;vertical-align:middle;text-align:left}
+#task-detail-body .r16-record-table th{position:sticky;top:0;z-index:2;background:#f3f6fb;color:#445470;font-size:12px;font-weight:650}
+#task-detail-body .r16-record-table tbody tr{--result-row:#fff}
+#task-detail-body .r16-record-table tbody tr:nth-child(even){--result-row:#fbfcff}
+#task-detail-body .r16-record-table tbody tr:hover{--result-row:#f3f6ff}
+#task-detail-body .r16-record-table tbody tr:has([data-r16-select]:checked){--result-row:#eef0ff}
+#task-detail-body .r16-record-table tbody td{background:var(--result-row);color:#34415a}
+#task-detail-body .r16-record-table tbody tr:last-child td{border-bottom:0}
+#task-detail-body .r16-record-table .r25-result-pick{min-width:44px;width:44px;text-align:center;position:sticky;left:0;z-index:1;box-shadow:1px 0 #e8edf5}
+#task-detail-body .r16-record-table th.r25-result-pick{z-index:3}
+#task-detail-body .r16-record-table input[type=checkbox]{margin:0;accent-color:#545fea}
+#task-detail-body .r25-result-scroll .r16-record-table .r5-media-cell{width:154px;min-width:154px;max-width:154px}
+#task-detail-body .r25-result-scroll .r5-media-expanded{width:124px}
+#task-detail-body .r25-result-scroll .r5-media-expanded>img,#task-detail-body .r25-result-scroll .r5-media-expanded>video{height:86px}
+#task-detail-body .r16-record-table td[data-result-col="title"]{min-width:150px;max-width:230px;white-space:normal;overflow-wrap:anywhere;color:#182643;font-weight:650}
+#task-detail-body .r16-record-table td[data-result-col="contentId"]{font-variant-numeric:tabular-nums;color:#526382}
+#task-detail-body .r16-record-table td[data-result-col$="At"],#task-detail-body .r16-record-table td[data-result-col="sent"]{font-variant-numeric:tabular-nums;color:#53617a}
+#task-detail-body .r16-record-table td.r25-result-missing{color:#626f86}
+.r25-result-status{display:inline-flex;align-items:center;border-radius:999px;padding:3px 8px;font-size:12px;font-weight:600;background:#eaf0fb;color:#334d77}
+.r25-result-status.pass{background:#e4f5ed;color:#176548}.r25-result-status.reject{background:#fcebed;color:#a8283e}.r25-result-status.pending{background:#fff2d9;color:#815100}
+#task-detail-body .r16-record-table .r25-result-actions{width:174px;min-width:174px;max-width:174px}
+#task-detail-body .r16-record-table .r16-row-actions{gap:6px 9px;line-height:1.4}
+#task-detail-body .r16-record-table .r16-row-actions [data-detail-record]{border:1px solid #d6dfff;background:#f0f3ff;border-radius:5px;padding:3px 7px!important}
+#task-detail-body .r16-record-table .r25-result-empty{text-align:center;color:#526382;padding:34px 16px}
+@media(min-width:1050px){
+#task-detail-body .r16-record-table .r25-result-actions{position:sticky;right:0;z-index:1;box-shadow:-1px 0 #e5eaf4}
+#task-detail-body .r16-record-table th.r25-result-actions{z-index:3}
+}
+</style>
 <style id="rev18-summary">.task-detail-summary{grid-template-columns:minmax(290px,4fr) minmax(590px,6fr);align-items:stretch;gap:12px}.r18-detail-meters{display:flex;align-items:stretch;gap:0;padding:18px 8px!important;min-width:0}.r18-detail-meters .r18-summary-column{flex:1;min-width:0;padding:0 12px;border-right:1px solid #edf0f5}.r18-detail-meters .r18-summary-column:last-child{border-right:0}.r18-summary-head{border:0;background:transparent;text-align:left;color:inherit;width:100%;padding:0 0 12px;min-height:76px;display:block}.r18-summary-head:is(button){cursor:pointer}.r18-detail-meters .r18-summary-head span{font-size:12px;color:#7b8ba8;white-space:nowrap}.r18-detail-meters .r18-summary-head b{font-size:19px;font-weight:600;color:#26324b;line-height:1.3;margin:9px 0 7px}.r18-detail-meters .r18-summary-head progress{display:block;width:100%;max-width:100px;height:4px;accent-color:#59b284}.r18-summary-statuses{display:grid;gap:1px;border-top:1px solid #f0f2f7;padding-top:8px}.r18-summary-statuses button{border:0;background:transparent;display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;border-radius:4px;cursor:pointer;text-align:left;padding:5px 4px;min-height:25px}.r18-detail-meters .r18-summary-statuses span{font-size:12px;color:#8791a4;white-space:nowrap}.r18-summary-statuses strong{font-size:13px;font-weight:550;color:#44526a;font-variant-numeric:tabular-nums}.r18-summary-statuses button:hover,.r18-summary-statuses button.selected{background:#f0efff}.r18-summary-statuses button.selected span,.r18-summary-statuses button.selected strong{color:#6258ef}.r18-summary-head[aria-pressed=true] b{color:#6258ef}.r18-summary-statuses button:focus-visible,.r18-summary-head:focus-visible{outline:2px solid #7971f9;outline-offset:2px}.r18-list-scope{display:flex;align-items:center;gap:12px;margin:14px 0 0;font-size:12px;color:#7a8395}.r18-list-scope strong{font-weight:500;color:#5c53da;background:#f1efff;padding:4px 9px;border-radius:4px}.r18-list-scope .action{font-size:12px}.task-detail-summary>.task-detail-card:first-child{display:flex;flex-direction:column;justify-content:center}.r18-detail-meters .r18-summary-column:only-child{max-width:260px}.task-detail .r16-listbar{margin-top:14px}@media(max-width:1200px){.task-detail-summary{grid-template-columns:1fr}.r18-detail-meters .r18-summary-column{padding:0 18px}.r18-summary-statuses{grid-template-columns:1fr}}@media(max-width:640px){.r18-detail-meters{flex-wrap:wrap;row-gap:20px}.r18-detail-meters .r18-summary-column{flex-basis:50%;padding:0 12px;box-sizing:border-box}.r18-detail-meters .r18-summary-column:nth-child(2n){border:0}}
 </style>
 <style id="rev18-filter-entry">.r18-filter-dialog{width:min(980px,96vw)!important}.r18-filter-tabs{margin:0 0 18px!important;display:flex;gap:24px;border-bottom:1px solid #e7eaf1}.r18-filter-tabs button{padding:12px 0;border:0;border-bottom:2px solid transparent;background:none;color:#7c8498;font-size:14px;cursor:pointer}.r18-filter-tabs button[aria-selected=true]{color:#5149d9;border-bottom-color:#6258ef}.r18-filter-help{font-size:12px;color:#7d879b;margin:0 0 18px}.r18-filter-dialog .r16-filter-config{gap:17px;max-height:58vh;padding-bottom:12px}.r18-filter-dialog [hidden]{display:none!important}.r18-filter-dialog #r16-rules>.expression:empty{display:none}.r18-filter-dialog .flow-group{margin-bottom:12px}.r18-filter-dialog #r18-filter-error:empty{display:none}</style>
@@ -11728,7 +11761,20 @@ function r25RecordActions(task,r){
 function r25TaskRecords(task,found,state,keys,cell){
   const pick=r=>'<input type="checkbox" data-r16-select="'+esc(r.id)+'" aria-label="选择 '+esc(r.id)+'" '+(state.selected.includes(r.id)?'checked':'')+'>';
   const all='<input type="checkbox" id="r16-select-all" aria-label="选择当前筛选全部数据" '+(found.length&&state.selected.length===found.length?'checked':'')+'>';
-  if(state.presentation==='flat')return '<div class="tablewrap"><table class="detail-table r16-record-table"><thead><tr><th>'+all+'</th>'+keys.map(k=>'<th>'+esc(detailColumns[k])+'</th>').join('')+'<th>操作</th></tr></thead><tbody>'+found.map(r=>'<tr><td>'+pick(r)+'</td>'+keys.map(k=>'<td class="'+(['video','gallery'].includes(k)?'r5-media-cell':'')+'">'+(['video','gallery'].includes(k)?viewMediaCell(task,r,k):esc(cell(r,k)))+'</td>').join('')+'<td><div class="r16-row-actions">'+r25RecordActions(task,r)+'</div></td></tr>').join('')+(!found.length?'<tr><td colspan="'+(keys.length+2)+'" class="empty">暂无符合条件的数据</td></tr>':'')+'</tbody></table></div>';
+  if(state.presentation==='flat'){
+    const renderCell=(r,k)=>{
+      const media=['video','gallery'].includes(k),val=media?'':cell(r,k);
+      const status=['auditResult','auditStatus','status'].includes(k)&&val!=='—'&&val;
+      const tone=status==='通过'||status==='已完成'?'pass':status==='不通过'?'reject':/^(待|未)/.test(status||'')?'pending':'';
+      return '<td data-result-col="'+esc(k)+'" class="'+(media?'r5-media-cell':val==='—'?'r25-result-missing':'')+'">'+
+        (media?viewMediaCell(task,r,k):status?'<span class="r25-result-status '+tone+'">'+esc(val)+'</span>':esc(val))+'</td>';
+    };
+    const header='<th class="r25-result-pick" scope="col">'+all+'</th>'+keys.map(k=>'<th scope="col">'+esc(detailColumns[k])+'</th>').join('')+'<th class="r25-result-actions" scope="col">操作</th>';
+    const body=found.length?found.map(r=>'<tr><td class="r25-result-pick">'+pick(r)+'</td>'+keys.map(k=>renderCell(r,k)).join('')+
+      '<td class="r25-result-actions"><div class="r16-row-actions">'+r25RecordActions(task,r)+'</div></td></tr>').join(''):
+      '<tr><td colspan="'+(keys.length+2)+'" class="r25-result-empty">暂无符合条件的数据</td></tr>';
+    return '<div class="tablewrap r25-result-scroll" role="region" aria-label="筛选结果表格" tabindex="0"><table class="detail-table r16-record-table"><thead><tr>'+header+'</tr></thead><tbody>'+body+'</tbody></table></div>';
+  }
   return '<label class="r25-select-all">'+all+' 选择当前筛选全部数据</label><div class="r25-record-grid r26-biz-grid">'+found.map(r=>{
     const media=viewRecordMedia(r),hasVideo=!!media.video&&r.contentType!=='图文',result=r16FinalResult(r),kind=result==='通过'?'pass':result==='不通过'?'reject':result?'grade':'pending';
     const title=viewCaseIdentity(r,'title'),account=viewCaseIdentity(r,'account'),id=r16FieldValue(task,r,'contentId'),time=r16FieldValue(task,r,'auditedAt'),reviewer=r16FieldValue(task,r,'reviewer');
